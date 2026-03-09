@@ -174,3 +174,37 @@ Para correr comandos con `--prefix`:
 
 - `frontend/test-results/.last-run.json` es un archivo temporal de Playwright.
 - Si aparece como cambio local, no es código funcional del proyecto.
+
+Git (trabajo normal en tu rama)
+
+git checkout dev_nebeltran
+git pull origin dev_nebeltran
+git add .
+git commit -m "tu cambio"
+git push origin dev_nebeltran
+Pasar cambios a develop
+
+git checkout develop
+git pull origin develop
+git merge dev_nebeltran
+git push origin develop
+Pasar cambios a producción (main)
+
+git checkout main
+git pull origin main
+git merge develop
+git push origin main
+Correr proyecto
+
+Backend: npm run backend:start
+Frontend: npm run frontend:dev
+Correr tests
+
+npm run test:e2e
+UI tests: npm run test:e2e:ui
+Si npm falla en PowerShell (Windows)
+
+$env:Path = 'C:\Program Files\nodejs;' + $env:Path
+& 'C:\Program Files\nodejs\npm.cmd' run backend:start
+& 'C:\Program Files\nodejs\npm.cmd' run frontend:dev
+& 'C:\Program Files\nodejs\npm.cmd' run test:e2e
