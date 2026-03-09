@@ -1,9 +1,7 @@
 import { test, expect } from '@playwright/test'
 
-const baseUrl = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:4173'
-
 test('formulario de login: validación de campos requeridos', async ({ page }) => {
-  await page.goto(baseUrl)
+  await page.goto('/')
 
   await page.getByRole('link', { name: 'Inscríbete' }).click()
   await page.getByRole('button', { name: 'Continuar' }).click()
@@ -13,7 +11,19 @@ test('formulario de login: validación de campos requeridos', async ({ page }) =
 })
 
 test('formulario de login: credenciales válidas', async ({ page }) => {
-  await page.goto(baseUrl)
+  await page.route('**/api/auth/login', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok: true,
+        message: 'Inicio de sesión exitoso.',
+        user: { id: 1, email: 'usuario@test.com', fullName: 'Usuario Test' }
+      })
+    })
+  })
+
+  await page.goto('/')
 
   await page.getByRole('link', { name: 'Inscríbete' }).click()
   await page.fill('#auth-login-email', 'usuario@test.com')
