@@ -788,6 +788,8 @@
       <button id="auth-tab-register" class="auth-tab" type="button" onclick="showAuthTab('register')">Registrarse</button>
     </div>
 
+    <p class="auth-info" id="auth-global-message"></p>
+
     <form id="auth-login-form" class="auth-form" onsubmit="submitLogin(event)" novalidate>
       <label class="form-label-custom">Correo electrónico</label>
       <input class="form-input" type="email" id="auth-login-email" placeholder="correo@ejemplo.com" required>
@@ -930,7 +932,16 @@ function clearLoginErrors() {
   if (passwordError) passwordError.textContent = '';
 }
 
-function submitLogin(event) {
+function setAuthMessage(message = '', type = 'default') {
+  const el = document.getElementById('auth-global-message');
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove('error', 'success');
+  if (type === 'error') el.classList.add('error');
+  if (type === 'success') el.classList.add('success');
+}
+
+async function submitLogin(event) {
   event.preventDefault();
 
   const emailInput = document.getElementById('auth-login-email');
@@ -955,22 +966,87 @@ function submitLogin(event) {
     hasErrors = true;
   }
 
-  if (hasErrors) return;
-
-  closeAuthModal();
-  navigate('boletas');
-}
-
-function submitRegister(event) {
-  event.preventDefault();
-  const pass = document.getElementById('auth-register-password')?.value || '';
-  const confirm = document.getElementById('auth-register-confirm')?.value || '';
-  if (pass !== confirm) {
-    alert('Las contraseñas no coinciden.');
+  if (hasErrors) {
+    setAuthMessage('Completa los campos obligatorios.', 'error');
     return;
   }
-  closeAuthModal();
-  navigate('boletas');
+
+  try {
+    setAuthMessage('Validando credenciales...');
+    const response = await fetch('http://127.0.0.1:3000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: emailValue,
+        password: passwordValue
+      })
+    });
+
+    const payload = await response.json();
+    if (!response.ok || !payload.ok) {
+      setAuthMessage(payload.message || 'No fue posible iniciar sesión.', 'error');
+      return;
+    }
+
+    setAuthMessage('Inicio de sesión exitoso.', 'success');
+    closeAuthModal();
+    navigate('boletas');
+  } catch (_error) {
+    setAuthMessage('No hay conexión con el servidor backend.', 'error');
+  }
+}
+
+async function submitRegister(event) {
+  event.preventDefault();
+  const fullName = document.getElementById('auth-register-name')?.value?.trim() || '';
+  const email = document.getElementById('auth-register-email')?.value?.trim() || '';
+  const pass = document.getElementById('auth-register-password')?.value || '';
+  const confirm = document.getElementById('auth-register-confirm')?.value || '';
+
+  if (!fullName) {
+    setAuthMessage('El nombre es obligatorio.', 'error');
+    return;
+  }
+
+  if (!email) {
+    setAuthMessage('El correo es obligatorio.', 'error');
+    return;
+  }
+
+  if (!pass) {
+    setAuthMessage('La contraseña es obligatoria.', 'error');
+    return;
+  }
+
+  if (pass !== confirm) {
+    setAuthMessage('Las contraseñas no coinciden.', 'error');
+    return;
+  }
+
+  try {
+    setAuthMessage('Creando cuenta...');
+    const response = await fetch('http://127.0.0.1:3000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName,
+        email,
+        password: pass
+      })
+    });
+
+    const payload = await response.json();
+    if (!response.ok || !payload.ok) {
+      setAuthMessage(payload.message || 'No fue posible registrar el usuario.', 'error');
+      return;
+    }
+
+    setAuthMessage('Cuenta creada correctamente.', 'success');
+    closeAuthModal();
+    navigate('boletas');
+  } catch (_error) {
+    setAuthMessage('No hay conexión con el servidor backend.', 'error');
+  }
 }
 
 document.addEventListener('keydown', (e) => {

@@ -1103,6 +1103,14 @@ body {
   background: var(--gold);
 }
 .auth-form .btn-primary { width: 100%; justify-content: center; }
+.auth-info {
+  min-height: 20px;
+  margin: 6px 0 6px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.65);
+}
+.auth-info.error { color: #ff9a9a; }
+.auth-info.success { color: #9dffbf; }
 .auth-error {
   min-height: 16px;
   margin-top: 6px;
