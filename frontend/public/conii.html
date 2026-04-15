@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONIITI 2025 — Congreso Internacional de Innovación y Tendencias en Ingeniería</title>
+
+<!-- Bulma CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Raleway:wght@200;300;400;600;700;900&family=Noto+Serif+Display:ital,wght@0,100;1,100;1,200&display=swap" rel="stylesheet">
+<!-- Custom CSS -->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════
+     NAVBAR
+═══════════════════════════════ -->
+<nav class="coniiti-navbar" id="main-nav">
+  <div class="navbar-inner">
+
+    <!-- Brand -->
+    <a class="brand" onclick="navigate('inicio')">
+      <span class="brand-mark">CONIITI</span>
+      <span class="brand-year">Bogotá · 2025</span>
+    </a>
+
+    <!-- Nav Links -->
+    <ul class="nav-links">
+      <li class="has-dropdown">
+        <button id="nav-inicio" class="active">
+          Inicio <i class="bi bi-chevron-down ms-1" style="font-size:.5rem;"></i>
+        </button>
+        <div class="nav-dropdown">
+          <a onclick="navigate('inicio'); sscroll('sec-fechas')"><span class="dot"></span> Fechas importantes</a>
+          <a onclick="navigate('inicio'); sscroll('sec-countdown')"><span class="dot"></span> Cuenta regresiva</a>
+          <a onclick="navigate('inicio'); sscroll('sec-speakers')"><span class="dot"></span> Conferencistas</a>
+          <a onclick="navigate('inicio'); sscroll('sec-sponsors')"><span class="dot"></span> Patrocinadores</a>
+          <a onclick="navigate('inicio'); sscroll('sec-pais')"><span class="dot"></span> País invitado</a>
+          <a onclick="navigate('inicio'); sscroll('sec-mapa')"><span class="dot"></span> Localización</a>
+        </div>
+      </li>
+      <!--
+      <li><a id="nav-cronograma" onclick="navigate('cronograma')" href="#">Cronograma</a></li>
+      <li><a id="nav-boletas"    onclick="navigate('boletas')"    href="#">Boletas</a></li>
+      <li><a id="nav-lineas"     onclick="navigate('lineas')"     href="#">Líneas temáticas</a></li>
+      <li><a id="nav-acerca"     onclick="navigate('acerca')"     href="#">Acerca de</a></li>
+      <li><a id="nav-contacto"   onclick="navigate('contacto')"   href="#">Contacto</a></li>
+      -->
+      <li><a class="nav-cta" onclick="openAuthModal(event)" href="#">Inscríbete</a></li>
+    </ul>
+
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════
+     PAGE: INICIO
+═══════════════════════════════ -->
+<div class="page active" id="page-inicio">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-stripe">
+      <div style="background:#009246;"></div>
+      <div style="background:#ffffff; opacity:.6;"></div>
+      <div style="background:#ce2b37;"></div>
+    </div>
+    <div class="hero-grid"></div>
+    <div class="hero-noise"></div>
+    <div class="glow glow-gold"></div>
+    <div class="glow glow-teal"></div>
+    <div class="hero-bg-text">CONIITI</div>
+
+    <div class="container" style="width:100%; max-width:1340px; padding:0 60px; position:relative; z-index:2;">
+      <div class="columns is-vcentered" style="min-height:calc(100vh - 170px); padding-top:60px;">
+        <div class="column is-8-widescreen is-10-desktop">
+
+          <div class="hero-overline">
+            <span class="hero-overline-bar"></span>
+            <span class="hero-overline-text">Universidad Católica de Colombia · X Edición</span>
+          </div>
+
+          <h1 class="hero-title">CONIITI</h1>
+          <span class="hero-title-ghost">2025</span>
+
+          <p class="hero-tagline">
+            Congreso Internacional de Innovación y Tendencias en Ingeniería — donde la ciencia, la tecnología y el futuro convergen.
+          </p>
+
+          <div class="hero-actions">
+            <span class="btn-primary" onclick="openAuthModal()" style="cursor:pointer;">
+              <i class="bi bi-ticket-perforated"></i> Adquirir Boleta
+            </span>
+            <span class="btn-secondary" onclick="navigate('cronograma')" style="cursor:pointer;">
+              <i class="bi bi-play-circle"></i> Ver cronograma
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar info (desktop) -->
+    <div class="hero-sidebar">
+      <div class="hero-sidebar-item">
+        <div class="hero-sidebar-label">Fecha</div>
+        <div class="hero-sidebar-val">Oct 15–17</div>
+      </div>
+      <div class="hero-sidebar-item">
+        <div class="hero-sidebar-label">Sede</div>
+        <div class="hero-sidebar-val">Bogotá D.C.</div>
+      </div>
+      <div class="hero-sidebar-item">
+        <div class="hero-sidebar-label">País invitado</div>
+        <div class="hero-sidebar-val">🇮🇹 Italia</div>
+      </div>
+      <div class="hero-sidebar-item">
+        <div class="hero-sidebar-label">Edición</div>
+        <div class="hero-sidebar-val">X · Décima</div>
+      </div>
+    </div>
+
+    <!-- Stats band -->
+    <div class="stats-band" style="position:absolute; bottom:0; left:0; right:0;">
+      <div class="columns is-gapless mb-0">
+        <div class="column"><div class="stat-unit"><span class="stat-num">48</span><span class="stat-lbl">Conferencistas</span></div></div>
+        <div class="column"><div class="stat-unit"><span class="stat-num">12</span><span class="stat-lbl">Países</span></div></div>
+        <div class="column"><div class="stat-unit"><span class="stat-num">6</span><span class="stat-lbl">Líneas temáticas</span></div></div>
+        <div class="column"><div class="stat-unit"><span class="stat-num">3</span><span class="stat-lbl">Días</span></div></div>
+        <div class="column"><div class="stat-unit"><span class="stat-num">+800</span><span class="stat-lbl">Asistentes</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-line">
+
+  <!-- FECHAS IMPORTANTES -->
+  <section class="sec-fechas" id="sec-fechas">
+    <div class="container" style="max-width:1180px;">
+      <div class="columns is-variable is-8 is-desktop">
+
+        <!-- Left: fechas list -->
+        <div class="column is-6-desktop" data-anim="fade-right">
+          <span class="section-eyebrow eyebrow-cerulean">Calendario académico</span>
+          <h2 class="section-title">Fechas<br><em>importantes</em></h2>
+          <div class="gold-rule" style="margin-bottom:48px;"></div>
+
+          <div class="fecha-item" data-anim="fade-up" data-anim-delay="60">
+            <div class="fecha-date"><span class="fecha-day">15</span><span class="fecha-month">Ago</span></div>
+            <div>
+              <div class="fecha-title">Cierre de envío de resúmenes</div>
+              <p class="fecha-desc">Fecha límite para el envío de abstracts y propuestas de ponencia al comité científico.</p>
+            </div>
+          </div>
+          <div class="fecha-item" data-anim="fade-up" data-anim-delay="110">
+            <div class="fecha-date"><span class="fecha-day">05</span><span class="fecha-month">Sep</span></div>
+            <div>
+              <div class="fecha-title">Notificación de aceptación</div>
+              <p class="fecha-desc">El comité revisor comunicará los resultados de evaluación a los autores postulantes.</p>
+            </div>
+          </div>
+          <div class="fecha-item" data-anim="fade-up" data-anim-delay="160">
+            <div class="fecha-date"><span class="fecha-day">20</span><span class="fecha-month">Sep</span></div>
+            <div>
+              <div class="fecha-title">Cierre de inscripciones con descuento</div>
+              <p class="fecha-desc">Precio reducido disponible hasta esta fecha. Luego aplica tarifa regular.</p>
+            </div>
+          </div>
+          <div class="fecha-item" data-anim="fade-up" data-anim-delay="210">
+            <div class="fecha-date"><span class="fecha-day">30</span><span class="fecha-month">Sep</span></div>
+            <div>
+              <div class="fecha-title">Entrega de artículos completos</div>
+              <p class="fecha-desc">Fecha límite para cargar las versiones definitivas de los artículos aceptados.</p>
+            </div>
+          </div>
+          <div class="fecha-item" data-anim="fade-up" data-anim-delay="260">
+            <div class="fecha-date"><span class="fecha-day" style="color:var(--gold);">15</span><span class="fecha-month">Oct</span></div>
+            <div>
+              <div class="fecha-title">¡Inauguración del Congreso!</div>
+              <p class="fecha-desc">Apertura oficial de CONIITI 2025 en la Universidad Católica de Colombia, Bogotá.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: timeline card -->
+        <div class="column is-6-desktop" data-anim="fade-left" data-anim-delay="100" style="padding-top: 320px;">
+          <div class="timeline-card">
+            <p class="tl-head">Línea de tiempo 2025</p>
+            <div class="tl-list">
+              <div class="tl-entry"><div class="tl-dot active"></div><div><div class="tl-date">Agosto 2025</div><div class="tl-text">Convocatoria abierta</div></div></div>
+              <div class="tl-entry"><div class="tl-dot"></div><div><div class="tl-date">Septiembre 2025</div><div class="tl-text">Evaluación y selección de ponencias</div></div></div>
+              <div class="tl-entry"><div class="tl-dot"></div><div><div class="tl-date">1 – 14 Oct 2025</div><div class="tl-text">Registro de asistentes</div></div></div>
+              <div class="tl-entry"><div class="tl-dot"></div><div><div class="tl-date">15 – 17 Oct 2025</div><div class="tl-text">Congreso CONIITI 2025</div></div></div>
+              <div class="tl-entry"><div class="tl-dot"></div><div><div class="tl-date">Noviembre 2025</div><div class="tl-text">Publicación de memorias oficiales</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-line">
+
+  <!-- COUNTDOWN -->
+  <section class="sec-countdown" id="sec-countdown">
+    <div class="container" style="max-width:1100px; position:relative; z-index:1;">
+      <div class="has-text-centered mb-6" data-anim="fade-up">
+        <span class="section-eyebrow eyebrow-ash">Tiempo restante</span>
+        <h2 class="section-title" style="color:#fff;">El congreso<br><em style="color:var(--gold-light);">comienza en</em></h2>
+      </div>
+      <div class="cd-row" data-anim="fade-up" data-anim-delay="60">
+        <div class="cd-card" data-anim="zoom-in" data-anim-delay="0">
+          <span class="cd-number" id="cd-dias">--</span><span class="cd-label">Días</span>
+        </div>
+        <span class="cd-sep">:</span>
+        <div class="cd-card" data-anim="zoom-in" data-anim-delay="80">
+          <span class="cd-number" id="cd-horas">--</span><span class="cd-label">Horas</span>
+        </div>
+        <span class="cd-sep">:</span>
+        <div class="cd-card" data-anim="zoom-in" data-anim-delay="160">
+          <span class="cd-number" id="cd-min">--</span><span class="cd-label">Minutos</span>
+        </div>
+        <span class="cd-sep">:</span>
+        <div class="cd-card" data-anim="zoom-in" data-anim-delay="240">
+          <span class="cd-number" id="cd-seg">--</span><span class="cd-label">Segundos</span>
+        </div>
+      </div>
+      <p class="has-text-centered mt-5" style="font-family:var(--font-title);font-style:italic;color:rgba(255,255,255,0.28);font-size:.95rem;" data-anim="fade-up" data-anim-delay="300">
+        Bogotá D.C., Colombia &nbsp;·&nbsp; 15, 16 y 17 de Octubre de 2025
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider-line">
+
+  <!-- CONFERENCISTAS -->
+  <section class="sec-speakers" id="sec-speakers">
+    <div class="container" style="max-width:1260px;">
+      <div class="columns is-vcentered mb-6">
+        <div class="column" data-anim="fade-right">
+          <span class="section-eyebrow eyebrow-gold">Ponentes internacionales</span>
+          <h2 class="section-title" style="color:#fff;">Conferencistas<br><em>invitados</em></h2>
+          <div class="gold-rule"></div>
+        </div>
+        <div class="column is-narrow" data-anim="fade-left">
+          <span class="btn-secondary" onclick="navigate('boletas')" style="cursor:pointer;">
+            Ver todos <i class="bi bi-arrow-right ms-2"></i>
+          </span>
+        </div>
+      </div>
+      <div class="columns is-variable is-3">
+        <div class="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay="0">
+          <div class="speaker-card">
+            <div class="speaker-img"><span class="speaker-initials">GM</span></div>
+            <div class="speaker-info">
+              <span class="speaker-name">Giuseppe Moretti</span>
+              <span class="speaker-role">Politecnico di Milano</span>
+              <p class="speaker-bio">Experto en robótica avanzada y sistemas autónomos con 25 años de investigación en Europa.</p>
+              <span class="speaker-country">🇮🇹 Italia</span>
+            </div>
+          </div>
+        </div>
+        <div class="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay="80">
+          <div class="speaker-card">
+            <div class="speaker-img"><span class="speaker-initials">CR</span></div>
+            <div class="speaker-info">
+              <span class="speaker-name">Claudia Russo</span>
+              <span class="speaker-role">Università La Sapienza</span>
+              <p class="speaker-bio">Pionera en inteligencia artificial aplicada a la ingeniería biomédica y salud digital.</p>
+              <span class="speaker-country">🇮🇹 Italia</span>
+            </div>
+          </div>
+        </div>
+        <div class="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay="160">
+          <div class="speaker-card">
+            <div class="speaker-img" style="background:linear-gradient(135deg,var(--cerulean),var(--ink));"><span class="speaker-initials">JA</span></div>
+            <div class="speaker-info">
+              <span class="speaker-name">Dr. Jorge Arévalo</span>
+              <span class="speaker-role">Universidad Nacional</span>
+              <p class="speaker-bio">Investigador líder en energías renovables y sostenibilidad para Latinoamérica.</p>
+              <span class="speaker-country">🇨🇴 Colombia</span>
+            </div>
+          </div>
+        </div>
+        <div class="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay="240">
+          <div class="speaker-card">
+            <div class="speaker-img"><span class="speaker-initials">LF</span></div>
+            <div class="speaker-info">
+              <span class="speaker-name">Laura Fontana</span>
+              <span class="speaker-role">Università di Bologna</span>
+              <p class="speaker-bio">Especialista en nanomateriales y su aplicación en la ingeniería de materiales del futuro.</p>
+              <span class="speaker-country">🇮🇹 Italia</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-line">
+
+  <!-- PATROCINADORES -->
+  <section class="sec-sponsors" id="sec-sponsors">
+    <div class="container" style="max-width:1100px;">
+      <div class="columns is-vcentered mb-4">
+        <div class="column" data-anim="fade-right">
+          <span class="section-eyebrow eyebrow-cerulean">Aliados estratégicos</span>
+          <h2 class="section-title">Patrocinadores</h2>
+          <div class="gold-rule"></div>
+        </div>
+        <div class="column is-narrow" data-anim="fade-left">
+          <span class="btn-outline-dark" onclick="navigate('contacto')" style="cursor:pointer;">
+            Ser patrocinador <i class="bi bi-arrow-right ms-2"></i>
+          </span>
+        </div>
+      </div>
+
+      <span class="sponsor-tier-label" data-anim="fade-up">Patrocinadores Oro</span>
+      <div class="is-flex is-flex-wrap-wrap" style="gap:12px;" data-anim="fade-up" data-anim-delay="60">
+        <div class="sponsor-chip"><span class="sponsor-name-text">EMPRESA A</span></div>
+        <div class="sponsor-chip"><span class="sponsor-name-text">TECH CORP</span></div>
+        <div class="sponsor-chip"><span class="sponsor-name-text">INNOVA CO</span></div>
+      </div>
+
+      <span class="sponsor-tier-label" data-anim="fade-up">Patrocinadores Plata</span>
+      <div class="is-flex is-flex-wrap-wrap" style="gap:12px;" data-anim="fade-up" data-anim-delay="60">
+        <div class="sponsor-chip"><span class="sponsor-name-text" style="font-size:1.05rem;">PARTNER UNO</span></div>
+        <div class="sponsor-chip"><span class="sponsor-name-text" style="font-size:1.05rem;">PARTNER DOS</span></div>
+        <div class="sponsor-chip"><span class="sponsor-name-text" style="font-size:1.05rem;">PARTNER TRES</span></div>
+        <div class="sponsor-chip"><span class="sponsor-name-text" style="font-size:1.05rem;">PARTNER CUATRO</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-line">
+
+  <!-- PAÍS INVITADO -->
+  <section class="sec-pais" id="sec-pais">
+    <div class="pais-bg">
+      <div style="background:#009246;"></div>
+      <div style="background:#ffffff;"></div>
+      <div style="background:#ce2b37;"></div>
+    </div>
+    <div class="pais-veil"></div>
+    <div class="container pais-content" style="max-width:1200px; padding:80px 40px;">
+      <div class="columns">
+        <div class="column is-7-widescreen is-9-desktop" data-anim="fade-right">
+          <span class="section-eyebrow eyebrow-gold">País invitado · 2025</span>
+          <h2 class="pais-giant">
+            Italia
+            <span class="pais-em">La Republica Italiana</span>
+          </h2>
+          <p class="pais-desc">
+            Italia, cuna del Renacimiento y la innovación, llega a CONIITI 2025 trayendo su legado de excelencia en diseño, ingeniería y ciencia para inspirar a la próxima generación de ingenieros latinoamericanos.
+          </p>
+          <div class="pais-chips">
+            <span class="pais-chip">Politecnico di Milano</span>
+            <span class="pais-chip">Università di Bologna</span>
+            <span class="pais-chip">Sapienza Roma</span>
+            <span class="pais-chip">Robótica</span>
+            <span class="pais-chip">Diseño Industrial</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-line">
+
+  <!-- MAPA -->
+  <section class="sec-mapa" id="sec-mapa">
+    <div class="map-dots-bg"></div>
+    <div class="map-info-card" data-anim="zoom-in">
+      <span class="map-pin-icon">📍</span>
+      <h3>Universidad Católica de Colombia</h3>
+      <p>Av. Caracas #46-72, Bogotá D.C.<br>Edificio El Claustro — Bloque L<br><br>Acceso fácil en transporte público.</p>
+      <a href="https://maps.google.com" target="_blank" class="map-link">
+        <i class="bi bi-map"></i> Abrir en Google Maps
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container" style="max-width:1200px;">
+      <div class="columns is-variable is-6">
+        <div class="column is-4-desktop">
+          <div class="footer-brand">CONIITI</div>
+          <div style="display:flex;gap:3px;margin:10px 0;">
+            <div style="width:22px;height:10px;background:#009246;"></div>
+            <div style="width:22px;height:10px;background:#fff;opacity:.5;"></div>
+            <div style="width:22px;height:10px;background:#ce2b37;"></div>
+          </div>
+          <p class="footer-brand-sub">Congreso Internacional de Innovación y Tendencias en Ingeniería. Universidad Católica de Colombia · 2025</p>
+        </div>
+        <div class="column is-2-desktop">
+          <p class="footer-col-title">Inicio</p>
+          <a class="footer-item" onclick="navigate('inicio');sscroll('sec-fechas')">Fechas</a>
+          <a class="footer-item" onclick="navigate('inicio');sscroll('sec-countdown')">Cuenta regresiva</a>
+          <a class="footer-item" onclick="navigate('inicio');sscroll('sec-speakers')">Conferencistas</a>
+          <a class="footer-item" onclick="navigate('inicio');sscroll('sec-sponsors')">Patrocinadores</a>
+          <a class="footer-item" onclick="navigate('inicio');sscroll('sec-pais')">País invitado</a>
+        </div>
+        <div class="column is-2-desktop">
+          <p class="footer-col-title">Congreso</p>
+          <a class="footer-item" onclick="navigate('cronograma')">Cronograma</a>
+          <a class="footer-item" onclick="navigate('boletas')">Boletas</a>
+          <a class="footer-item" onclick="navigate('lineas')">Líneas temáticas</a>
+          <a class="footer-item" onclick="navigate('acerca')">Acerca de</a>
+          <a class="footer-item" onclick="navigate('contacto')">Contacto</a>
+        </div>
+        <div class="column is-2-desktop">
+          <p class="footer-col-title">Institucional</p>
+          <a class="footer-item">Universidad Católica</a>
+          <a class="footer-item">Política de privacidad</a>
+          <a class="footer-item">Términos y condiciones</a>
+          <a class="footer-item">Preguntas frecuentes</a>
+        </div>
+      </div>
+      <hr class="footer-divider">
+      <div class="is-flex is-justify-content-space-between is-align-items-center is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia. Todos los derechos reservados.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div><!-- /page-inicio -->
+
+
+<!-- ═══════════════════════════════
+     PAGE: CRONOGRAMA
+═══════════════════════════════ -->
+<div class="page" id="page-cronograma">
+  <div class="page-band" data-bg="CRONOGRAMA">
+    <div class="container" style="max-width:1200px;">
+      <span class="section-eyebrow eyebrow-gold">Programa oficial</span>
+      <h1>Cronograma 2025</h1>
+    </div>
+  </div>
+
+  <div class="container py-6" style="max-width:960px;">
+    <div class="sched-tabs-wrap" data-anim="fade-up">
+      <button class="sched-tab-btn active" onclick="showDay('sd1',this)">Día 1 &nbsp;·&nbsp; Oct 15</button>
+      <button class="sched-tab-btn" onclick="showDay('sd2',this)">Día 2 &nbsp;·&nbsp; Oct 16</button>
+      <button class="sched-tab-btn" onclick="showDay('sd3',this)">Día 3 &nbsp;·&nbsp; Oct 17</button>
+    </div>
+
+    <div id="sd1" class="sched-panel active">
+      <div class="sched-row"><div class="sched-time">8:00 AM</div><div><span class="sched-badge badge-br">Registro</span><div class="sched-title">Acreditación y bienvenida</div><div class="sched-speaker">Comité organizador CONIITI</div></div></div>
+      <div class="sched-row"><div class="sched-time">9:00 AM</div><div><span class="sched-badge badge-k">Keynote</span><div class="sched-title">Ingeniería e innovación: el puente entre Italia y América Latina</div><div class="sched-speaker">Giuseppe Moretti · Politecnico di Milano</div></div></div>
+      <div class="sched-row"><div class="sched-time">11:00 AM</div><div><span class="sched-badge badge-p">Panel</span><div class="sched-title">Transformación digital en la industria 4.0</div><div class="sched-speaker">Panel internacional de expertos</div></div></div>
+      <div class="sched-row"><div class="sched-time">1:00 PM</div><div><span class="sched-badge badge-br">Pausa</span><div class="sched-title">Almuerzo y networking</div></div></div>
+      <div class="sched-row"><div class="sched-time">3:00 PM</div><div><span class="sched-badge badge-t">Taller</span><div class="sched-title">Inteligencia Artificial aplicada a sistemas de ingeniería</div><div class="sched-speaker">Claudia Russo · Università La Sapienza</div></div></div>
+      <div class="sched-row"><div class="sched-time">5:30 PM</div><div><span class="sched-badge badge-br">Social</span><div class="sched-title">Cóctel de apertura y exposición de proyectos</div></div></div>
+    </div>
+    <div id="sd2" class="sched-panel">
+      <div class="sched-row"><div class="sched-time">9:00 AM</div><div><span class="sched-badge badge-k">Keynote</span><div class="sched-title">Nanomateriales: la próxima revolución industrial</div><div class="sched-speaker">Laura Fontana · Università di Bologna</div></div></div>
+      <div class="sched-row"><div class="sched-time">11:00 AM</div><div><span class="sched-badge badge-p">Panel</span><div class="sched-title">Energías renovables para una ingeniería sostenible</div><div class="sched-speaker">Dr. Jorge Arévalo · Universidad Nacional</div></div></div>
+      <div class="sched-row"><div class="sched-time">3:00 PM</div><div><span class="sched-badge badge-t">Taller</span><div class="sched-title">Diseño de sistemas embebidos e IoT</div></div></div>
+    </div>
+    <div id="sd3" class="sched-panel">
+      <div class="sched-row"><div class="sched-time">9:00 AM</div><div><span class="sched-badge badge-k">Keynote</span><div class="sched-title">El futuro de la movilidad: ciudades inteligentes e infraestructura</div></div></div>
+      <div class="sched-row"><div class="sched-time">11:30 AM</div><div><span class="sched-badge badge-p">Panel</span><div class="sched-title">Retos de la ingeniería latinoamericana en el siglo XXI</div></div></div>
+      <div class="sched-row"><div class="sched-time">3:00 PM</div><div><span class="sched-badge badge-br">Ceremonia</span><div class="sched-title">Premiación de mejores trabajos y clausura oficial</div></div></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container" style="max-width:1200px;">
+      <div class="is-flex is-justify-content-space-between is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+
+<!-- ═══════════════════════════════
+     PAGE: BOLETAS
+═══════════════════════════════ -->
+<div class="page" id="page-boletas">
+  <div class="page-band" data-bg="BOLETAS">
+    <div class="container" style="max-width:1200px;">
+      <span class="section-eyebrow eyebrow-gold">Inscripciones abiertas</span>
+      <h1>Boletas de Acceso</h1>
+    </div>
+  </div>
+
+  <div class="container py-6" style="max-width:1100px;">
+    <div class="columns is-variable is-4">
+      <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="0">
+        <div class="boleta-card">
+          <div class="boleta-name">Visitante</div>
+          <div class="boleta-for">Público general</div>
+          <div class="boleta-price"><sup>COP</sup> 180K</div>
+          <ul class="boleta-features">
+            <li class="boleta-feature">Acceso a conferencias magistrales</li>
+            <li class="boleta-feature">Material digital del evento</li>
+            <li class="boleta-feature">Certificado de asistencia</li>
+            <li class="boleta-feature">Feria de innovación tecnológica</li>
+          </ul>
+          <a class="btn-register btn-reg-outline" onclick="return false;" href="#">Comprar aquí</a>
+        </div>
+      </div>
+      <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="120">
+        <div class="boleta-card featured" style="margin-top:-12px;">
+          <div class="boleta-hot-tag">Más popular</div>
+          <div class="boleta-name">Ponente</div>
+          <div class="boleta-for">Investigadores y académicos</div>
+          <div class="boleta-price"><sup>COP</sup> 320K</div>
+          <ul class="boleta-features">
+            <li class="boleta-feature">Todo el paquete Visitante</li>
+            <li class="boleta-feature">Publicación en memorias IEEE</li>
+            <li class="boleta-feature">Presentación de artículo o póster</li>
+            <li class="boleta-feature">Acceso a sesiones cerradas</li>
+            <li class="boleta-feature">Almuerzo incluido los 3 días</li>
+          </ul>
+          <a class="btn-register btn-reg-gold" onclick="return false;" href="#">Comprar aquí</a>
+        </div>
+      </div>
+      <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="240">
+        <div class="boleta-card">
+          <div class="boleta-name">Estudiante</div>
+          <div class="boleta-for">Pregrado y posgrado</div>
+          <div class="boleta-price"><sup>COP</sup> 90K</div>
+          <ul class="boleta-features">
+            <li class="boleta-feature">Conferencias y talleres</li>
+            <li class="boleta-feature">Certificado de participación</li>
+            <li class="boleta-feature">Mentorías con conferencistas</li>
+            <li class="boleta-feature">Red de contactos estudiantil</li>
+          </ul>
+          <a class="btn-register btn-reg-teal" onclick="return false;" href="#">Comprar aquí</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer mt-5">
+    <div class="container" style="max-width:1200px;">
+      <div class="is-flex is-justify-content-space-between is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+
+<!-- ═══════════════════════════════
+     PAGE: LÍNEAS TEMÁTICAS
+═══════════════════════════════ -->
+<div class="page" id="page-lineas" style="background:var(--ink);">
+  <div class="page-band" data-bg="LINEAS">
+    <div class="container" style="max-width:1200px;">
+      <span class="section-eyebrow eyebrow-gold">Ejes de investigación</span>
+      <h1>Líneas Temáticas</h1>
+    </div>
+  </div>
+
+  <div class="py-6" style="background:var(--ink);">
+    <div class="container" style="max-width:1200px;">
+      <div class="columns is-variable is-3 is-multiline">
+        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="0">
+          <div class="linea-card">
+            <span class="linea-icon-big">🤖</span>
+            <div class="linea-num">01</div>
+            <div class="linea-title">Inteligencia Artificial e Ingeniería de Datos</div>
+            <p class="linea-desc">Machine learning, redes neuronales, big data y su aplicación en procesos de ingeniería industrial y de sistemas.</p>
+          </div>
+        </div>
+        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="80">
+          <div class="linea-card">
+            <span class="linea-icon-big">⚡</span>
+            <div class="linea-num">02</div>
+            <div class="linea-title">Energías Renovables y Sostenibilidad</div>
+            <p class="linea-desc">Innovación en fuentes de energía limpias, eficiencia energética e ingeniería ambiental para el desarrollo sostenible.</p>
+          </div>
+        </div>
+        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="160">
+          <div class="linea-card">
+            <span class="linea-icon-big">🦾</span>
+            <div class="linea-num">03</div>
+            <div class="linea-title">Robótica y Automatización Industrial</div>
+            <p class="linea-desc">Sistemas autónomos, robótica colaborativa, automatización de procesos y la industria 4.0 aplicada.</p>
+          </div>
+        </div>
+        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="0">
+          <div class="linea-card">
+            <span class="linea-icon-big">🧬</span>
+            <div class="linea-num">04</div>
+            <div class="linea-title">Ingeniería Biomédica e Innovación en Salud</div>
+            <p class="linea-desc">Dispositivos médicos, telemedicina, biosensores y tecnologías emergentes para el sector salud.</p>
+          </div>
+        </div>
+        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="80">
+          <div class="linea-card">
+            <span class="linea-icon-big">🏙️</span>
+            <div class="linea-num">05</div>
+            <div class="linea-title">Infraestructura y Ciudades Inteligentes</div>
+            <p class="linea-desc">Smart cities, ingeniería civil del futuro, gestión de recursos urbanos e infraestructura resiliente y conectada.</p>
+          </div>
+        </div>
+        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="160">
+          <div class="linea-card">
+            <span class="linea-icon-big">🔮</span>
+            <div class="linea-num">06</div>
+            <div class="linea-title">Tecnologías Emergentes y Educación</div>
+            <p class="linea-desc">Realidad aumentada, blockchain y nuevas metodologías pedagógicas para la formación de ingenieros del futuro.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container" style="max-width:1200px;">
+      <div class="is-flex is-justify-content-space-between is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+
+<!-- ═══════════════════════════════
+     PAGE: ACERCA DE
+═══════════════════════════════ -->
+<div class="page" id="page-acerca">
+  <div class="page-band" data-bg="HISTORIA">
+    <div class="container" style="max-width:1200px;">
+      <span class="section-eyebrow eyebrow-gold">Nuestra historia</span>
+      <h1>Acerca de CONIITI</h1>
+    </div>
+  </div>
+
+  <div class="container py-6" style="max-width:1100px;">
+    <div class="columns is-variable is-8 is-vcentered">
+      <div class="column is-6-desktop" data-anim="fade-right">
+        <span class="section-eyebrow eyebrow-cerulean">¿Quiénes somos?</span>
+        <h2 class="section-title">El congreso más<br><em>innovador de Colombia</em></h2>
+        <div class="gold-rule" style="margin-bottom:36px;"></div>
+
+        <p class="acerca-lead">El Congreso Internacional de Innovación y Tendencias en Ingeniería nació en la Universidad Católica de Colombia como un espacio para reunir a la comunidad académica y profesional en torno a los grandes desafíos del siglo XXI.</p>
+        <p class="acerca-lead">Desde su primera edición, CONIITI ha crecido hasta convertirse en un referente de innovación para la región, atrayendo investigadores, instituciones y empresas de más de 12 países.</p>
+        <p class="acerca-lead">En 2025, con Italia como país invitado, celebramos la décima edición — la más ambiciosa e internacional de nuestra historia.</p>
+      </div>
+      <div class="column is-6-desktop" data-anim="fade-left">
+        <div class="columns is-variable is-3 mb-4">
+          <div class="column is-6"><div class="stat-block"><div class="val">10</div><div class="lbl">Ediciones realizadas</div></div></div>
+          <div class="column is-6"><div class="stat-block"><div class="val">12+</div><div class="lbl">Países participantes</div></div></div>
+          <div class="column is-6"><div class="stat-block"><div class="val">480+</div><div class="lbl">Ponencias publicadas</div></div></div>
+          <div class="column is-6"><div class="stat-block"><div class="val">6K+</div><div class="lbl">Alumni de CONIITI</div></div></div>
+        </div>
+        <div style="position:relative; padding-bottom:28px; padding-right:28px;">
+          <div class="acerca-visual-box"></div>
+          <div class="acerca-badge">
+            <span class="acerca-badge-num">X</span>
+            <span class="acerca-badge-text">Edición CONIITI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container" style="max-width:1200px;">
+      <div class="is-flex is-justify-content-space-between is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+
+<!-- ═══════════════════════════════
+     PAGE: CONTACTO
+═══════════════════════════════ -->
+<div class="page" id="page-contacto" style="background:var(--ink);">
+  <div class="page-band" data-bg="CONTACTO">
+    <div class="container" style="max-width:1200px;">
+      <span class="section-eyebrow eyebrow-gold">Escríbenos</span>
+      <h1>Contacto</h1>
+    </div>
+  </div>
+
+  <div class="py-6" style="background:var(--ink);">
+    <div class="container" style="max-width:1100px;">
+      <div class="columns is-variable is-8">
+
+        <!-- Info -->
+        <div class="column is-4-desktop" data-anim="fade-right">
+          <span class="section-eyebrow eyebrow-gold" style="margin-bottom:32px;display:block;">Información de contacto</span>
+          <div class="contact-item">
+            <div class="contact-icon"><i class="bi bi-envelope"></i></div>
+            <div><div class="contact-label">Correo electrónico</div><div class="contact-value">coniiti2025@ucatolica.edu.co</div></div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><i class="bi bi-telephone"></i></div>
+            <div><div class="contact-label">Teléfono</div><div class="contact-value">+57 (601) 327 7300 Ext. 5000</div></div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><i class="bi bi-geo-alt"></i></div>
+            <div><div class="contact-label">Dirección</div><div class="contact-value">Av. Caracas #46-72, Bogotá D.C.</div></div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><i class="bi bi-clock"></i></div>
+            <div><div class="contact-label">Horario</div><div class="contact-value">Lun – Vie, 8:00 AM – 5:00 PM</div></div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="column is-8-desktop" data-anim="fade-left">
+          <form onsubmit="return false;">
+            <div class="columns is-variable is-3 is-multiline">
+              <div class="column is-6">
+                <label class="form-label-custom">Nombre</label>
+                <input class="form-input" type="text" placeholder="Tu nombre">
+              </div>
+              <div class="column is-6">
+                <label class="form-label-custom">Apellido</label>
+                <input class="form-input" type="text" placeholder="Tu apellido">
+              </div>
+              <div class="column is-12">
+                <label class="form-label-custom">Correo electrónico</label>
+                <input class="form-input" type="email" placeholder="correo@ejemplo.com">
+              </div>
+              <div class="column is-6">
+                <label class="form-label-custom">Institución</label>
+                <input class="form-input" type="text" placeholder="Tu universidad o empresa">
+              </div>
+              <div class="column is-6">
+                <label class="form-label-custom">Tipo de consulta</label>
+                <select class="form-input">
+                  <option value="">Selecciona una opción</option>
+                  <option>Inscripción y boletas</option>
+                  <option>Ponencias y abstracts</option>
+                  <option>Patrocinio</option>
+                  <option>Prensa y medios</option>
+                  <option>Otra consulta</option>
+                </select>
+              </div>
+              <div class="column is-12">
+                <label class="form-label-custom">Mensaje</label>
+                <textarea class="form-input" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
+              </div>
+              <div class="column is-12">
+                <button type="submit" class="btn-primary" style="cursor:pointer; clip-path:none;">
+                  <i class="bi bi-send"></i> Enviar mensaje
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer" style="background:#0a0a0a;">
+    <div class="container" style="max-width:1200px;">
+      <div class="is-flex is-justify-content-space-between is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia. Todos los derechos reservados.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-modal" id="auth-modal" aria-hidden="true">
+  <div class="auth-modal-backdrop" onclick="closeAuthModal()"></div>
+  <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <button class="auth-close" type="button" onclick="closeAuthModal()" aria-label="Cerrar">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <span class="section-eyebrow eyebrow-gold">Acceso CONIITI</span>
+    <h3 class="section-title" id="auth-modal-title" style="font-size:2.2rem;margin-bottom:20px;color:#fff;">Bienvenido</h3>
+
+    <div class="auth-tabs" role="tablist" aria-label="Acceso">
+      <button id="auth-tab-login" class="auth-tab active" type="button" onclick="showAuthTab('login')">Iniciar sesión</button>
+      <button id="auth-tab-register" class="auth-tab" type="button" onclick="showAuthTab('register')">Registrarse</button>
+    </div>
+
+    <p class="auth-info" id="auth-global-message"></p>
+
+    <form id="auth-login-form" class="auth-form" onsubmit="submitLogin(event)" novalidate>
+      <label class="form-label-custom">Correo electrónico</label>
+      <input class="form-input" type="email" id="auth-login-email" placeholder="correo@ejemplo.com" required>
+      <p class="auth-error" id="auth-login-email-error"></p>
+
+      <label class="form-label-custom" style="margin-top:14px;">Contraseña</label>
+      <input class="form-input" type="password" id="auth-login-password" placeholder="Tu contraseña" required>
+      <p class="auth-error" id="auth-login-password-error"></p>
+
+      <button type="submit" class="btn-primary" style="margin-top:20px;cursor:pointer;clip-path:none;">Continuar</button>
+    </form>
+
+    <form id="auth-register-form" class="auth-form" style="display:none;" onsubmit="submitRegister(event)">
+      <label class="form-label-custom">Nombre completo</label>
+      <input class="form-input" type="text" id="auth-register-name" placeholder="Tu nombre" required>
+
+      <label class="form-label-custom" style="margin-top:14px;">Correo electrónico</label>
+      <input class="form-input" type="email" id="auth-register-email" placeholder="correo@ejemplo.com" required>
+
+      <label class="form-label-custom" style="margin-top:14px;">Contraseña</label>
+      <input class="form-input" type="password" id="auth-register-password" placeholder="Mínimo 6 caracteres" minlength="6" required>
+
+      <label class="form-label-custom" style="margin-top:14px;">Confirmar contraseña</label>
+      <input class="form-input" type="password" id="auth-register-confirm" placeholder="Repite tu contraseña" minlength="6" required>
+
+      <button type="submit" class="btn-primary" style="margin-top:20px;cursor:pointer;clip-path:none;">Crear cuenta</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- Scripts -->
+<script>
+// ── AOS Init ──
+// ── Custom scroll animations ──
+function initAnims() {
+  const els = document.querySelectorAll('[data-anim]');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const delay = parseInt(e.target.dataset.animDelay || 0);
+        setTimeout(() => e.target.classList.add('anim-in'), delay);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(el => io.observe(el));
+}
+initAnims();
+
+// ── Navbar scroll ──
+window.addEventListener('scroll', () => {
+  document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 30);
+});
+
+// ── Countdown ──
+function tick() {
+  const diff = new Date('2025-10-15T08:00:00') - new Date();
+  if (diff <= 0) { ['cd-dias','cd-horas','cd-min','cd-seg'].forEach(id => document.getElementById(id).textContent = '00'); return; }
+  document.getElementById('cd-dias').textContent  = String(Math.floor(diff/86400000)).padStart(2,'0');
+  document.getElementById('cd-horas').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+  document.getElementById('cd-min').textContent   = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  document.getElementById('cd-seg').textContent   = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+}
+tick(); setInterval(tick, 1000);
+
+// ── SPA Navigation ──
+let current = 'inicio';
+function navigate(page) {
+  if (page === current) { window.scrollTo({top:0,behavior:'smooth'}); return; }
+  const oldEl = document.getElementById('page-' + current);
+  const newEl = document.getElementById('page-' + page);
+
+  document.querySelectorAll('.nav-links li a, .nav-links li button').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+
+  oldEl.classList.add('exit');
+  setTimeout(() => {
+    oldEl.classList.remove('active','exit');
+    newEl.classList.add('active');
+    window.scrollTo({top:0,behavior:'instant'});
+    current = page;
+    setTimeout(() => initAnims(), 100);
+  }, 260);
+}
+
+function sscroll(id) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 560);
+}
+
+// ── Schedule tabs ──
+function showDay(id, btn) {
+  document.querySelectorAll('.sched-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sched-tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Auth Modal ──
+function openAuthModal(event) {
+  if (event) event.preventDefault();
+  const modal = document.getElementById('auth-modal');
+  if (!modal) return;
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+  showAuthTab('login');
+  clearLoginErrors();
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById('auth-modal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function showAuthTab(tab) {
+  const loginTab = document.getElementById('auth-tab-login');
+  const registerTab = document.getElementById('auth-tab-register');
+  const loginForm = document.getElementById('auth-login-form');
+  const registerForm = document.getElementById('auth-register-form');
+  if (!loginTab || !registerTab || !loginForm || !registerForm) return;
+
+  const isLogin = tab === 'login';
+  loginTab.classList.toggle('active', isLogin);
+  registerTab.classList.toggle('active', !isLogin);
+  loginForm.style.display = isLogin ? 'block' : 'none';
+  registerForm.style.display = isLogin ? 'none' : 'block';
+  if (isLogin) clearLoginErrors();
+}
+
+function clearLoginErrors() {
+  const emailError = document.getElementById('auth-login-email-error');
+  const passwordError = document.getElementById('auth-login-password-error');
+  if (emailError) emailError.textContent = '';
+  if (passwordError) passwordError.textContent = '';
+}
+
+function setAuthMessage(message = '', type = 'default') {
+  const el = document.getElementById('auth-global-message');
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove('error', 'success');
+  if (type === 'error') el.classList.add('error');
+  if (type === 'success') el.classList.add('success');
+}
+
+async function submitLogin(event) {
+  event.preventDefault();
+
+  const emailInput = document.getElementById('auth-login-email');
+  const passwordInput = document.getElementById('auth-login-password');
+  const emailError = document.getElementById('auth-login-email-error');
+  const passwordError = document.getElementById('auth-login-password-error');
+
+  const emailValue = emailInput?.value?.trim() || '';
+  const passwordValue = passwordInput?.value?.trim() || '';
+
+  let hasErrors = false;
+  if (emailError) emailError.textContent = '';
+  if (passwordError) passwordError.textContent = '';
+
+  if (!emailValue) {
+    if (emailError) emailError.textContent = 'El correo es obligatorio';
+    hasErrors = true;
+  }
+
+  if (!passwordValue) {
+    if (passwordError) passwordError.textContent = 'La contraseña es obligatoria';
+    hasErrors = true;
+  }
+
+  if (hasErrors) {
+    setAuthMessage('Completa los campos obligatorios.', 'error');
+    return;
+  }
+
+  try {
+    setAuthMessage('Validando credenciales...');
+    const response = await fetch('http://127.0.0.1:3003/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: emailValue,
+        password: passwordValue
+      })
+    });
+
+    const payload = await response.json();
+    if (!response.ok || !payload.ok) {
+      setAuthMessage(payload.message || 'No fue posible iniciar sesión.', 'error');
+      return;
+    }
+
+    setAuthMessage('Inicio de sesión exitoso.', 'success');
+    closeAuthModal();
+    navigate('boletas');
+  } catch (_error) {
+    setAuthMessage('No hay conexión con el servicio de autenticación.', 'error');
+  }
+}
+
+async function submitRegister(event) {
+  event.preventDefault();
+  const fullName = document.getElementById('auth-register-name')?.value?.trim() || '';
+  const email = document.getElementById('auth-register-email')?.value?.trim() || '';
+  const pass = document.getElementById('auth-register-password')?.value || '';
+  const confirm = document.getElementById('auth-register-confirm')?.value || '';
+
+  if (!fullName) {
+    setAuthMessage('El nombre es obligatorio.', 'error');
+    return;
+  }
+
+  if (!email) {
+    setAuthMessage('El correo es obligatorio.', 'error');
+    return;
+  }
+
+  if (!pass) {
+    setAuthMessage('La contraseña es obligatoria.', 'error');
+    return;
+  }
+
+  if (pass !== confirm) {
+    setAuthMessage('Las contraseñas no coinciden.', 'error');
+    return;
+  }
+
+  try {
+    setAuthMessage('Creando cuenta...');
+    const response = await fetch('http://127.0.0.1:3003/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName,
+        email,
+        password: pass
+      })
+    });
+
+    const payload = await response.json();
+    if (!response.ok || !payload.ok) {
+      setAuthMessage(payload.message || 'No fue posible registrar el usuario.', 'error');
+      return;
+    }
+
+    setAuthMessage('Cuenta creada correctamente.', 'success');
+    closeAuthModal();
+    navigate('boletas');
+  } catch (_error) {
+    setAuthMessage('No hay conexión con el servicio de autenticación.', 'error');
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeAuthModal();
+});
+
+// ══════════════════════════════════════
+// ANIMACIONES EXTRA
+// ══════════════════════════════════════
+
+// ── Partículas flotantes en hero ──
+function spawnParticles() {
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+  let container = hero.querySelector('.hero-particles');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'hero-particles';
+    hero.appendChild(container);
+  }
+  container.innerHTML = '';
+  const count = 28;
+  const colors = ['#F5C800','#FFD93D','#ffffff','#1E88E5','#90CAF9'];
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 6 + 2;
+    const left = Math.random() * 100;
+    const delay = Math.random() * 12;
+    const duration = Math.random() * 10 + 8;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${left}%; bottom:-10px;
+      background:${color};
+      animation-delay:${delay}s;
+      animation-duration:${duration}s;
+    `;
+    container.appendChild(p);
+  }
+}
+spawnParticles();
+
+// ── 3D Tilt en cards ──
+function initTilt() {
+  document.querySelectorAll('.speaker-card, .linea-card, .cd-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `perspective(600px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(8px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+}
+initTilt();
+
+// ── Contador animado para stats del hero ──
+function animateCounters() {
+  document.querySelectorAll('.stat-num').forEach((el, i) => {
+    const raw   = el.textContent.replace(/[^0-9]/g,'');
+    const prefix = el.textContent.match(/^\+/) ? '+' : '';
+    const target = parseInt(raw) || 0;
+    if (!target) return;
+    let start = null;
+    const duration = 1400;
+    const delay = i * 120;
+    setTimeout(() => {
+      function step(ts) {
+        if (!start) start = ts;
+        const progress = Math.min((ts - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 4); // easeOutQuart
+        el.textContent = prefix + Math.round(ease * target);
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = el.dataset.original;
+      }
+      requestAnimationFrame(step);
+    }, delay);
+  });
+}
+// Store original values and trigger on hero visible
+document.querySelectorAll('.stat-num').forEach(el => el.dataset.original = el.textContent);
+const statsObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { animateCounters(); statsObs.disconnect(); }
+  });
+}, { threshold: 0.5 });
+const statsEl = document.querySelector('.stats-band');
+if (statsEl) statsObs.observe(statsEl);
+
+// ── Ripple en botones al click ──
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn-primary, .btn-secondary, .btn-reg-gold, .btn-reg-teal, .btn-reg-outline, .nav-cta');
+  if (!btn) return;
+  const r = document.createElement('span');
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 2;
+  r.style.cssText = `
+    position:absolute; border-radius:50%;
+    width:${size}px; height:${size}px;
+    left:${e.clientX - rect.left - size/2}px;
+    top:${e.clientY - rect.top - size/2}px;
+    background:rgba(255,255,255,0.25);
+    pointer-events:none;
+    transform:scale(0);
+    animation:rippleOut 0.6s ease forwards;
+  `;
+  if (!btn.style.position || btn.style.position === 'static') btn.style.position = 'relative';
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+
+// ── Texto de título con efecto de aparición letra por letra ──
+function splitReveal(selector) {
+  const el = document.querySelector(selector);
+  if (!el || el.dataset.split) return;
+  el.dataset.split = '1';
+  const text = el.childNodes;
+  // Only split text nodes, leave em tags intact
+  el.querySelectorAll('em').forEach(em => {
+    em.style.display = 'inline-block';
+    em.style.animation = 'none';
+  });
+}
+
+// ── Magnetic hover en nav links ──
+document.querySelectorAll('.nav-links li a, .nav-links li button').forEach(link => {
+  link.addEventListener('mousemove', e => {
+    const r = link.getBoundingClientRect();
+    const x = (e.clientX - r.left - r.width  / 2) * 0.35;
+    const y = (e.clientY - r.top  - r.height / 2) * 0.35;
+    link.style.transform = `translate(${x}px, ${y}px)`;
+  });
+  link.addEventListener('mouseleave', () => {
+    link.style.transform = '';
+    link.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+    setTimeout(() => link.style.transition = '', 400);
+  });
+});
+
+// ── Stagger animation en speaker cards al aparecer ──
+const speakerObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.speaker-card').forEach((card, i) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(50px) scale(0.92)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.7s cubic-bezier(0.22,1,0.36,1)';
+          card.style.opacity = '1';
+          card.style.transform = '';
+        }, i * 120);
+      });
+      speakerObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15 });
+const speakerSection = document.querySelector('.sec-speakers .columns.is-variable');
+if (speakerSection) speakerObs.observe(speakerSection);
+
+// ── Re-init animaciones al navegar ──
+const _origNavigate = navigate;
+
+// Inject ripple keyframe into DOM
+const styleTag = document.createElement('style');
+styleTag.textContent = `
+@keyframes rippleOut {
+  to { transform: scale(1); opacity: 0; }
+}
+`;
+document.head.appendChild(styleTag);
+</script>
+</body>
+</html>

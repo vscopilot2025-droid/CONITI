@@ -1,0 +1,23 @@
+{
+  "name": "coniiti-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix frontend && npm install --prefix auth-service && npm install --prefix conferencias-service && npm install --prefix conferencistas-service && npm install --prefix fechas-service",
+    "dev": "npm run frontend:dev",
+    "dev:all": "node scripts/run-all.js dev",
+    "start:all": "node scripts/run-all.js start",
+    "frontend:dev": "npm run dev --prefix frontend",
+    "frontend:build": "npm run build --prefix frontend",
+    "test:e2e": "npm run test:e2e --prefix frontend",
+    "test:e2e:ui": "npm run test:e2e:ui --prefix frontend",
+    "auth-service:dev": "npm run dev --prefix auth-service",
+    "auth-service:start": "npm run start --prefix auth-service",
+    "conferencias-service:dev": "npm run dev --prefix conferencias-service",
+    "conferencias-service:start": "npm run start --prefix conferencias-service",
+    "conferencistas-service:dev": "npm run dev --prefix conferencistas-service",
+    "conferencistas-service:start": "npm run start --prefix conferencistas-service",
+    "fechas-service:dev": "npm run dev --prefix fechas-service",
+    "fechas-service:start": "npm run start --prefix fechas-service"
+  }
+}
