@@ -257,10 +257,10 @@ body {
 
 /* Large background text */
 .hero-bg-text {
-  position: absolute; right: -20px; top: 50%;
+  position: absolute; right: -15px; top: 40%;
   transform: translateY(-50%);
   font-family: var(--font-title);
-  font-size: clamp(14rem, 25vw, 28rem);
+  font-size: clamp(12rem, 18vw, 20rem);
   font-weight: 700; font-style: italic;
   color: rgba(255,255,255,0.02);
   line-height: 1; pointer-events: none; z-index: 1;
@@ -808,6 +808,7 @@ body {
 .page-band h1 {
   font-family: var(--font-title);
   font-size: clamp(2.5rem, 6vw, 4.5rem);
+  
   color: #fff; font-weight: 700; line-height: 1.05;
   letter-spacing: -0.01em;
 }
