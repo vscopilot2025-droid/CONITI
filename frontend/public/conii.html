@@ -1156,11 +1156,13 @@ function showHomeSlide(index, restartTimer = false) {
   if (!slider) return;
   const track = slider.querySelector('.showcase-track');
   const slides = slider.querySelectorAll('.showcase-slide');
+  const dots = slider.querySelectorAll('.showcase-dot');
   if (!track || !slides.length) return;
 
   homeSlideIndex = (index + slides.length) % slides.length;
   track.style.transform = `translateX(-${homeSlideIndex * 100}%)`;
   slider.setAttribute('data-slide', String(homeSlideIndex));
+  dots.forEach((dot, dotIndex) => dot.classList.toggle('active', dotIndex === homeSlideIndex));
 
   if (restartTimer) startHomeSlider();
 }
@@ -1211,6 +1213,10 @@ function initHomeShowcase() {
     <button class="showcase-arrow" type="button" aria-label="Slide anterior" onclick="moveHomeSlide(-1)">
       <span aria-hidden="true">&#8592;</span>
     </button>
+    <div class="showcase-dots">
+      <button class="showcase-dot active" type="button" aria-label="Ver portada" onclick="showHomeSlide(0, true)"></button>
+      <button class="showcase-dot" type="button" aria-label="Ver pais invitado" onclick="showHomeSlide(1, true)"></button>
+    </div>
     <button class="showcase-arrow" type="button" aria-label="Siguiente slide" onclick="moveHomeSlide(1)">
       <span aria-hidden="true">&#8594;</span>
     </button>
