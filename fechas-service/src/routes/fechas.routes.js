@@ -18,7 +18,7 @@ function validateAvailabilityPayload(body) {
     return `El estado debe ser uno de: ${allowedAvailabilityStatuses.join(', ')}`
   }
   if (Number.isNaN(Date.parse(body?.startsAt)) || Number.isNaN(Date.parse(body?.endsAt))) {
-    return 'Las fechas de disponibilidad son invalidas'
+    return 'Las fechas de disponibilidad son inválidas'
   }
   if (new Date(body.startsAt) >= new Date(body.endsAt)) {
     return 'La fecha de inicio debe ser anterior a la fecha de fin'
@@ -33,9 +33,9 @@ function validateConflictPayload(body) {
   if (!allowedConflictSeverities.includes(body?.severity)) {
     return `La severidad debe ser una de: ${allowedConflictSeverities.join(', ')}`
   }
-  if (!body?.reason?.trim()) return 'La razon del conflicto es obligatoria'
+  if (!body?.reason?.trim()) return 'La razón del conflicto es obligatoria'
   if (Number.isNaN(Date.parse(body?.startsAt)) || Number.isNaN(Date.parse(body?.endsAt))) {
-    return 'Las fechas del conflicto son invalidas'
+    return 'Las fechas del conflicto son inválidas'
   }
   if (new Date(body.startsAt) >= new Date(body.endsAt)) {
     return 'La fecha de inicio debe ser anterior a la fecha de fin'
@@ -46,11 +46,11 @@ function validateConflictPayload(body) {
 function validateAgendaPayload(body) {
   if (!body?.eventType?.trim()) return 'El tipo de evento es obligatorio'
   if (!Number.isInteger(body?.eventId) || body.eventId <= 0) return 'El id del evento debe ser un entero mayor a cero'
-  if (!body?.title?.trim()) return 'El titulo del evento es obligatorio'
+  if (!body?.title?.trim()) return 'El título del evento es obligatorio'
   if (!body?.timezone?.trim()) return 'La zona horaria es obligatoria'
   if (!body?.owner?.trim()) return 'El owner es obligatorio'
   if (Number.isNaN(Date.parse(body?.startsAt)) || Number.isNaN(Date.parse(body?.endsAt))) {
-    return 'Las fechas de agenda son invalidas'
+    return 'Las fechas de agenda son inválidas'
   }
   if (new Date(body.startsAt) >= new Date(body.endsAt)) {
     return 'La fecha de inicio debe ser anterior a la fecha de fin'

@@ -30,26 +30,23 @@
 
     <!-- Nav Links -->
     <ul class="nav-links">
+      <li><a id="nav-inicio" class="active" onclick="navigate('inicio')" href="#">Inicio</a></li>
+      <li><a id="nav-conferencias" onclick="navigate('conferencias')" href="#">Conferencias</a></li>
+      <li><a id="nav-cronograma" onclick="navigate('cronograma')" href="#">Cronograma</a></li>
+      <li><a id="nav-conferencistas" onclick="navigate('conferencistas')" href="#">Conferencistas</a></li>
+      <li><a id="nav-nosotros" onclick="navigate('nosotros')" href="#">Nosotros</a></li>
       <li class="has-dropdown">
-        <button id="nav-inicio" class="active">
-          Inicio <i class="bi bi-chevron-down ms-1" style="font-size:.5rem;"></i>
+        <button id="nav-mas" type="button" onclick="toggleNavDropdown(event)" aria-expanded="false">
+          Más sobre nosotros <i class="bi bi-chevron-down ms-1" style="font-size:.5rem;"></i>
         </button>
         <div class="nav-dropdown">
-          <a onclick="navigate('inicio'); sscroll('sec-fechas')"><span class="dot"></span> Fechas importantes</a>
-          <a onclick="navigate('inicio'); sscroll('sec-countdown')"><span class="dot"></span> Cuenta regresiva</a>
-          <a onclick="navigate('inicio'); sscroll('sec-speakers')"><span class="dot"></span> Conferencistas</a>
-          <a onclick="navigate('inicio'); sscroll('sec-sponsors')"><span class="dot"></span> Patrocinadores</a>
-          <a onclick="navigate('inicio'); sscroll('sec-pais')"><span class="dot"></span> País invitado</a>
-          <a onclick="navigate('inicio'); sscroll('sec-mapa')"><span class="dot"></span> Localización</a>
+          <a href="#" onclick="navigate('comite'); return false;"><span class="dot"></span> Comité</a>
+          <a href="#" onclick="navigate('participacion'); return false;"><span class="dot"></span> Guía de participación</a>
+          <a href="#" onclick="navigate('lineas'); return false;"><span class="dot"></span> Líneas temáticas</a>
+          <a href="#" onclick="navigate('boletas'); return false;"><span class="dot"></span> Inscripciones</a>
+          <a href="#" onclick="navigate('contacto'); return false;"><span class="dot"></span> Contacto</a>
         </div>
       </li>
-      <!--
-      <li><a id="nav-cronograma" onclick="navigate('cronograma')" href="#">Cronograma</a></li>
-      <li><a id="nav-boletas"    onclick="navigate('boletas')"    href="#">Boletas</a></li>
-      <li><a id="nav-lineas"     onclick="navigate('lineas')"     href="#">Líneas temáticas</a></li>
-      <li><a id="nav-acerca"     onclick="navigate('acerca')"     href="#">Acerca de</a></li>
-      <li><a id="nav-contacto"   onclick="navigate('contacto')"   href="#">Contacto</a></li>
-      -->
       <li><a class="nav-cta" onclick="openAuthModal(event)" href="#">Inscríbete</a></li>
     </ul>
 
@@ -61,6 +58,45 @@
      PAGE: INICIO
 ═══════════════════════════════ -->
 <div class="page active" id="page-inicio">
+
+  <!-- PAÍS INVITADO -->
+  <section class="sec-pais home-country-showcase" id="sec-pais">
+    <div class="pais-bg">
+      <div style="background:#009246;"></div>
+      <div style="background:#ffffff;"></div>
+      <div style="background:#ce2b37;"></div>
+    </div>
+    <div class="pais-veil"></div>
+    <div class="pais-orbit pais-orbit-one"></div>
+    <div class="pais-orbit pais-orbit-two"></div>
+    <div class="container pais-content" style="max-width:1200px; padding:80px 40px;">
+      <div class="columns">
+        <div class="column is-7-widescreen is-9-desktop" data-anim="fade-right">
+          <span class="section-eyebrow eyebrow-gold">País invitado · 2025</span>
+          <h2 class="pais-giant">
+            Italia
+            <span class="pais-em">La República Italiana</span>
+          </h2>
+          <p class="pais-desc">
+            Italia, cuna del Renacimiento y la innovación, llega a CONIITI 2025 trayendo su legado de excelencia en diseño, ingeniería y ciencia para inspirar a la próxima generación de ingenieros latinoamericanos.
+          </p>
+          <div class="pais-chips">
+            <span class="pais-chip">Politecnico di Milano</span>
+            <span class="pais-chip">Università di Bologna</span>
+            <span class="pais-chip">Sapienza Roma</span>
+            <span class="pais-chip">Robótica</span>
+            <span class="pais-chip">Diseño Industrial</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="country-scroll-cue">
+      <span>Continúa explorando</span>
+
+    </div>
+  </section>
+
+  <hr class="divider-line">
 
   <!-- HERO -->
   <section class="hero">
@@ -135,8 +171,6 @@
       </div>
     </div>
   </section>
-
-  <hr class="divider-line">
 
   <!-- FECHAS IMPORTANTES -->
   <section class="sec-fechas" id="sec-fechas">
@@ -301,92 +335,20 @@
     </div>
   </section>
 
-  <hr class="divider-line">
-
-  <!-- PATROCINADORES -->
-  <section class="sec-sponsors" id="sec-sponsors">
-    <div class="container" style="max-width:1100px;">
-      <div class="columns is-vcentered mb-4">
-        <div class="column" data-anim="fade-right">
-          <span class="section-eyebrow eyebrow-cerulean">Aliados estratégicos</span>
-          <h2 class="section-title">Patrocinadores</h2>
-          <div class="gold-rule"></div>
-        </div>
-        <div class="column is-narrow" data-anim="fade-left">
-          <span class="btn-outline-dark" onclick="navigate('contacto')" style="cursor:pointer;">
-            Ser patrocinador <i class="bi bi-arrow-right ms-2"></i>
-          </span>
-        </div>
-      </div>
-
-      <span class="sponsor-tier-label" data-anim="fade-up">Patrocinadores Oro</span>
-      <div class="is-flex is-flex-wrap-wrap" style="gap:12px;" data-anim="fade-up" data-anim-delay="60">
-        <div class="sponsor-chip"><span class="sponsor-name-text">EMPRESA A</span></div>
-        <div class="sponsor-chip"><span class="sponsor-name-text">TECH CORP</span></div>
-        <div class="sponsor-chip"><span class="sponsor-name-text">INNOVA CO</span></div>
-      </div>
-
-      <span class="sponsor-tier-label" data-anim="fade-up">Patrocinadores Plata</span>
-      <div class="is-flex is-flex-wrap-wrap" style="gap:12px;" data-anim="fade-up" data-anim-delay="60">
-        <div class="sponsor-chip"><span class="sponsor-name-text" style="font-size:1.05rem;">PARTNER UNO</span></div>
-        <div class="sponsor-chip"><span class="sponsor-name-text" style="font-size:1.05rem;">PARTNER DOS</span></div>
-        <div class="sponsor-chip"><span class="sponsor-name-text" style="font-size:1.05rem;">PARTNER TRES</span></div>
-        <div class="sponsor-chip"><span class="sponsor-name-text" style="font-size:1.05rem;">PARTNER CUATRO</span></div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider-line">
-
-  <!-- PAÍS INVITADO -->
-  <section class="sec-pais" id="sec-pais">
-    <div class="pais-bg">
-      <div style="background:#009246;"></div>
-      <div style="background:#ffffff;"></div>
-      <div style="background:#ce2b37;"></div>
-    </div>
-    <div class="pais-veil"></div>
-    <div class="container pais-content" style="max-width:1200px; padding:80px 40px;">
-      <div class="columns">
-        <div class="column is-7-widescreen is-9-desktop" data-anim="fade-right">
-          <span class="section-eyebrow eyebrow-gold">País invitado · 2025</span>
-          <h2 class="pais-giant">
-            Italia
-            <span class="pais-em">La Republica Italiana</span>
-          </h2>
-          <p class="pais-desc">
-            Italia, cuna del Renacimiento y la innovación, llega a CONIITI 2025 trayendo su legado de excelencia en diseño, ingeniería y ciencia para inspirar a la próxima generación de ingenieros latinoamericanos.
-          </p>
-          <div class="pais-chips">
-            <span class="pais-chip">Politecnico di Milano</span>
-            <span class="pais-chip">Università di Bologna</span>
-            <span class="pais-chip">Sapienza Roma</span>
-            <span class="pais-chip">Robótica</span>
-            <span class="pais-chip">Diseño Industrial</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <hr class="divider-line">
-
-  <!-- MAPA -->
-  <section class="sec-mapa" id="sec-mapa">
-    <div class="map-dots-bg"></div>
-    <div class="map-info-card" data-anim="zoom-in">
-      <span class="map-pin-icon">📍</span>
-      <h3>Universidad Católica de Colombia</h3>
-      <p>Av. Caracas #46-72, Bogotá D.C.<br>Edificio El Claustro — Bloque L<br><br>Acceso fácil en transporte público.</p>
-      <a href="https://maps.google.com" target="_blank" class="map-link">
-        <i class="bi bi-map"></i> Abrir en Google Maps
-      </a>
-    </div>
-  </section>
-
   <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container" style="max-width:1200px;">
+  <footer class="site-footer home-footer">
+    <div class="container footer-shell">
+      <div class="footer-map-section" id="sec-mapa">
+        <div class="map-dots-bg"></div>
+        <div class="map-info-card footer-map-card" data-anim="zoom-in">
+          <span class="map-pin-icon">📍</span>
+          <h3>Universidad Católica de Colombia</h3>
+          <p>Av. Caracas #46-72, Bogotá D.C.<br>Edificio El Claustro — Bloque L<br><br>Acceso fácil en transporte público.</p>
+          <a href="https://maps.google.com" target="_blank" class="map-link">
+            <i class="bi bi-map"></i> Abrir en Google Maps
+          </a>
+        </div>
+      </div>
       <div class="columns is-variable is-6">
         <div class="column is-4-desktop">
           <div class="footer-brand">CONIITI</div>
@@ -402,15 +364,15 @@
           <a class="footer-item" onclick="navigate('inicio');sscroll('sec-fechas')">Fechas</a>
           <a class="footer-item" onclick="navigate('inicio');sscroll('sec-countdown')">Cuenta regresiva</a>
           <a class="footer-item" onclick="navigate('inicio');sscroll('sec-speakers')">Conferencistas</a>
-          <a class="footer-item" onclick="navigate('inicio');sscroll('sec-sponsors')">Patrocinadores</a>
           <a class="footer-item" onclick="navigate('inicio');sscroll('sec-pais')">País invitado</a>
+          <a class="footer-item" onclick="navigate('inicio');sscroll('sec-mapa')">Ubicación</a>
         </div>
         <div class="column is-2-desktop">
           <p class="footer-col-title">Congreso</p>
+          <a class="footer-item" onclick="navigate('conferencias')">Conferencias</a>
           <a class="footer-item" onclick="navigate('cronograma')">Cronograma</a>
-          <a class="footer-item" onclick="navigate('boletas')">Boletas</a>
-          <a class="footer-item" onclick="navigate('lineas')">Líneas temáticas</a>
-          <a class="footer-item" onclick="navigate('acerca')">Acerca de</a>
+          <a class="footer-item" onclick="navigate('conferencistas')">Conferencistas</a>
+          <a class="footer-item" onclick="navigate('nosotros')">Nosotros</a>
           <a class="footer-item" onclick="navigate('contacto')">Contacto</a>
         </div>
         <div class="column is-2-desktop">
@@ -430,6 +392,286 @@
   </footer>
 </div><!-- /page-inicio -->
 
+<!-- ═══════════════════════════════
+     PAGE: CONFERENCIAS
+═══════════════════════════════ -->
+<div class="page" id="page-conferencias">
+  <div class="page-band" data-bg="CONFERENCIAS">
+    <div class="container" style="max-width:1200px;">
+      <span class="section-eyebrow eyebrow-gold">Programa académico</span>
+      <h1>Conferencias</h1>
+    </div>
+  </div>
+
+  <div class="container py-6" style="max-width:1180px;">
+    <div class="columns is-variable is-5 is-multiline">
+      <div class="column is-4-desktop" data-anim="fade-up">
+        <div class="boleta-card">
+          <div class="boleta-name">Conferencias magistrales</div>
+          <div class="boleta-for">Apertura internacional</div>
+          <p class="acerca-lead" style="font-size:1rem;">Sesiones centrales con expertos nacionales e internacionales sobre innovación, ingeniería, sostenibilidad y transformación digital.</p>
+          <a class="btn-register btn-reg-gold" onclick="navigate('cronograma')" href="#">Ver cronograma</a>
+        </div>
+      </div>
+      <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="100">
+        <div class="boleta-card">
+          <div class="boleta-name">Talleres aplicados</div>
+          <div class="boleta-for">Experiencia práctica</div>
+          <p class="acerca-lead" style="font-size:1rem;">Espacios de trabajo orientados a prototipado, inteligencia artificial, datos, robótica, diseño e investigación aplicada.</p>
+          <a class="btn-register btn-reg-outline" onclick="navigate('lineas')" href="#">Líneas temáticas</a>
+        </div>
+      </div>
+      <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="200">
+        <div class="boleta-card">
+          <div class="boleta-name">Paneles de discusión</div>
+          <div class="boleta-for">Academia e industria</div>
+          <p class="acerca-lead" style="font-size:1rem;">Conversatorios con investigadores, empresas y comunidad académica para conectar retos reales con soluciones de ingeniería.</p>
+          <a class="btn-register btn-reg-teal" onclick="navigate('conferencistas')" href="#">Conferencistas</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container" style="max-width:1200px;">
+      <div class="is-flex is-justify-content-space-between is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE: CONFERENCISTAS
+═══════════════════════════════ -->
+<div class="page" id="page-conferencistas" style="background:var(--ink);">
+  <div class="page-band" data-bg="PONENTES">
+    <div class="container" style="max-width:1200px;">
+      <span class="section-eyebrow eyebrow-gold">Invitados principales</span>
+      <h1>Conferencistas</h1>
+    </div>
+  </div>
+
+  <div class="py-6" style="background:var(--ink);">
+    <div class="container" style="max-width:1260px;">
+      <div class="columns is-variable is-3 is-multiline">
+        <div class="column is-6-tablet is-3-desktop" data-anim="fade-up">
+          <div class="speaker-card">
+            <div class="speaker-img"><span class="speaker-initials">GM</span></div>
+            <div class="speaker-info">
+              <span class="speaker-name">Giuseppe Moretti</span>
+              <span class="speaker-role">Politecnico di Milano</span>
+              <p class="speaker-bio">Experto en robótica avanzada, sistemas autónomos e industria 4.0.</p>
+              <span class="speaker-country">IT Italia</span>
+            </div>
+          </div>
+        </div>
+        <div class="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay="80">
+          <div class="speaker-card">
+            <div class="speaker-img"><span class="speaker-initials">CR</span></div>
+            <div class="speaker-info">
+              <span class="speaker-name">Claudia Russo</span>
+              <span class="speaker-role">Università La Sapienza</span>
+              <p class="speaker-bio">Investigadora en inteligencia artificial aplicada a salud digital.</p>
+              <span class="speaker-country">IT Italia</span>
+            </div>
+          </div>
+        </div>
+        <div class="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay="160">
+          <div class="speaker-card">
+            <div class="speaker-img" style="background:linear-gradient(135deg,var(--cerulean),var(--ink));"><span class="speaker-initials">JA</span></div>
+            <div class="speaker-info">
+              <span class="speaker-name">Dr. Jorge Arévalo</span>
+              <span class="speaker-role">Universidad Nacional</span>
+              <p class="speaker-bio">Investigador líder en energías renovables y sostenibilidad.</p>
+              <span class="speaker-country">CO Colombia</span>
+            </div>
+          </div>
+        </div>
+        <div class="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay="240">
+          <div class="speaker-card">
+            <div class="speaker-img"><span class="speaker-initials">LF</span></div>
+            <div class="speaker-info">
+              <span class="speaker-name">Laura Fontana</span>
+              <span class="speaker-role">Università di Bologna</span>
+              <p class="speaker-bio">Especialista en nanomateriales e ingeniería de materiales.</p>
+              <span class="speaker-country">IT Italia</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container" style="max-width:1200px;">
+      <div class="is-flex is-justify-content-space-between is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE: COMITÉ
+═══════════════════════════════ -->
+<div class="page" id="page-comite">
+  <div class="page-band" data-bg="COMITÉ">
+    <div class="container" style="max-width:1200px;">
+      <span class="section-eyebrow eyebrow-gold">Equipo CONIITI</span>
+      <h1>Comité</h1>
+    </div>
+  </div>
+
+  <div class="container py-6" style="max-width:1180px;">
+    <div class="columns is-variable is-4 is-multiline">
+      <div class="column is-4-desktop" data-anim="fade-up">
+        <div class="boleta-card">
+          <div class="boleta-name">Ing. Jaime Díaz Ortiz</div>
+          <div class="boleta-for">Oversight Committee</div>
+          <p class="acerca-lead" style="font-size:1rem;">Decano Facultad de Ingeniería.</p>
+        </div>
+      </div>
+      <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="100">
+        <div class="boleta-card">
+          <div class="boleta-name">Ing. Claudia Constanza Jiménez Carranza</div>
+          <div class="boleta-for">Publication Chair</div>
+          <p class="acerca-lead" style="font-size:1rem;">Directora CIFI.</p>
+        </div>
+      </div>
+      <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="200">
+        <div class="boleta-card">
+          <div class="boleta-name">Esp. Jenny Paola Hernández Triana</div>
+          <div class="boleta-for">General Chair</div>
+          <p class="acerca-lead" style="font-size:1rem;">Coordinación general del congreso.</p>
+        </div>
+      </div>
+      <div class="column is-4-desktop" data-anim="fade-up">
+        <div class="boleta-card">
+          <div class="boleta-name">Jefferson E. Paredes G.</div>
+          <div class="boleta-for">Webmaster</div>
+          <p class="acerca-lead" style="font-size:1rem;">Gestión y soporte de plataforma web.</p>
+        </div>
+      </div>
+      <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="100">
+        <div class="boleta-card">
+          <div class="boleta-name">Cristian Bernal</div>
+          <div class="boleta-for">Webmaster</div>
+          <p class="acerca-lead" style="font-size:1rem;">Apoyo técnico y administración web.</p>
+        </div>
+      </div>
+      <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="200">
+        <div class="boleta-card">
+          <div class="boleta-name">Universidad Católica de Colombia</div>
+          <div class="boleta-for">Organized by</div>
+          <p class="acerca-lead" style="font-size:1rem;">Facultad de Ingeniería y Centro de Investigación de la Facultad de Ingeniería.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container" style="max-width:1200px;">
+      <div class="is-flex is-justify-content-space-between is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════
+     PAGE: GUÍA DE PARTICIPACIÓN
+═══════════════════════════════ -->
+<div class="page" id="page-participacion">
+  <div class="page-band" data-bg="GUÍA">
+    <div class="container" style="max-width:1200px;">
+      <span class="section-eyebrow eyebrow-gold">Convocatoria académica</span>
+      <h1>Guía de participación</h1>
+    </div>
+  </div>
+
+  <div class="container py-6 content-page" style="max-width:1180px;">
+    <div class="content-hero-grid">
+      <div class="content-intro" data-anim="fade-right">
+        <span class="section-eyebrow eyebrow-cerulean">CONIITI 2026</span>
+        <h2 class="section-title">Participa con tu<br><em>trabajo académico</em></h2>
+        <div class="gold-rule" style="margin-bottom:28px;"></div>
+        <p class="acerca-lead">La XII Conferencia Internacional sobre Innovación y Tendencias en Ingeniería se llevará a cabo en Bogotá, Colombia, del 30 de septiembre al 02 de octubre de 2026 en modalidad híbrida.</p>
+        <p class="acerca-lead">CONIITI es un espacio abierto de interacción entre actores del ecosistema innovador para compartir nuevos enfoques de transformación creativa con visión de ingeniería.</p>
+        <a class="btn-register btn-reg-gold" onclick="navigate('lineas')" href="#">Ver líneas temáticas</a>
+      </div>
+      <div class="content-summary-panel" data-anim="fade-left">
+        <div class="summary-kicker">Call for papers now open</div>
+        <h3>XII CONIITI 2026</h3>
+        <p>Del 30 de septiembre al 02 de octubre de 2026, Bogotá recibe un encuentro híbrido para investigadores, docentes, estudiantes y profesionales de ingeniería.</p>
+        <div class="summary-meta">
+          <span>Bogotá, Colombia</span>
+          <span>Formato híbrido</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="metric-grid mt-5">
+      <div class="metric-card" data-anim="fade-up">
+        <span class="metric-value">30</span>
+        <span class="metric-label">Septiembre 2026</span>
+      </div>
+      <div class="metric-card" data-anim="fade-up" data-anim-delay="100">
+        <span class="metric-value">02</span>
+        <span class="metric-label">Octubre 2026</span>
+      </div>
+      <div class="metric-card" data-anim="fade-up" data-anim-delay="200">
+        <span class="metric-value">6</span>
+        <span class="metric-label">Páginas máximo</span>
+      </div>
+    </div>
+
+    <div class="guidelines-panel mt-6" data-anim="fade-up">
+      <div class="guidelines-heading">
+        <span class="section-eyebrow eyebrow-gold">Requisitos de envío</span>
+        <h3>Submission guidelines</h3>
+      </div>
+      <div class="guideline-grid">
+        <article class="guideline-card"><span>01</span><h4>Originalidad</h4><p>Se reciben artículos completos de alta calidad con investigación original en las líneas temáticas del congreso.</p></article>
+        <article class="guideline-card"><span>02</span><h4>Idioma</h4><p>Las postulaciones deben estar escritas en inglés y no haber sido publicadas ni estar en evaluación en otro evento o revista.</p></article>
+        <article class="guideline-card"><span>03</span><h4>Formato</h4><p>Los documentos deben seguir el formato IEEE doble columna y enviarse en archivo Word.</p></article>
+        <article class="guideline-card"><span>04</span><h4>Extensión</h4><p>Cada envío tendrá máximo 6 páginas, incluyendo figuras, tablas y referencias.</p></article>
+        <article class="guideline-card"><span>05</span><h4>Presentación</h4><p>Los trabajos aceptados serán presentados como ponencias orales durante el evento.</p></article>
+      </div>
+    </div>
+
+    <div class="columns is-variable is-4 is-multiline mt-6 resource-grid">
+      <div class="column is-6-desktop" data-anim="fade-up">
+        <div class="resource-card">
+          <div class="boleta-name">Plantilla para presentaciones</div>
+          <div class="boleta-for">Material de apoyo</div>
+          <p class="acerca-lead" style="font-size:1rem;">Acceso pendiente a la plantilla oficial para preparar la presentación de trabajos aceptados.</p>
+          <a class="btn-register btn-reg-outline" href="#" onclick="return false;">Disponible próximamente</a>
+        </div>
+      </div>
+      <div class="column is-6-desktop" data-anim="fade-up" data-anim-delay="100">
+        <div class="resource-card">
+          <div class="boleta-name">Plantilla Word formato IEEE</div>
+          <div class="boleta-for">Documento de envío</div>
+          <p class="acerca-lead" style="font-size:1rem;">Formato base para preparar artículos siguiendo el estándar IEEE de conferencia.</p>
+          <a class="btn-register btn-reg-outline" href="#" onclick="return false;">Disponible próximamente</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container" style="max-width:1200px;">
+      <div class="is-flex is-justify-content-space-between is-flex-wrap-wrap" style="gap:12px;">
+        <p class="footer-copy mb-0">© 2025 CONIITI — Universidad Católica de Colombia.</p>
+        <p class="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
+      </div>
+    </div>
+  </footer>
+</div>
 
 <!-- ═══════════════════════════════
      PAGE: CRONOGRAMA
@@ -563,56 +805,62 @@
   </div>
 
   <div class="py-6" style="background:var(--ink);">
-    <div class="container" style="max-width:1200px;">
-      <div class="columns is-variable is-3 is-multiline">
-        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="0">
-          <div class="linea-card">
-            <span class="linea-icon-big">🤖</span>
-            <div class="linea-num">01</div>
-            <div class="linea-title">Inteligencia Artificial e Ingeniería de Datos</div>
-            <p class="linea-desc">Machine learning, redes neuronales, big data y su aplicación en procesos de ingeniería industrial y de sistemas.</p>
-          </div>
-        </div>
-        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="80">
-          <div class="linea-card">
-            <span class="linea-icon-big">⚡</span>
-            <div class="linea-num">02</div>
-            <div class="linea-title">Energías Renovables y Sostenibilidad</div>
-            <p class="linea-desc">Innovación en fuentes de energía limpias, eficiencia energética e ingeniería ambiental para el desarrollo sostenible.</p>
-          </div>
-        </div>
-        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="160">
-          <div class="linea-card">
-            <span class="linea-icon-big">🦾</span>
-            <div class="linea-num">03</div>
-            <div class="linea-title">Robótica y Automatización Industrial</div>
-            <p class="linea-desc">Sistemas autónomos, robótica colaborativa, automatización de procesos y la industria 4.0 aplicada.</p>
-          </div>
-        </div>
-        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="0">
-          <div class="linea-card">
-            <span class="linea-icon-big">🧬</span>
-            <div class="linea-num">04</div>
-            <div class="linea-title">Ingeniería Biomédica e Innovación en Salud</div>
-            <p class="linea-desc">Dispositivos médicos, telemedicina, biosensores y tecnologías emergentes para el sector salud.</p>
-          </div>
-        </div>
-        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="80">
-          <div class="linea-card">
-            <span class="linea-icon-big">🏙️</span>
-            <div class="linea-num">05</div>
-            <div class="linea-title">Infraestructura y Ciudades Inteligentes</div>
-            <p class="linea-desc">Smart cities, ingeniería civil del futuro, gestión de recursos urbanos e infraestructura resiliente y conectada.</p>
-          </div>
-        </div>
-        <div class="column is-4-desktop" data-anim="fade-up" data-anim-delay="160">
-          <div class="linea-card">
-            <span class="linea-icon-big">🔮</span>
-            <div class="linea-num">06</div>
-            <div class="linea-title">Tecnologías Emergentes y Educación</div>
-            <p class="linea-desc">Realidad aumentada, blockchain y nuevas metodologías pedagógicas para la formación de ingenieros del futuro.</p>
-          </div>
-        </div>
+    <div class="container" style="max-width:1180px;">
+      <div class="lineas-intro" data-anim="fade-up">
+        <span class="section-eyebrow eyebrow-gold">XII CONIITI 2026</span>
+        <h2>Para esta edición contamos con 7 líneas temáticas</h2>
+        <p>Selecciona una línea para ver los subtemas admitidos en la convocatoria académica.</p>
+      </div>
+
+      <div class="topic-accordion" data-anim="fade-up" data-anim-delay="120">
+        <details class="topic-item" open>
+          <summary><span>01</span><strong>Creativity, Innovation and Entrepreneurship</strong></summary>
+          <ul class="topic-list">
+            <li>Creative Processes</li><li>Co-creativity</li><li>Co-working</li><li>Culture of innovation and entrepreneurship</li><li>Data marketing</li><li>Design thinking - application experiences</li><li>Disruptive Innovation</li><li>e-Government</li><li>Innovation and social entrepreneurship</li><li>Public Innovation</li><li>Living labs</li><li>Open and smart cities and territories</li><li>Open Innovation</li><li>Strategic Innovation</li><li>Social Innovation</li><li>Technology and innovation management</li><li>Technology transfer</li><li>Technology-based entrepreneurship</li><li>Value creation through Innovation</li>
+          </ul>
+        </details>
+
+        <details class="topic-item">
+          <summary><span>02</span><strong>Infrastructure and Environment</strong></summary>
+          <ul class="topic-list">
+            <li>Bridges and Viaducts</li><li>Environmental management and evaluation</li><li>Green IT</li><li>Imperceptible Science</li><li>Innovative Construction Projects</li><li>Intelligent Transport Systems</li><li>Irradiation and Electromagnetic Pollution</li><li>Lean construction</li><li>Materials</li><li>Nano biosecurity</li><li>Nano sensors</li><li>Pavements</li><li>Precision Agriculture</li><li>Roads and their Environment</li><li>Smart buildings</li><li>Sustainability and Eco-innovation</li><li>Sustainable Building</li><li>Sustainable Cities</li><li>Territorial Development Approaches</li><li>Transport and Mobility Networks</li><li>Tunnels and underground Works</li><li>Urban Mobility</li><li>Urban Planning and Design</li><li>Water and Sanitation</li>
+          </ul>
+        </details>
+
+        <details class="topic-item">
+          <summary><span>03</span><strong>Energy Efficiency and Renewable Energy</strong></summary>
+          <ul class="topic-list">
+            <li>Alternative Energies (Solar energy, Wind energy, Hydro energy, Tidal energy, Geothermal energy, Biomass energy)</li><li>Other Renewable Energy (Energy Storage and Artificial Intelligence)</li><li>Energy Solutions</li><li>Energy Marketing</li><li>Innovative Energy Models</li><li>Process Electrification</li><li>Reduction of CO2 emissions</li><li>New Energy Business Models for Sustainability</li>
+          </ul>
+        </details>
+
+        <details class="topic-item">
+          <summary><span>04</span><strong>Intelligent Software and Technological Convergence</strong></summary>
+          <ul class="topic-list">
+            <li>Agent and Multi-Agent Systems</li><li>Artificial Intelligence</li><li>Autonomous Computing</li><li>Autonomous Systems</li><li>Big Data Analytics</li><li>Business Intelligence</li><li>Business Models for the Internet of Things</li><li>Cloud Computing</li><li>Collaborative Social Networks</li><li>Collective Intelligence</li><li>Data Mining</li><li>Digital Economy</li><li>Distributed Infrastructure for Smart Grids</li><li>Information Security</li><li>Internet of Things</li><li>IT Architecture</li><li>Machine Learning</li><li>Open Data</li><li>Semantic Web and Ontologies</li><li>Security and privacy in Big Data</li><li>Smart Tutoring Systems</li><li>Software Engineering</li><li>Social Network Analysis</li>
+          </ul>
+        </details>
+
+        <details class="topic-item">
+          <summary><span>05</span><strong>Integral and Dynamic Management of Organizations</strong></summary>
+          <ul class="topic-list">
+            <li>Branding</li><li>Change Management</li><li>Business Intelligence</li><li>Corporate Social Responsibility</li><li>Criteria for Decision-Making</li><li>Financial Intelligence</li><li>Intellectual Capital</li><li>Knowledge Management</li><li>Lean Manufacturing</li><li>Lean Six Sigma</li><li>Logistics Management</li><li>Modeling and Simulation</li><li>Operational Research</li><li>Occupational health and safety</li><li>Project Management</li><li>Risk Management</li><li>Six Sigma</li><li>System dynamics</li><li>Statistical Quality Control</li><li>Strategic Foresight</li><li>Strategic Marketing</li><li>Sustainable Logistics</li><li>Supplying and Supply Chains</li><li>Technological Forecasting</li>
+          </ul>
+        </details>
+
+        <details class="topic-item">
+          <summary><span>06</span><strong>Telecommunication Systems and Technologies</strong></summary>
+          <ul class="topic-list">
+            <li>Apps and developments in Telecommunications</li><li>Cognitive Radio</li><li>4G, 5G and beyond</li><li>Wireless body area networks</li><li>Wireless mesh networks</li><li>Modulation, coding, and diversity techniques</li><li>Antennas, smart antennas</li><li>Cryptographic implementations for networking</li><li>Firewall technologies</li><li>Software Defined Networking</li><li>Software Defined Radio</li><li>Networking and energy efficiency</li><li>Future Internet</li><li>Smart buildings and smart homes</li><li>Spectrum measurements and monitoring</li><li>Applied Robotic</li><li>Drones, Applications and Regulation</li><li>Microwave, Optoelectronics and Applications</li><li>Radio Spectrum for 5g and IoT</li><li>Wireless Sensing Systems</li><li>Cooperative sensing</li><li>Dynamic spectrum access</li><li>Machine learning techniques for cognitive radio systems</li><li>Smart healthcare and e-health systems</li><li>IoT-based smart farming</li><li>Green Computing</li><li>Energy-efficient spectrum sensing</li><li>MIMO Systems</li><li>MEMs</li>
+          </ul>
+        </details>
+
+        <details class="topic-item">
+          <summary><span>07</span><strong>Engineering Education</strong></summary>
+          <ul class="topic-list">
+            <li>Accreditation and certification of HEI and programs</li><li>Action research</li><li>Assessment in Education</li><li>Curriculum Development</li><li>Education for entrepreneurship</li><li>Education in STEM</li><li>Educational Innovation</li><li>e-Learning Platforms</li><li>Future Universities</li><li>Gamification</li><li>ICT in Education</li><li>Inclusive Education</li><li>Lean Education</li><li>Problem-Based Learning</li><li>Project-Based Learning</li><li>Public policies in education</li><li>Quality Management in Higher Education Institutions</li><li>Strategies for internationalization</li><li>Strategies for reduction of dropout</li><li>Teaching-learning strategies</li>
+          </ul>
+        </details>
       </div>
     </div>
   </div>
@@ -629,42 +877,79 @@
 
 
 <!-- ═══════════════════════════════
-     PAGE: ACERCA DE
+     PAGE: NOSOTROS
 ═══════════════════════════════ -->
-<div class="page" id="page-acerca">
+<div class="page" id="page-nosotros">
   <div class="page-band" data-bg="HISTORIA">
     <div class="container" style="max-width:1200px;">
       <span class="section-eyebrow eyebrow-gold">Nuestra historia</span>
-      <h1>Acerca de CONIITI</h1>
+      <h1>Nosotros</h1>
     </div>
   </div>
 
-  <div class="container py-6" style="max-width:1100px;">
-    <div class="columns is-variable is-8 is-vcentered">
-      <div class="column is-6-desktop" data-anim="fade-right">
-        <span class="section-eyebrow eyebrow-cerulean">¿Quiénes somos?</span>
-        <h2 class="section-title">El congreso más<br><em>innovador de Colombia</em></h2>
+  <div class="container py-6 content-page" style="max-width:1180px;">
+    <div class="content-hero-grid nosotros-hero">
+      <div class="content-intro" data-anim="fade-right">
+        <span class="section-eyebrow eyebrow-cerulean">Inicios de CONIITI</span>
+        <h2 class="section-title">Innovación con<br><em>visión de ingeniería</em></h2>
         <div class="gold-rule" style="margin-bottom:36px;"></div>
 
-        <p class="acerca-lead">El Congreso Internacional de Innovación y Tendencias en Ingeniería nació en la Universidad Católica de Colombia como un espacio para reunir a la comunidad académica y profesional en torno a los grandes desafíos del siglo XXI.</p>
-        <p class="acerca-lead">Desde su primera edición, CONIITI ha crecido hasta convertirse en un referente de innovación para la región, atrayendo investigadores, instituciones y empresas de más de 12 países.</p>
-        <p class="acerca-lead">En 2025, con Italia como país invitado, celebramos la décima edición — la más ambiciosa e internacional de nuestra historia.</p>
+        <p class="acerca-lead"><strong>CONIITI</strong> es un espacio abierto de interacción entre actores del ecosistema innovador orientado a compartir nuevas aproximaciones para la transformación creativa de Colombia a través del diseño de soluciones con visión de ingeniería.</p>
+        <p class="acerca-lead">La Universidad Católica de Colombia, en el marco de la Semana de Ingeniería, desarrolló el I Congreso Internacional de Innovación y Tendencias en Ingeniería en 2015, realizado entre el 14 y el 17 de octubre en Bogotá.</p>
+        <p class="acerca-lead">Desde entonces, el congreso ha reunido conferencistas, ponencias, workshops y pósteres alrededor de líneas como software inteligente, infraestructura, medio ambiente, creatividad, innovación, emprendimiento y gestión de organizaciones.</p>
       </div>
-      <div class="column is-6-desktop" data-anim="fade-left">
-        <div class="columns is-variable is-3 mb-4">
-          <div class="column is-6"><div class="stat-block"><div class="val">10</div><div class="lbl">Ediciones realizadas</div></div></div>
-          <div class="column is-6"><div class="stat-block"><div class="val">12+</div><div class="lbl">Países participantes</div></div></div>
-          <div class="column is-6"><div class="stat-block"><div class="val">480+</div><div class="lbl">Ponencias publicadas</div></div></div>
-          <div class="column is-6"><div class="stat-block"><div class="val">6K+</div><div class="lbl">Alumni de CONIITI</div></div></div>
-        </div>
-        <div style="position:relative; padding-bottom:28px; padding-right:28px;">
-          <div class="acerca-visual-box"></div>
-          <div class="acerca-badge">
-            <span class="acerca-badge-num">X</span>
-            <span class="acerca-badge-text">Edición CONIITI</span>
-          </div>
+      <div class="content-summary-panel history-summary" data-anim="fade-left">
+        <div class="summary-kicker">Universidad Católica de Colombia</div>
+        <h3>De la Semana de Ingeniería a un congreso internacional</h3>
+        <p>CONIITI nace como un punto de encuentro académico para conectar investigación, industria y nuevas tendencias de ingeniería.</p>
+        <div class="summary-meta">
+          <span>Desde 2015</span>
+          <span>Bogotá D.C.</span>
         </div>
       </div>
+    </div>
+
+    <div class="metric-grid mt-5">
+      <div class="metric-card" data-anim="fade-up">
+        <span class="metric-value">2015</span>
+        <span class="metric-label">I CONIITI</span>
+      </div>
+      <div class="metric-card" data-anim="fade-up" data-anim-delay="100">
+        <span class="metric-value">2016</span>
+        <span class="metric-label">II CONIITI</span>
+      </div>
+      <div class="metric-card" data-anim="fade-up" data-anim-delay="200">
+        <span class="metric-value">XII</span>
+        <span class="metric-label">CONIITI 2026</span>
+      </div>
+    </div>
+
+    <div class="history-grid mt-6">
+      <article class="history-card" data-anim="fade-up">
+        <div class="history-year">2015</div>
+        <div>
+          <h3>Surge el I CONIITI</h3>
+          <p class="acerca-lead" style="font-size:1rem;">Encuentro académico organizado por la Facultad de Ingeniería para compartir nuevas tendencias y herramientas que impulsaran la innovación en el país.</p>
+          <ul class="history-list">
+            <li>Software inteligente y convergencia tecnológica.</li>
+            <li>Infraestructura y medio ambiente.</li>
+            <li>Gestión integral y dinámica de organizaciones empresariales.</li>
+          </ul>
+        </div>
+      </article>
+      <article class="history-card" data-anim="fade-up" data-anim-delay="120">
+        <div class="history-year">2016</div>
+        <div>
+          <h3>II CONIITI</h3>
+          <p class="acerca-lead" style="font-size:1rem;">Realizado entre el 24 y el 26 de agosto de 2016 en Bogotá, con conferencias, ponencias, workshops y pósteres.</p>
+          <ul class="history-list">
+            <li>Creatividad, innovación y emprendimiento.</li>
+            <li>Software inteligente y convergencia tecnológica.</li>
+            <li>Infraestructura y medio ambiente.</li>
+            <li>Gestión integral y dinámica de las organizaciones.</li>
+          </ul>
+        </div>
+      </article>
     </div>
   </div>
 
@@ -772,55 +1057,6 @@
   </footer>
 </div>
 
-<!-- AUTH MODAL -->
-<div class="auth-modal" id="auth-modal" aria-hidden="true">
-  <div class="auth-modal-backdrop" onclick="closeAuthModal()"></div>
-  <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
-    <button class="auth-close" type="button" onclick="closeAuthModal()" aria-label="Cerrar">
-      <i class="bi bi-x-lg"></i>
-    </button>
-
-    <span class="section-eyebrow eyebrow-gold">Acceso CONIITI</span>
-    <h3 class="section-title" id="auth-modal-title" style="font-size:2.2rem;margin-bottom:20px;color:#fff;">Bienvenido</h3>
-
-    <div class="auth-tabs" role="tablist" aria-label="Acceso">
-      <button id="auth-tab-login" class="auth-tab active" type="button" onclick="showAuthTab('login')">Iniciar sesión</button>
-      <button id="auth-tab-register" class="auth-tab" type="button" onclick="showAuthTab('register')">Registrarse</button>
-    </div>
-
-    <p class="auth-info" id="auth-global-message"></p>
-
-    <form id="auth-login-form" class="auth-form" onsubmit="submitLogin(event)" novalidate>
-      <label class="form-label-custom">Correo electrónico</label>
-      <input class="form-input" type="email" id="auth-login-email" placeholder="correo@ejemplo.com" required>
-      <p class="auth-error" id="auth-login-email-error"></p>
-
-      <label class="form-label-custom" style="margin-top:14px;">Contraseña</label>
-      <input class="form-input" type="password" id="auth-login-password" placeholder="Tu contraseña" required>
-      <p class="auth-error" id="auth-login-password-error"></p>
-
-      <button type="submit" class="btn-primary" style="margin-top:20px;cursor:pointer;clip-path:none;">Continuar</button>
-    </form>
-
-    <form id="auth-register-form" class="auth-form" style="display:none;" onsubmit="submitRegister(event)">
-      <label class="form-label-custom">Nombre completo</label>
-      <input class="form-input" type="text" id="auth-register-name" placeholder="Tu nombre" required>
-
-      <label class="form-label-custom" style="margin-top:14px;">Correo electrónico</label>
-      <input class="form-input" type="email" id="auth-register-email" placeholder="correo@ejemplo.com" required>
-
-      <label class="form-label-custom" style="margin-top:14px;">Contraseña</label>
-      <input class="form-input" type="password" id="auth-register-password" placeholder="Mínimo 6 caracteres" minlength="6" required>
-
-      <label class="form-label-custom" style="margin-top:14px;">Confirmar contraseña</label>
-      <input class="form-input" type="password" id="auth-register-confirm" placeholder="Repite tu contraseña" minlength="6" required>
-
-      <button type="submit" class="btn-primary" style="margin-top:20px;cursor:pointer;clip-path:none;">Crear cuenta</button>
-    </form>
-  </div>
-</div>
-
-
 <!-- Scripts -->
 <script>
 // ── AOS Init ──
@@ -862,14 +1098,19 @@ function navigate(page) {
   if (page === current) { window.scrollTo({top:0,behavior:'smooth'}); return; }
   const oldEl = document.getElementById('page-' + current);
   const newEl = document.getElementById('page-' + page);
+  if (!newEl) return;
+  closeNavDropdowns();
 
   document.querySelectorAll('.nav-links li a, .nav-links li button').forEach(el => el.classList.remove('active'));
   const navEl = document.getElementById('nav-' + page);
   if (navEl) navEl.classList.add('active');
+  if (!navEl && ['comite', 'participacion', 'lineas', 'boletas', 'contacto'].includes(page)) {
+    document.getElementById('nav-mas')?.classList.add('active');
+  }
 
-  oldEl.classList.add('exit');
+  oldEl?.classList.add('exit');
   setTimeout(() => {
-    oldEl.classList.remove('active','exit');
+    oldEl?.classList.remove('active','exit');
     newEl.classList.add('active');
     window.scrollTo({top:0,behavior:'instant'});
     current = page;
@@ -877,12 +1118,150 @@ function navigate(page) {
   }, 260);
 }
 
+function toggleNavDropdown(event) {
+  event.preventDefault();
+  const dropdown = event.currentTarget.closest('.has-dropdown');
+  const willOpen = !dropdown?.classList.contains('open');
+  closeNavDropdowns();
+  if (!dropdown || !willOpen) return;
+  dropdown.classList.add('open');
+  event.currentTarget.setAttribute('aria-expanded', 'true');
+}
+
+function closeNavDropdowns() {
+  document.querySelectorAll('.has-dropdown.open').forEach((dropdown) => {
+    dropdown.classList.remove('open');
+    dropdown.querySelector('button')?.setAttribute('aria-expanded', 'false');
+  });
+}
+
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.has-dropdown')) closeNavDropdowns();
+});
+
 function sscroll(id) {
   setTimeout(() => {
+    if (id === 'sec-pais') showHomeSlide(1);
+    if (id === 'sec-home-hero') showHomeSlide(0);
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
   }, 560);
 }
+
+let homeSlideIndex = 0;
+let homeSlideTimer = null;
+
+function showHomeSlide(index, restartTimer = false) {
+  const slider = document.querySelector('[data-home-slider]');
+  if (!slider) return;
+  const track = slider.querySelector('.showcase-track');
+  const slides = slider.querySelectorAll('.showcase-slide');
+  if (!track || !slides.length) return;
+
+  homeSlideIndex = (index + slides.length) % slides.length;
+  track.style.transform = `translateX(-${homeSlideIndex * 100}%)`;
+  slider.setAttribute('data-slide', String(homeSlideIndex));
+
+  if (restartTimer) startHomeSlider();
+}
+
+function moveHomeSlide(step) {
+  showHomeSlide(homeSlideIndex + step, true);
+}
+
+function startHomeSlider() {
+  if (homeSlideTimer) clearInterval(homeSlideTimer);
+  homeSlideTimer = setInterval(() => {
+    showHomeSlide(homeSlideIndex + 1);
+  }, 6500);
+}
+
+function initHomeShowcase() {
+  const page = document.getElementById('page-inicio');
+  const country = page?.querySelector('#sec-pais');
+  const hero = page?.querySelector('.hero');
+  if (!page || !country || !hero || page.querySelector('[data-home-slider]')) return;
+
+  hero.id = 'sec-home-hero';
+  hero.classList.add('hero-slide');
+
+  const slider = document.createElement('section');
+  slider.className = 'home-showcase';
+  slider.id = 'sec-home-showcase';
+  slider.setAttribute('data-home-slider', '');
+
+  const track = document.createElement('div');
+  track.className = 'showcase-track';
+
+  const heroSlide = document.createElement('article');
+  heroSlide.className = 'showcase-slide';
+  heroSlide.appendChild(hero);
+
+  const countrySlide = document.createElement('article');
+  countrySlide.className = 'showcase-slide';
+  countrySlide.appendChild(country);
+
+  track.appendChild(heroSlide);
+  track.appendChild(countrySlide);
+
+  const controls = document.createElement('div');
+  controls.className = 'showcase-controls';
+  controls.setAttribute('aria-label', 'Destacados de inicio');
+  controls.innerHTML = `
+    <button class="showcase-arrow" type="button" aria-label="Slide anterior" onclick="moveHomeSlide(-1)">
+      <span aria-hidden="true">&#8592;</span>
+    </button>
+    <button class="showcase-arrow" type="button" aria-label="Siguiente slide" onclick="moveHomeSlide(1)">
+      <span aria-hidden="true">&#8594;</span>
+    </button>
+  `;
+
+  slider.appendChild(track);
+  slider.appendChild(controls);
+  page.insertBefore(slider, page.firstElementChild);
+
+  const divider = slider.nextElementSibling;
+  if (divider?.classList.contains('divider-line')) divider.remove();
+
+  const showcaseDivider = document.createElement('hr');
+  showcaseDivider.className = 'divider-line';
+  slider.insertAdjacentElement('afterend', showcaseDivider);
+
+  slider.addEventListener('mouseenter', () => {
+    if (homeSlideTimer) clearInterval(homeSlideTimer);
+  });
+  slider.addEventListener('mouseleave', startHomeSlider);
+
+  showHomeSlide(0);
+  startHomeSlider();
+}
+
+function initFooterMapCard() {
+  const footer = document.querySelector('.home-footer');
+  const mapSection = footer?.querySelector('.footer-map-section');
+  const mapCard = footer?.querySelector('.footer-map-card');
+  const columns = footer?.querySelector('.columns');
+  const brandCol = columns?.querySelector('.column.is-4-desktop');
+  if (!footer || !mapCard || !columns) return;
+  if (footer.querySelector('.footer-map-column')) return;
+
+  if (brandCol) {
+    brandCol.classList.remove('is-4-desktop');
+    brandCol.classList.add('is-3-desktop');
+  }
+
+  mapCard.id = 'sec-mapa';
+  const mapColumn = document.createElement('div');
+  mapColumn.className = 'column is-3-desktop footer-map-column';
+  mapColumn.innerHTML = '<div class="footer-map-wrap"></div>';
+  mapColumn.querySelector('.footer-map-wrap').appendChild(mapCard);
+  columns.appendChild(mapColumn);
+
+  if (mapSection) mapSection.remove();
+}
+
+initHomeShowcase();
+initFooterMapCard();
 
 // ── Schedule tabs ──
 function showDay(id, btn) {
@@ -891,167 +1270,6 @@ function showDay(id, btn) {
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
 }
-
-// ── Auth Modal ──
-function openAuthModal(event) {
-  if (event) event.preventDefault();
-  const modal = document.getElementById('auth-modal');
-  if (!modal) return;
-  modal.classList.add('active');
-  modal.setAttribute('aria-hidden', 'false');
-  showAuthTab('login');
-  clearLoginErrors();
-}
-
-function closeAuthModal() {
-  const modal = document.getElementById('auth-modal');
-  if (!modal) return;
-  modal.classList.remove('active');
-  modal.setAttribute('aria-hidden', 'true');
-}
-
-function showAuthTab(tab) {
-  const loginTab = document.getElementById('auth-tab-login');
-  const registerTab = document.getElementById('auth-tab-register');
-  const loginForm = document.getElementById('auth-login-form');
-  const registerForm = document.getElementById('auth-register-form');
-  if (!loginTab || !registerTab || !loginForm || !registerForm) return;
-
-  const isLogin = tab === 'login';
-  loginTab.classList.toggle('active', isLogin);
-  registerTab.classList.toggle('active', !isLogin);
-  loginForm.style.display = isLogin ? 'block' : 'none';
-  registerForm.style.display = isLogin ? 'none' : 'block';
-  if (isLogin) clearLoginErrors();
-}
-
-function clearLoginErrors() {
-  const emailError = document.getElementById('auth-login-email-error');
-  const passwordError = document.getElementById('auth-login-password-error');
-  if (emailError) emailError.textContent = '';
-  if (passwordError) passwordError.textContent = '';
-}
-
-function setAuthMessage(message = '', type = 'default') {
-  const el = document.getElementById('auth-global-message');
-  if (!el) return;
-  el.textContent = message;
-  el.classList.remove('error', 'success');
-  if (type === 'error') el.classList.add('error');
-  if (type === 'success') el.classList.add('success');
-}
-
-async function submitLogin(event) {
-  event.preventDefault();
-
-  const emailInput = document.getElementById('auth-login-email');
-  const passwordInput = document.getElementById('auth-login-password');
-  const emailError = document.getElementById('auth-login-email-error');
-  const passwordError = document.getElementById('auth-login-password-error');
-
-  const emailValue = emailInput?.value?.trim() || '';
-  const passwordValue = passwordInput?.value?.trim() || '';
-
-  let hasErrors = false;
-  if (emailError) emailError.textContent = '';
-  if (passwordError) passwordError.textContent = '';
-
-  if (!emailValue) {
-    if (emailError) emailError.textContent = 'El correo es obligatorio';
-    hasErrors = true;
-  }
-
-  if (!passwordValue) {
-    if (passwordError) passwordError.textContent = 'La contraseña es obligatoria';
-    hasErrors = true;
-  }
-
-  if (hasErrors) {
-    setAuthMessage('Completa los campos obligatorios.', 'error');
-    return;
-  }
-
-  try {
-    setAuthMessage('Validando credenciales...');
-    const response = await fetch('http://127.0.0.1:3003/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: emailValue,
-        password: passwordValue
-      })
-    });
-
-    const payload = await response.json();
-    if (!response.ok || !payload.ok) {
-      setAuthMessage(payload.message || 'No fue posible iniciar sesión.', 'error');
-      return;
-    }
-
-    setAuthMessage('Inicio de sesión exitoso.', 'success');
-    closeAuthModal();
-    navigate('boletas');
-  } catch (_error) {
-    setAuthMessage('No hay conexión con el servicio de autenticación.', 'error');
-  }
-}
-
-async function submitRegister(event) {
-  event.preventDefault();
-  const fullName = document.getElementById('auth-register-name')?.value?.trim() || '';
-  const email = document.getElementById('auth-register-email')?.value?.trim() || '';
-  const pass = document.getElementById('auth-register-password')?.value || '';
-  const confirm = document.getElementById('auth-register-confirm')?.value || '';
-
-  if (!fullName) {
-    setAuthMessage('El nombre es obligatorio.', 'error');
-    return;
-  }
-
-  if (!email) {
-    setAuthMessage('El correo es obligatorio.', 'error');
-    return;
-  }
-
-  if (!pass) {
-    setAuthMessage('La contraseña es obligatoria.', 'error');
-    return;
-  }
-
-  if (pass !== confirm) {
-    setAuthMessage('Las contraseñas no coinciden.', 'error');
-    return;
-  }
-
-  try {
-    setAuthMessage('Creando cuenta...');
-    const response = await fetch('http://127.0.0.1:3003/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fullName,
-        email,
-        password: pass
-      })
-    });
-
-    const payload = await response.json();
-    if (!response.ok || !payload.ok) {
-      setAuthMessage(payload.message || 'No fue posible registrar el usuario.', 'error');
-      return;
-    }
-
-    setAuthMessage('Cuenta creada correctamente.', 'success');
-    closeAuthModal();
-    navigate('boletas');
-  } catch (_error) {
-    setAuthMessage('No hay conexión con el servicio de autenticación.', 'error');
-  }
-}
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeAuthModal();
-});
 
 // ══════════════════════════════════════
 // ANIMACIONES EXTRA

@@ -1,244 +1,64 @@
-# CONIITI - Frontend + Backend (Hexagonal)
+# CONITI
 
-Proyecto monorepo con frontend en React + Vite y backend en Node.js + Express, ambos organizados con arquitectura hexagonal.
+Monorepo web para CONITI con frontend en React + Vite y backend dividido en microservicios Node.js + Express + MySQL.
 
-## 1) Estructura del proyecto
+## Estructura
 
-- `frontend/` (React + Vite)
-  - `src/domain`
-  - `src/application`
-  - `src/infrastructure`
-  - `src/ui`
-- `backend/` (Node + Express)
-  - `src/domain`
-  - `src/application`
-  - `src/infrastructure`
-  - `src/interfaces/http`
+- `frontend/`: aplicacion React + Vite. Actualmente monta la landing legacy desde `frontend/public/conii.html`.
+- `auth-service/`: autenticacion, registro, JWT, roles y recuperacion de contrasena.
+- `conferencias-service/`: CRUD de conferencias, categorias, estados y agenda.
+- `conferencistas-service/`: CRUD de conferencistas, ponencias y relacion con eventos.
+- `fechas-service/`: disponibilidad, conflictos, zonas horarias y agenda maestra.
+- `scripts/run-all.js`: levanta todos los servicios desde la raiz.
 
-## 2) Flujo de ramas (Git)
+## Requisitos
 
-- `main`: producción (estable).
-- `develop`: integración previa a producción.
-- `dev_nebeltran`: rama personal de desarrollo.
-
-Flujo recomendado:
-
-1. Trabajar en `dev_nebeltran`.
-2. Merge / PR hacia `develop`.
-3. Validar en `develop`.
-4. Promover a `main`.
-
-## 3) Requisitos
-
-- Node.js LTS (recomendado 20+)
+- Node.js LTS recomendado 20+
 - npm
 - MySQL 8+
 
-## 4) Instalación paso a paso
+## Instalacion
 
-Desde la raíz del repo (`Coniiti/Coniiti`):
-
-```bash
-cd frontend
-npm install
-cd ../backend
-npm install
-cd ..
-```
-
-## 5) Configuración de base de datos (MySQL)
-
-El backend usa variables de entorno en `backend/.env`.
-
-### 5.1 Crear el archivo `.env`
-
-En `backend/`:
-
-```bash
-cp .env.example .env
-```
-
-En Windows PowerShell, si no tienes `cp`:
+Desde la raiz del proyecto:
 
 ```powershell
-Copy-Item .env.example .env
-```
-
-### 5.2 Variables de conexión
-
-Ejemplo de `backend/.env`:
-
-```dotenv
-PORT=3000
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=CONITI
-DB_USER=coniiti_app
-DB_PASSWORD=TU_PASSWORD_AQUI
-```
-
-También puedes usar `root` si lo prefieres:
-
-```dotenv
-DB_USER=root
-DB_PASSWORD=
-```
-
-> El backend crea automáticamente la base de datos `CONITI` y la tabla `users` si no existen.
-
-### 5.3 (Opcional recomendado) Crear usuario de app en MySQL
-
-```sql
-CREATE USER IF NOT EXISTS 'coniiti_app'@'localhost' IDENTIFIED BY 'TU_PASSWORD_AQUI';
-GRANT ALL PRIVILEGES ON CONITI.* TO 'coniiti_app'@'localhost';
-FLUSH PRIVILEGES;
-```
-
-## 6) Cómo correr el proyecto
-
-### Opción A: dos terminales (recomendado)
-
-Terminal 1 (backend):
-
-```bash
-npm run backend:start
-```
-
-Terminal 2 (frontend):
-
-```bash
-npm run frontend:dev
-```
-
-Frontend: `http://127.0.0.1:5173` (o puerto que indique Vite)
-Backend: `http://127.0.0.1:3000`
-
-### Opción B: modo desarrollo backend
-
-```bash
-npm run backend:dev
-```
-
-## 7) Cómo correr tests
-
-Desde la raíz:
-
-```bash
-npm run test:e2e
-```
-
-Modo UI (Playwright):
-
-```bash
-npm run test:e2e:ui
-```
-
-Directo desde `frontend/`:
-
-```bash
-cd frontend
-npm run test:e2e
-```
-
-Notas:
-
-- Los tests E2E están en `frontend/test`.
-- El test de login usa mock de API para no depender del backend encendido.
-
-## 8) Comandos disponibles (raíz)
-
-- `npm run frontend:dev`
-- `npm run frontend:build`
-- `npm run backend:dev`
-- `npm run backend:start`
-- `npm run test:e2e`
-- `npm run test:e2e:ui`
-
-## 9) Solución de problemas (Windows)
-
-Si `npm` no se reconoce en PowerShell:
-
-```powershell
-$env:Path = 'C:\Program Files\nodejs;' + $env:Path
-& 'C:\Program Files\nodejs\npm.cmd' run frontend:dev
-```
-
-Para correr comandos con `--prefix`:
-
-```powershell
-& 'C:\Program Files\nodejs\npm.cmd' run start --prefix backend
-& 'C:\Program Files\nodejs\npm.cmd' run test:e2e --prefix frontend
-```
-
-## 10) Notas de Git
-
-- `frontend/test-results/.last-run.json` es un archivo temporal de Playwright.
-- Si aparece como cambio local, no es código funcional del proyecto.
-
-Git (trabajo normal en tu rama)
-
-git checkout dev_nebeltran
-git pull origin dev_nebeltran
-git add .
-git commit -m "tu cambio"
-git push origin dev_nebeltran
-Pasar cambios a develop
-
-git checkout develop
-git pull origin develop
-git merge dev_nebeltran
-git push origin develop
-Pasar cambios a producción (main)
-
-git checkout main
-git pull origin main
-git merge develop
-git push origin main
-Correr proyecto
-
-Backend: npm run backend:start
-Frontend: npm run frontend:dev
-Correr tests
-
-npm run test:e2e
-UI tests: npm run test:e2e:ui
-Si npm falla en PowerShell (Windows)
-
-$env:Path = 'C:\Program Files\nodejs;' + $env:Path
-& 'C:\Program Files\nodejs\npm.cmd' run backend:start
-& 'C:\Program Files\nodejs\npm.cmd' run frontend:dev
-& 'C:\Program Files\nodejs\npm.cmd' run test:e2e
-
-## 11) Correr todo el proyecto con un solo comando
-
-Primero instala todo:
-
-```bash
 npm run install:all
 ```
 
-Desde la raiz:
+## Variables de entorno
 
-```bash
-npm run dev:all
+Cada microservicio tiene su propio `.env.example`. Crea los `.env` locales copiando esos ejemplos:
+
+```powershell
+Copy-Item auth-service\.env.example auth-service\.env
+Copy-Item conferencias-service\.env.example conferencias-service\.env
+Copy-Item conferencistas-service\.env.example conferencistas-service\.env
+Copy-Item fechas-service\.env.example fechas-service\.env
+Copy-Item frontend\.env.example frontend\.env
 ```
 
-Esto levanta al mismo tiempo:
+Los `.env` estan ignorados por Git.
 
-- frontend
-- auth-service
-- conferencias-service
+### Puertos por defecto
 
-## 12) Auth-service con base de datos
+- Frontend: `http://127.0.0.1:5173`
+- Auth service: `http://127.0.0.1:3003`
+- Conferencias service: `http://127.0.0.1:3004`
+- Conferencistas service: `http://127.0.0.1:3005`
+- Fechas service: `http://127.0.0.1:3006`
 
-El microservicio `auth-service` soporta:
+### Frontend
 
-- `AUTH_SERVICE_STORAGE=memory`
-- `AUTH_SERVICE_STORAGE=mysql`
+`frontend/.env`:
 
-Crea `auth-service/.env` a partir de `auth-service/.env.example`.
+```dotenv
+VITE_AUTH_API_URL=http://127.0.0.1:3003
+VITE_SPEAKERS_API_URL=http://127.0.0.1:3005
+```
 
-Ejemplo:
+### Auth service
+
+`auth-service/.env`:
 
 ```dotenv
 AUTH_SERVICE_PORT=3003
@@ -246,12 +66,113 @@ AUTH_SERVICE_STORAGE=mysql
 AUTH_SERVICE_JWT_SECRET=un_secreto_seguro
 AUTH_SERVICE_DB_HOST=localhost
 AUTH_SERVICE_DB_PORT=3306
-AUTH_SERVICE_DB_NAME=CONITI
+AUTH_SERVICE_DB_NAME=CONITI_AUTH
 AUTH_SERVICE_DB_USER=root
 AUTH_SERVICE_DB_PASSWORD=
 ```
 
-En modo MySQL el servicio crea o ajusta:
+Credenciales demo creadas automaticamente:
 
-- tabla `users` con columna `role`
-- tabla `password_reset_tokens`
+- Admin: `admin@coniiti.test` / `Admin123*`
+- Organizador: `organizer@coniiti.test` / `Organizer123*`
+
+## Comandos
+
+Levantar todo en desarrollo:
+
+```powershell
+npm run dev:all
+```
+
+Levantar solo frontend:
+
+```powershell
+npm run frontend:dev
+```
+
+Build del frontend:
+
+```powershell
+npm run frontend:build
+```
+
+Tests E2E:
+
+```powershell
+npm run test:e2e
+```
+
+## Health checks
+
+Con los servicios arriba:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:3003/health
+Invoke-RestMethod http://127.0.0.1:3004/health
+Invoke-RestMethod http://127.0.0.1:3005/health
+Invoke-RestMethod http://127.0.0.1:3006/health
+```
+
+## Base de datos
+
+La instancia local de MySQL funciona como el contenedor madre, equivalente a la vista de SQL Server Management Studio donde una instancia contiene varias bases de datos.
+
+Dentro de esa instancia, cada microservicio tiene su propia base:
+
+- `CONITI_AUTH`: tablas de `auth-service`
+- `CONITI_CONFERENCIAS`: tablas de `conferencias-service`
+- `CONITI_CONFERENCISTAS`: tablas de `conferencistas-service`
+- `CONITI_FECHAS`: tablas de `fechas-service`
+
+Esto mantiene separacion por responsabilidad y es mas cercano a una arquitectura de microservicios.
+
+El esquema general de todas las bases esta en:
+
+- `database/001_coniti_databases.sql`
+
+Para crear o validar todas las bases manualmente en MySQL:
+
+```powershell
+mysql -u root -p < database\001_coniti_databases.sql
+```
+
+Tambien existen esquemas versionados por microservicio:
+
+- `auth-service/sql/001_schema.sql`
+- `conferencias-service/sql/001_schema.sql`
+- `conferencistas-service/sql/001_schema.sql`
+- `fechas-service/sql/001_schema.sql`
+
+Si quieres aplicar solo el modulo de un servicio:
+
+```powershell
+mysql -u root -p < auth-service\sql\001_schema.sql
+mysql -u root -p < conferencias-service\sql\001_schema.sql
+mysql -u root -p < conferencistas-service\sql\001_schema.sql
+mysql -u root -p < fechas-service\sql\001_schema.sql
+```
+
+Si antes usaste la base `CONITI` para autenticacion, puedes migrar esos datos a `CONITI_AUTH` con:
+
+```powershell
+mysql -u root -p < database\002_migrate_auth_from_coniti.sql
+```
+
+Los repositorios MySQL todavia crean tablas automaticamente al iniciar en modo `mysql`. Eso se mantiene para desarrollo local, pero `database/001_coniti_databases.sql` es la fuente estable para instalacion, revision y despliegue.
+
+## Estado actual
+
+- La arquitectura activa esta en la raiz del repositorio.
+- La antigua carpeta duplicada `CONITI/` fue eliminada.
+- El frontend aun conserva una landing legacy, pero ya consume servicios desde configuracion `VITE_*`.
+- Los tests E2E no dependen de tener el backend encendido porque mockean el login.
+
+## Flujo recomendado antes de cambiar codigo
+
+```powershell
+git status --short
+npm run frontend:build
+npm run test:e2e
+```
+
+Despues de cada cambio importante, repetir build y tests para evitar regresiones.

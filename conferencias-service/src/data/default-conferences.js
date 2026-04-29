@@ -1,7 +1,7 @@
 const defaultConferences = [
   {
     title: 'Arquitectura de Microservicios con Node.js',
-    description: 'Conferencia enfocada en diseno desacoplado, escalabilidad y evolucion progresiva.',
+    description: 'Conferencia enfocada en diseño desacoplado, escalabilidad y evolución progresiva.',
     category: 'Arquitectura',
     status: 'published',
     modality: 'virtual',
@@ -20,7 +20,7 @@ const defaultConferences = [
         room: 'Sala Principal'
       },
       {
-        title: 'Patrones de descomposicion',
+        title: 'Patrones de descomposición',
         speaker: 'Laura Mendoza',
         startsAt: '2026-05-20T14:20:00.000Z',
         endsAt: '2026-05-20T15:10:00.000Z',
@@ -30,7 +30,7 @@ const defaultConferences = [
   },
   {
     title: 'Observabilidad para plataformas de eventos',
-    description: 'Buenas practicas para monitoreo, metricas y trazabilidad en sistemas orientados a eventos.',
+    description: 'Buenas prácticas para monitoreo, métricas y trazabilidad en sistemas orientados a eventos.',
     category: 'DevOps',
     status: 'draft',
     modality: 'hybrid',
@@ -42,7 +42,7 @@ const defaultConferences = [
     endDate: '2026-06-15T15:00:00.000Z',
     agenda: [
       {
-        title: 'Introduccion a metricas',
+        title: 'Introducción a métricas',
         speaker: 'Carlos Ruiz',
         startsAt: '2026-06-15T13:00:00.000Z',
         endsAt: '2026-06-15T13:45:00.000Z',

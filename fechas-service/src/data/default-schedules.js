@@ -58,7 +58,7 @@ const defaultConflicts = [
     startsAt: '2026-05-20T15:00:00.000Z',
     endsAt: '2026-05-20T16:00:00.000Z',
     severity: 'medium',
-    reason: 'Montaje tecnico y panel comparten la misma franja'
+    reason: 'Montaje técnico y panel comparten la misma franja'
   }
 ]
 

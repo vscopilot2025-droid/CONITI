@@ -17,19 +17,19 @@ function validateSpeakerPayload(body, { partial = false } = {}) {
     if (!body?.initials?.trim()) return 'Las iniciales son obligatorias'
   }
   if (!partial || body.institution !== undefined) {
-    if (!body?.institution?.trim()) return 'La institucion es obligatoria'
+    if (!body?.institution?.trim()) return 'La institución es obligatoria'
   }
   if (!partial || body.country !== undefined) {
-    if (!body?.country?.trim()) return 'El pais es obligatorio'
+    if (!body?.country?.trim()) return 'El país es obligatorio'
   }
   if (!partial || body.countryCode !== undefined) {
-    if (!body?.countryCode?.trim()) return 'El codigo de pais es obligatorio'
+    if (!body?.countryCode?.trim()) return 'El código de país es obligatorio'
   }
   if (!partial || body.city !== undefined) {
     if (!body?.city?.trim()) return 'La ciudad es obligatoria'
   }
   if (!partial || body.bio !== undefined) {
-    if (!body?.bio?.trim()) return 'La biografia es obligatoria'
+    if (!body?.bio?.trim()) return 'La biografía es obligatoria'
   }
   if (body.expertise !== undefined && !Array.isArray(body.expertise)) {
     return 'La experiencia debe enviarse como un arreglo'
@@ -38,20 +38,20 @@ function validateSpeakerPayload(body, { partial = false } = {}) {
 }
 
 function validateTalkPayload(body) {
-  if (!body?.title?.trim()) return 'El titulo de la ponencia es obligatorio'
+  if (!body?.title?.trim()) return 'El título de la ponencia es obligatorio'
   if (!body?.abstract?.trim()) return 'El resumen de la ponencia es obligatorio'
   if (!body?.topic?.trim()) return 'El tema de la ponencia es obligatorio'
   if (!Number.isInteger(body?.durationMinutes) || body.durationMinutes <= 0) {
-    return 'La duracion debe ser un entero mayor a cero'
+    return 'La duración debe ser un entero mayor a cero'
   }
   return null
 }
 
 function validateEventLinkPayload(body) {
-  if (!body?.conferenceTitle?.trim()) return 'El titulo del evento es obligatorio'
-  if (!body?.participationType?.trim()) return 'El tipo de participacion es obligatorio'
+  if (!body?.conferenceTitle?.trim()) return 'El título del evento es obligatorio'
+  if (!body?.participationType?.trim()) return 'El tipo de participación es obligatorio'
   if (body.scheduledAt && Number.isNaN(Date.parse(body.scheduledAt))) {
-    return 'La fecha programada es invalida'
+    return 'La fecha programada es inválida'
   }
   return null
 }
@@ -231,7 +231,7 @@ function createSpeakersRouter(repository) {
 
     res.status(201).json({
       ok: true,
-      message: 'Relacion con evento agregada correctamente',
+      message: 'Relación con evento agregada correctamente',
       eventLink
     })
   }))

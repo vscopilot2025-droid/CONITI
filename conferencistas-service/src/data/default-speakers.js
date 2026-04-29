@@ -6,15 +6,15 @@ const defaultSpeakers = [
     institution: 'Politecnico di Milano',
     country: 'Italia',
     countryCode: 'IT',
-    city: 'Milan',
-    bio: 'Experto en robotica avanzada y sistemas autonomos con 25 anos de investigacion en Europa.',
-    expertise: ['robotica', 'sistemas autonomos', 'industria 4.0'],
+    city: 'Milán',
+    bio: 'Experto en robótica avanzada y sistemas autónomos con 25 años de investigación en Europa.',
+    expertise: ['robótica', 'sistemas autónomos', 'industria 4.0'],
     featured: true,
     talks: [
       {
-        title: 'Ingenieria e innovacion: el puente entre Italia y America Latina',
-        abstract: 'Keynote sobre transferencia tecnologica, colaboracion academica e innovacion aplicada.',
-        topic: 'Innovacion',
+        title: 'Ingeniería e innovación: el puente entre Italia y América Latina',
+        abstract: 'Keynote sobre transferencia tecnológica, colaboración académica e innovación aplicada.',
+        topic: 'Innovación',
         durationMinutes: 60
       }
     ],
@@ -31,17 +31,17 @@ const defaultSpeakers = [
     fullName: 'Claudia Russo',
     slug: 'claudia-russo',
     initials: 'CR',
-    institution: 'Universita La Sapienza',
+    institution: 'Università La Sapienza',
     country: 'Italia',
     countryCode: 'IT',
     city: 'Rome',
-    bio: 'Pionera en inteligencia artificial aplicada a la ingenieria biomedica y salud digital.',
-    expertise: ['inteligencia artificial', 'salud digital', 'ingenieria biomedica'],
+    bio: 'Pionera en inteligencia artificial aplicada a la ingeniería biomédica y salud digital.',
+    expertise: ['inteligencia artificial', 'salud digital', 'ingeniería biomédica'],
     featured: true,
     talks: [
       {
-        title: 'Inteligencia artificial aplicada a sistemas de ingenieria',
-        abstract: 'Taller para aterrizar IA en procesos de diseno, manufactura y analitica avanzada.',
+        title: 'Inteligencia artificial aplicada a sistemas de ingeniería',
+        abstract: 'Taller para aterrizar IA en procesos de diseño, manufactura y analítica avanzada.',
         topic: 'Inteligencia Artificial',
         durationMinutes: 90
       }
@@ -56,20 +56,20 @@ const defaultSpeakers = [
     ]
   },
   {
-    fullName: 'Dr. Jorge Arevalo',
+    fullName: 'Dr. Jorge Arévalo',
     slug: 'dr-jorge-arevalo',
     initials: 'JA',
     institution: 'Universidad Nacional',
     country: 'Colombia',
     countryCode: 'CO',
-    city: 'Bogota',
-    bio: 'Investigador lider en energias renovables y sostenibilidad para Latinoamerica.',
-    expertise: ['energias renovables', 'sostenibilidad', 'ingenieria energetica'],
+    city: 'Bogotá',
+    bio: 'Investigador líder en energías renovables y sostenibilidad para Latinoamérica.',
+    expertise: ['energías renovables', 'sostenibilidad', 'ingeniería energética'],
     featured: true,
     talks: [
       {
-        title: 'Energias renovables para una ingenieria sostenible',
-        abstract: 'Sesion sobre transicion energetica y aplicacion de fuentes limpias en proyectos industriales.',
+        title: 'Energías renovables para una ingeniería sostenible',
+        abstract: 'Sesión sobre transición energética y aplicación de fuentes limpias en proyectos industriales.',
         topic: 'Sostenibilidad',
         durationMinutes: 60
       }
@@ -87,17 +87,17 @@ const defaultSpeakers = [
     fullName: 'Laura Fontana',
     slug: 'laura-fontana',
     initials: 'LF',
-    institution: 'Universita di Bologna',
+    institution: 'Università di Bologna',
     country: 'Italia',
     countryCode: 'IT',
     city: 'Bologna',
-    bio: 'Especialista en nanomateriales y su aplicacion en la ingenieria de materiales del futuro.',
-    expertise: ['nanomateriales', 'materiales avanzados', 'innovacion industrial'],
+    bio: 'Especialista en nanomateriales y su aplicación en la ingeniería de materiales del futuro.',
+    expertise: ['nanomateriales', 'materiales avanzados', 'innovación industrial'],
     featured: true,
     talks: [
       {
-        title: 'Nanomateriales: la proxima revolucion industrial',
-        abstract: 'Conferencia sobre materiales de nueva generacion y su impacto en manufactura avanzada.',
+        title: 'Nanomateriales: la próxima revolución industrial',
+        abstract: 'Conferencia sobre materiales de nueva generación y su impacto en manufactura avanzada.',
         topic: 'Materiales',
         durationMinutes: 60
       }

@@ -12,19 +12,19 @@ function asyncHandler(handler) {
 function validateConferencePayload(body, { partial = false } = {}) {
   if (!partial || body.title !== undefined) {
     if (!body?.title?.trim()) {
-      return 'El titulo es obligatorio'
+      return 'El título es obligatorio'
     }
   }
 
   if (!partial || body.description !== undefined) {
     if (!body?.description?.trim()) {
-      return 'La descripcion es obligatoria'
+      return 'La descripción es obligatoria'
     }
   }
 
   if (!partial || body.category !== undefined) {
     if (!body?.category?.trim()) {
-      return 'La categoria es obligatoria'
+      return 'La categoría es obligatoria'
     }
   }
 
@@ -60,13 +60,13 @@ function validateConferencePayload(body, { partial = false } = {}) {
 
   if (!partial || body.startDate !== undefined) {
     if (Number.isNaN(Date.parse(body?.startDate))) {
-      return 'La fecha de inicio es invalida'
+      return 'La fecha de inicio es inválida'
     }
   }
 
   if (!partial || body.endDate !== undefined) {
     if (Number.isNaN(Date.parse(body?.endDate))) {
-      return 'La fecha de fin es invalida'
+      return 'La fecha de fin es inválida'
     }
   }
 
@@ -83,7 +83,7 @@ function validateConferencePayload(body, { partial = false } = {}) {
 
 function validateAgendaPayload(body) {
   if (!body?.title?.trim()) {
-    return 'El titulo de la agenda es obligatorio'
+    return 'El título de la agenda es obligatorio'
   }
 
   if (!body?.speaker?.trim()) {
@@ -95,7 +95,7 @@ function validateAgendaPayload(body) {
   }
 
   if (Number.isNaN(Date.parse(body?.startsAt)) || Number.isNaN(Date.parse(body?.endsAt))) {
-    return 'Las fechas de agenda son invalidas'
+    return 'Las fechas de agenda son inválidas'
   }
 
   if (new Date(body.startsAt) >= new Date(body.endsAt)) {
@@ -311,7 +311,7 @@ function createConferenceRouter(repository) {
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(409).json({
         ok: false,
-        message: 'Ya existe una conferencia con ese titulo o slug'
+        message: 'Ya existe una conferencia con ese título o slug'
       })
     }
 

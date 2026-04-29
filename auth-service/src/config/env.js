@@ -23,7 +23,7 @@ function getAuthConfig() {
     database: {
       host: process.env.AUTH_SERVICE_DB_HOST || process.env.DB_HOST || 'localhost',
       port: Number(process.env.AUTH_SERVICE_DB_PORT || process.env.DB_PORT || 3306),
-      name: process.env.AUTH_SERVICE_DB_NAME || process.env.DB_NAME || 'CONITI',
+      name: process.env.AUTH_SERVICE_DB_NAME || 'CONITI_AUTH',
       user: process.env.AUTH_SERVICE_DB_USER || process.env.DB_USER || 'root',
       password: process.env.AUTH_SERVICE_DB_PASSWORD || process.env.DB_PASSWORD || ''
     }
