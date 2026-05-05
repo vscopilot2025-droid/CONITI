@@ -4,9 +4,12 @@ import { GetMasterAgenda } from '../application/use-cases/GetMasterAgenda'
 import { GetPublishedConferences } from '../application/use-cases/GetPublishedConferences'
 import { GetSpeakers } from '../application/use-cases/GetSpeakers'
 import { HttpConferenceRepository } from '../infrastructure/repositories/HttpConferenceRepository'
+import { apiConfig, buildApiUrl } from '../infrastructure/config/api'
 import { HttpScheduleRepository } from '../infrastructure/repositories/HttpScheduleRepository'
 import { HttpSpeakerRepository } from '../infrastructure/repositories/HttpSpeakerRepository'
 import { AuthModal } from './components/AuthModal'
+
+const authStorageKey = 'coniti.auth'
 
 const speakerRepository = new HttpSpeakerRepository()
 const conferenceRepository = new HttpConferenceRepository()
@@ -977,6 +980,7 @@ export default function App() {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
+  const [authSession, setAuthSession] = useState(null)
   const [currentHomeSlide, setCurrentHomeSlide] = useState(0)
   const [countdown, setCountdown] = useState(buildCountdown())
   const [scheduleDayIndex, setScheduleDayIndex] = useState(0)
@@ -993,6 +997,73 @@ export default function App() {
   const [speakersLoaded, setSpeakersLoaded] = useState(false)
   const [conferenceCardsLoaded, setConferenceCardsLoaded] = useState(false)
   const [scheduleDaysLoaded, setScheduleDaysLoaded] = useState(false)
+
+  useEffect(() => {
+    const storedValue = localStorage.getItem(authStorageKey)
+    if (!storedValue) {
+      return undefined
+    }
+
+    let storedSession = null
+    try {
+      storedSession = JSON.parse(storedValue)
+    } catch (_error) {
+      localStorage.removeItem(authStorageKey)
+      return undefined
+    }
+
+    if (!storedSession?.user) {
+      localStorage.removeItem(authStorageKey)
+      return undefined
+    }
+
+    setAuthSession(storedSession)
+
+    if (!storedSession.token) {
+      return undefined
+    }
+
+    const controller = new AbortController()
+
+    async function validateStoredSession() {
+      try {
+        const response = await fetch(buildApiUrl(apiConfig.authApiUrl, '/auth/me'), {
+          headers: {
+            Authorization: `${storedSession.tokenType || 'Bearer'} ${storedSession.token}`
+          },
+          signal: controller.signal
+        })
+
+        if (response.status === 401) {
+          localStorage.removeItem(authStorageKey)
+          setAuthSession(null)
+          return
+        }
+
+        if (!response.ok) {
+          return
+        }
+
+        const payload = await response.json()
+        if (payload?.ok && payload.user) {
+          const refreshedSession = {
+            ...storedSession,
+            user: payload.user
+          }
+          localStorage.setItem(authStorageKey, JSON.stringify(refreshedSession))
+          setAuthSession(refreshedSession)
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setAuthSession(storedSession)
+        }
+      }
+    }
+
+    validateStoredSession()
+
+    return () => controller.abort()
+  }, [])
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -1095,7 +1166,7 @@ export default function App() {
   const currentView = useMemo(() => {
     switch (page) {
       case 'inicio':
-        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={() => { setAuthMode('login'); setIsAuthOpen(true) }} onNavigate={setPage} />
+        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={setPage} />
       case 'conferencias':
         return <ConferencesPage conferenceCards={conferenceCards} onNavigate={setPage} />
       case 'conferencistas':
@@ -1115,9 +1186,9 @@ export default function App() {
       case 'contacto':
         return <ContactPage />
       default:
-        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={() => { setAuthMode('login'); setIsAuthOpen(true) }} onNavigate={setPage} />
+        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={setPage} />
     }
-  }, [conferenceCards, countdown, currentHomeSlide, featuredSpeakers, page, scheduleDayIndex, scheduleDays, speakers])
+  }, [authSession, conferenceCards, countdown, currentHomeSlide, featuredSpeakers, page, scheduleDayIndex, scheduleDays, speakers])
 
   function handleNavigate(nextPage) {
     setPage(nextPage)
@@ -1126,9 +1197,35 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  function handleAuthenticated() {
+  function handleAuthEntry() {
+    if (authSession?.user) {
+      setPage('boletas')
+      return
+    }
+
+    setAuthMode('login')
+    setIsAuthOpen(true)
+  }
+
+  function handleAuthenticated(payload) {
+    if (payload?.user) {
+      setAuthSession({
+        token: payload.token,
+        tokenType: payload.tokenType || 'Bearer',
+        user: payload.user
+      })
+    }
+
     setIsAuthOpen(false)
     setPage('boletas')
+  }
+
+  function handleLogout() {
+    localStorage.removeItem(authStorageKey)
+    setAuthSession(null)
+    setIsAuthOpen(false)
+    setPage('inicio')
+    setDropdownOpen(false)
   }
 
   return (
@@ -1158,7 +1255,19 @@ export default function App() {
                 <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('contacto') }}><span className="dot" /> Contacto</a>
               </div>
             </li>
-            <li><a className="nav-cta" onClick={(event) => { event.preventDefault(); setAuthMode('login'); setIsAuthOpen(true) }} href="#">Inscríbete</a></li>
+            {authSession?.user ? (
+              <li className="nav-session">
+                <span className="nav-user">
+                  <i className="bi bi-person-check" />
+                  {authSession.user.fullName || authSession.user.email}
+                </span>
+                <button className="nav-logout" type="button" onClick={handleLogout}>
+                  Cerrar sesión
+                </button>
+              </li>
+            ) : (
+              <li><a className="nav-cta" onClick={(event) => { event.preventDefault(); handleAuthEntry() }} href="#">Inscríbete</a></li>
+            )}
           </ul>
         </div>
       </nav>
