@@ -1,0 +1,110 @@
+# ============================================================
+# conferencias-service  →  http://localhost:3004
+# ============================================================
+
+@baseUrl = http://localhost:3004
+
+# ──────────────────────────────────────────────────────────────
+# HEALTH CHECK
+# ──────────────────────────────────────────────────────────────
+
+### GET /health — Estado del servicio
+GET {{baseUrl}}/health
+
+
+# ──────────────────────────────────────────────────────────────
+# LISTADOS AUXILIARES
+# ──────────────────────────────────────────────────────────────
+
+### GET /conferencias/categories — Listar categorías disponibles
+GET {{baseUrl}}/conferencias/categories
+
+
+### GET /conferencias/statuses — Listar estados disponibles
+GET {{baseUrl}}/conferencias/statuses
+
+
+# ──────────────────────────────────────────────────────────────
+# CONFERENCIAS  (CRUD)
+# ──────────────────────────────────────────────────────────────
+
+### GET /conferencias — Listar todas las conferencias
+# Filtros opcionales: status, category, modality, search, fromDate, toDate
+GET {{baseUrl}}/conferencias?status=published&modality=hybrid
+
+
+### GET /conferencias/:id — Obtener conferencia por ID
+GET {{baseUrl}}/conferencias/1
+
+
+### POST /conferencias — Crear una nueva conferencia
+POST {{baseUrl}}/conferencias
+Content-Type: application/json
+
+{
+  "title": "IA en la Educación Superior",
+  "description": "Conferencia sobre el impacto de la inteligencia artificial en la educación.",
+  "category": "Tecnología",
+  "status": "draft",
+  "modality": "hybrid",
+  "timezone": "America/Bogota",
+  "capacity": 200,
+  "availableSeats": 200,
+  "tags": ["IA", "educación", "tecnología"],
+  "startDate": "2026-11-10T09:00:00.000Z",
+  "endDate": "2026-11-10T18:00:00.000Z"
+}
+
+
+### PUT /conferencias/:id — Actualizar conferencia completa
+PUT {{baseUrl}}/conferencias/1
+Content-Type: application/json
+
+{
+  "title": "IA en la Educación Superior (Actualizada)",
+  "description": "Descripción actualizada de la conferencia.",
+  "category": "Tecnología",
+  "status": "published",
+  "modality": "hybrid",
+  "timezone": "America/Bogota",
+  "capacity": 250,
+  "availableSeats": 250,
+  "tags": ["IA", "educación"],
+  "startDate": "2026-11-10T09:00:00.000Z",
+  "endDate": "2026-11-10T18:00:00.000Z"
+}
+
+
+### PATCH /conferencias/:id — Actualizar conferencia parcialmente
+PATCH {{baseUrl}}/conferencias/1
+Content-Type: application/json
+
+{
+  "status": "published",
+  "availableSeats": 180
+}
+
+
+### DELETE /conferencias/:id — Eliminar conferencia
+DELETE {{baseUrl}}/conferencias/1
+
+
+# ──────────────────────────────────────────────────────────────
+# AGENDA DE CONFERENCIA
+# ──────────────────────────────────────────────────────────────
+
+### GET /conferencias/:id/agenda — Ver agenda de una conferencia
+GET {{baseUrl}}/conferencias/1/agenda
+
+
+### POST /conferencias/:id/agenda — Agregar ítem a la agenda
+POST {{baseUrl}}/conferencias/1/agenda
+Content-Type: application/json
+
+{
+  "title": "Apertura y bienvenida",
+  "speaker": "Dra. María García",
+  "room": "Auditorio Principal",
+  "startsAt": "2026-11-10T09:00:00.000Z",
+  "endsAt": "2026-11-10T09:30:00.000Z"
+}
