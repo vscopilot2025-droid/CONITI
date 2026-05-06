@@ -1,0 +1,123 @@
+# ============================================================
+# conferencistas-service  →  http://localhost:3005
+# ============================================================
+
+@baseUrl = http://localhost:3005
+
+# ──────────────────────────────────────────────────────────────
+# HEALTH CHECK
+# ──────────────────────────────────────────────────────────────
+
+### GET /health — Estado del servicio
+GET {{baseUrl}}/health
+
+
+# ──────────────────────────────────────────────────────────────
+# LISTADOS AUXILIARES
+# ──────────────────────────────────────────────────────────────
+
+### GET /conferencistas/countries — Listar países de conferencistas
+GET {{baseUrl}}/conferencistas/countries
+
+
+# ──────────────────────────────────────────────────────────────
+# CONFERENCISTAS  (CRUD)
+# ──────────────────────────────────────────────────────────────
+
+### GET /conferencistas — Listar todos los conferencistas
+# Filtros opcionales: country, institution, featured, search
+GET {{baseUrl}}/conferencistas?featured=true
+
+
+### GET /conferencistas/:id — Obtener conferencista por ID
+GET {{baseUrl}}/conferencistas/1
+
+
+### POST /conferencistas — Crear un nuevo conferencista
+POST {{baseUrl}}/conferencistas
+Content-Type: application/json
+
+{
+  "fullName": "Dr. Carlos Rodríguez",
+  "slug": "carlos-rodriguez",
+  "initials": "CR",
+  "institution": "Universidad Nacional",
+  "country": "Colombia",
+  "countryCode": "CO",
+  "city": "Bogotá",
+  "bio": "Doctor en Ciencias de la Computación con 15 años de experiencia en IA.",
+  "expertise": ["Inteligencia Artificial", "Machine Learning", "Deep Learning"],
+  "featured": true
+}
+
+
+### PUT /conferencistas/:id — Actualizar conferencista completo
+PUT {{baseUrl}}/conferencistas/1
+Content-Type: application/json
+
+{
+  "fullName": "Dr. Carlos Rodríguez Pérez",
+  "slug": "carlos-rodriguez-perez",
+  "initials": "CR",
+  "institution": "Universidad Nacional de Colombia",
+  "country": "Colombia",
+  "countryCode": "CO",
+  "city": "Bogotá",
+  "bio": "Doctor en Ciencias de la Computación con 20 años de experiencia.",
+  "expertise": ["IA", "Machine Learning"],
+  "featured": true
+}
+
+
+### PATCH /conferencistas/:id — Actualizar conferencista parcialmente
+PATCH {{baseUrl}}/conferencistas/1
+Content-Type: application/json
+
+{
+  "featured": false,
+  "city": "Medellín"
+}
+
+
+### DELETE /conferencistas/:id — Eliminar conferencista
+DELETE {{baseUrl}}/conferencistas/1
+
+
+# ──────────────────────────────────────────────────────────────
+# PONENCIAS DEL CONFERENCISTA
+# ──────────────────────────────────────────────────────────────
+
+### GET /conferencistas/:id/ponencias — Listar ponencias de un conferencista
+GET {{baseUrl}}/conferencistas/1/ponencias
+
+
+### POST /conferencistas/:id/ponencias — Agregar ponencia a un conferencista
+POST {{baseUrl}}/conferencistas/1/ponencias
+Content-Type: application/json
+
+{
+  "title": "El futuro del Machine Learning en Latinoamérica",
+  "abstract": "Una revisión del estado actual y las tendencias del ML en la región.",
+  "topic": "Machine Learning",
+  "durationMinutes": 45
+}
+
+
+# ──────────────────────────────────────────────────────────────
+# EVENTOS RELACIONADOS AL CONFERENCISTA
+# ──────────────────────────────────────────────────────────────
+
+### GET /conferencistas/:id/eventos — Listar eventos de un conferencista
+GET {{baseUrl}}/conferencistas/1/eventos
+
+
+### POST /conferencistas/:id/eventos — Vincular conferencista a un evento
+POST {{baseUrl}}/conferencistas/1/eventos
+Content-Type: application/json
+
+{
+  "conferenceId": 1,
+  "conferenceTitle": "IA en la Educación Superior",
+  "participationType": "keynote",
+  "scheduledAt": "2026-11-10T10:00:00.000Z"
+}
