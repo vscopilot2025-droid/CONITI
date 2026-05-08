@@ -228,7 +228,7 @@ export function LegacyLandingView({
         return
       }
 
-      document.title = documentNode.title || 'CONIITI 2025'
+      document.title = documentNode.title || 'CONITI 2026'
       documentNode.getElementById('auth-modal')?.remove()
 
       const [featuredResult, speakersResult, conferencesResult, agendaResult] = await Promise.allSettled([

@@ -199,7 +199,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
           <i className="bi bi-x-lg" />
         </button>
 
-        <span className="section-eyebrow eyebrow-gold">Acceso CONIITI</span>
+        <span className="section-eyebrow eyebrow-gold">Acceso CONITI</span>
         <h3 className="section-title" id="auth-modal-title" style={{ fontSize: '2.2rem', marginBottom: 20, color: '#fff' }}>
           Bienvenido
         </h3>

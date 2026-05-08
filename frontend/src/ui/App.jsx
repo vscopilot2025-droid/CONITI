@@ -126,7 +126,7 @@ const topicGroups = [
 const historyCards = [
   {
     year: '2015',
-    title: 'Surge el I CONIITI',
+    title: 'Surge el I CONITI',
     description:
       'Encuentro académico organizado por la Facultad de Ingeniería para compartir nuevas tendencias y herramientas que impulsaran la innovación en el país.',
     items: [
@@ -137,7 +137,7 @@ const historyCards = [
   },
   {
     year: '2016',
-    title: 'II CONIITI',
+    title: 'II CONITI',
     description:
       'Realizado entre el 24 y el 26 de agosto de 2016 en Bogotá, con conferencias, ponencias, workshops y pósteres.',
     items: [
@@ -150,7 +150,7 @@ const historyCards = [
 ]
 
 const contactItems = [
-  ['bi-envelope', 'Correo electrónico', 'coniiti2025@ucatolica.edu.co'],
+  ['bi-envelope', 'Correo electrónico', 'coniti2026@ucatolica.edu.co'],
   ['bi-telephone', 'Teléfono', '+57 (601) 327 7300 Ext. 5000'],
   ['bi-geo-alt', 'Dirección', 'Av. Caracas #46-72, Bogotá D.C.'],
   ['bi-clock', 'Horario', 'Lun – Vie, 8:00 AM – 5:00 PM']
@@ -226,7 +226,7 @@ function normalizeScheduleDays(entries) {
       {
         label: 'Día 1 · Oct 15',
         rows: [
-          ['8:00 AM', 'Registro', 'Acreditación y bienvenida', 'Comité organizador CONIITI', 'badge-br'],
+          ['8:00 AM', 'Registro', 'Acreditación y bienvenida', 'Comité organizador CONITI', 'badge-br'],
           ['9:00 AM', 'Keynote', 'Ingeniería e innovación: el puente entre Italia y América Latina', 'Giuseppe Moretti · Politecnico di Milano', 'badge-k'],
           ['11:00 AM', 'Panel', 'Transformación digital en la industria 4.0', 'Panel internacional de expertos', 'badge-p']
         ]
@@ -280,13 +280,13 @@ function SimpleFooter({ dark = false, full = false }) {
           <>
             <div className="columns is-variable is-6">
               <div className="column is-3-desktop">
-                <div className="footer-brand">CONIITI</div>
+                <div className="footer-brand">CONITI</div>
                 <div style={{ display: 'flex', gap: 3, margin: '10px 0' }}>
                   <div style={{ width: 22, height: 10, background: '#009246' }} />
                   <div style={{ width: 22, height: 10, background: '#fff', opacity: 0.5 }} />
                   <div style={{ width: 22, height: 10, background: '#ce2b37' }} />
                 </div>
-                <p className="footer-brand-sub">Congreso Internacional de Innovación y Tendencias en Ingeniería. Universidad Católica de Colombia · 2025</p>
+                <p className="footer-brand-sub">Congreso Internacional de Innovación y Tendencias en Ingeniería. Universidad Católica de Colombia · 2026</p>
               </div>
               <div className="column is-2-desktop">
                 <p className="footer-col-title">Inicio</p>
@@ -317,7 +317,7 @@ function SimpleFooter({ dark = false, full = false }) {
                     <span className="map-pin-icon">📍</span>
                     <h3>Universidad Católica de Colombia</h3>
                     <p>Av. Caracas #46-72, Bogotá D.C.<br />Edificio El Claustro — Bloque L<br /><br />Acceso fácil en transporte público.</p>
-                    <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="map-link">
+                    <a href="https://maps.app.goo.gl/1cVbbtcHSBKMEGgx8" target="_blank" rel="noreferrer" className="map-link">
                       <i className="bi bi-map" /> Abrir en Google Maps
                     </a>
                   </div>
@@ -328,7 +328,7 @@ function SimpleFooter({ dark = false, full = false }) {
           </>
         ) : null}
         <div className="is-flex is-justify-content-space-between is-flex-wrap-wrap" style={{ gap: 12 }}>
-          <p className="footer-copy mb-0">{full ? '© 2025 CONIITI — Universidad Católica de Colombia. Todos los derechos reservados.' : '© 2025 CONIITI — Universidad Católica de Colombia.'}</p>
+          <p className="footer-copy mb-0">{full ? '© 2026 CONITI — Universidad Católica de Colombia. Todos los derechos reservados.' : '© 2026 CONITI — Universidad Católica de Colombia.'}</p>
           <p className="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
         </div>
       </div>
@@ -355,18 +355,18 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
               <div className="hero-noise" />
               <div className="glow glow-gold" />
               <div className="glow glow-teal" />
-              <div className="hero-bg-text">CONIITI</div>
+              <div className="hero-bg-text">CONITI</div>
 
-              <div className="container" style={{ width: '100%', maxWidth: 1340, padding: '0 60px', position: 'relative', zIndex: 2 }}>
-                <div className="columns is-vcentered" style={{ minHeight: 'calc(100vh - 170px)', paddingTop: 60 }}>
+              <div className="container" style={{ width: '100%', maxWidth: 1380, padding: '0 60px', position: 'relative', zIndex: 2 }}>
+                <div className="columns is-vcentered" style={{ minHeight: 'calc(100vh - 180px)', paddingTop: 60 }}>
                   <div className="column is-8-widescreen is-10-desktop">
                     <div className="hero-overline">
                       <span className="hero-overline-bar" />
-                      <span className="hero-overline-text">Universidad Católica de Colombia · X Edición</span>
+                      <span className="hero-overline-text">Universidad Católica de Colombia · XI Edición</span>
                     </div>
 
                     <h1 className="hero-title">CONIITI</h1>
-                    <span className="hero-title-ghost">2025</span>
+                    <span className="hero-title-ghost">2026</span>
 
                     <p className="hero-tagline">
                       Congreso Internacional de Innovación y Tendencias en Ingeniería — donde la ciencia, la tecnología y el futuro convergen.
@@ -399,7 +399,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
                 </div>
                 <div className="hero-sidebar-item">
                   <div className="hero-sidebar-label">Edición</div>
-                  <div className="hero-sidebar-val">X · Décima</div>
+                  <div className="hero-sidebar-val">XI · Undécima</div>
                 </div>
               </div>
 
@@ -428,13 +428,13 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
               <div className="container pais-content" style={{ maxWidth: 1200, padding: '80px 40px' }}>
                 <div className="columns">
                   <div className="column is-7-widescreen is-9-desktop" data-anim="fade-right">
-                    <span className="section-eyebrow eyebrow-gold">País invitado · 2025</span>
+                    <span className="section-eyebrow eyebrow-gold">País invitado · 2026</span>
                     <h2 className="pais-giant">
                       Italia
                       <span className="pais-em">La República Italiana</span>
                     </h2>
                     <p className="pais-desc">
-                      Italia, cuna del Renacimiento y la innovación, llega a CONIITI 2025 trayendo su legado de excelencia en diseño, ingeniería y ciencia para inspirar a la próxima generación de ingenieros latinoamericanos.
+                      Italia, cuna del Renacimiento y la innovación, llega a CONITI 2026 trayendo su legado de excelencia en diseño, ingeniería y ciencia para inspirar a la próxima generación de ingenieros latinoamericanos.
                     </p>
                     <div className="pais-chips">
                       <span className="pais-chip">Politecnico di Milano</span>
@@ -477,7 +477,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
                 ['05', 'Sep', 'Notificación de aceptación', 'El comité revisor comunicará los resultados de evaluación a los autores postulantes.'],
                 ['20', 'Sep', 'Cierre de inscripciones con descuento', 'Precio reducido disponible hasta esta fecha. Luego aplica tarifa regular.'],
                 ['30', 'Sep', 'Entrega de artículos completos', 'Fecha límite para cargar las versiones definitivas de los artículos aceptados.'],
-                ['15', 'Oct', '¡Inauguración del Congreso!', 'Apertura oficial de CONIITI 2025 en la Universidad Católica de Colombia, Bogotá.']
+                ['15', 'Oct', '¡Inauguración del Congreso!', 'Apertura oficial de CONITI 2026 en la Universidad Católica de Colombia, Bogotá.']
               ].map(([day, month, title, desc], index) => (
                 <div className="fecha-item" key={title} data-anim="fade-up" data-anim-delay={60 + index * 50}>
                   <div className="fecha-date"><span className="fecha-day" style={index === 4 ? { color: 'var(--gold)' } : undefined}>{day}</span><span className="fecha-month">{month}</span></div>
@@ -490,14 +490,14 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
             </div>
             <div className="column is-6-desktop" data-anim="fade-left" data-anim-delay="100" style={{ paddingTop: 320 }}>
               <div className="timeline-card">
-                <p className="tl-head">Línea de tiempo 2025</p>
+                <p className="tl-head">Línea de tiempo 2026</p>
                 <div className="tl-list">
                   {[
-                    ['Agosto 2025', 'Convocatoria abierta', true],
-                    ['Septiembre 2025', 'Evaluación y selección de ponencias'],
-                    ['1 – 14 Oct 2025', 'Registro de asistentes'],
-                    ['15 – 17 Oct 2025', 'Congreso CONIITI 2025'],
-                    ['Noviembre 2025', 'Publicación de memorias oficiales']
+                    ['Agosto 2026', 'Convocatoria abierta', true],
+                    ['Septiembre 2026', 'Evaluación y selección de ponencias'],
+                    ['1 – 14 Oct 2026', 'Registro de asistentes'],
+                    ['15 – 17 Oct 2026', 'Congreso CONITI 2026'],
+                    ['Noviembre 2026', 'Publicación de memorias oficiales']
                   ].map(([date, text, active]) => (
                     <div className="tl-entry" key={date}>
                       <div className={`tl-dot${active ? ' active' : ''}`} />
@@ -529,7 +529,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
             <div className="cd-card" data-anim="zoom-in" data-anim-delay="240"><span className="cd-number">{countdown.seconds}</span><span className="cd-label">Segundos</span></div>
           </div>
           <p className="has-text-centered mt-5" style={{ fontFamily: 'var(--font-title)', fontStyle: 'italic', color: 'rgba(255,255,255,0.28)', fontSize: '.95rem' }} data-anim="fade-up" data-anim-delay="300">
-            Bogotá D.C., Colombia · 15, 16 y 17 de Octubre de 2025
+            Bogotá D.C., Colombia · 15, 16 y 17 de Octubre de 2026
           </p>
         </div>
       </section>
@@ -644,7 +644,7 @@ function CommitteePage() {
     <div className="page active" id="page-comite">
       <div className="page-band" data-bg="COMITÉ">
         <div className="container" style={{ maxWidth: 1200 }}>
-          <span className="section-eyebrow eyebrow-gold">Equipo CONIITI</span>
+          <span className="section-eyebrow eyebrow-gold">Equipo CONITI</span>
           <h1>Comité</h1>
         </div>
       </div>
@@ -681,16 +681,16 @@ function ParticipationPage({ onNavigate }) {
       <div className="container py-6 content-page" style={{ maxWidth: 1180 }}>
         <div className="content-hero-grid">
           <div className="content-intro" data-anim="fade-right">
-            <span className="section-eyebrow eyebrow-cerulean">CONIITI 2026</span>
+            <span className="section-eyebrow eyebrow-cerulean">CONITI 2026</span>
             <h2 className="section-title">Participa con tu<br /><em>trabajo académico</em></h2>
             <div className="gold-rule" style={{ marginBottom: 28 }} />
             <p className="acerca-lead">La XII Conferencia Internacional sobre Innovación y Tendencias en Ingeniería se llevará a cabo en Bogotá, Colombia, del 30 de septiembre al 02 de octubre de 2026 en modalidad híbrida.</p>
-            <p className="acerca-lead">CONIITI es un espacio abierto de interacción entre actores del ecosistema innovador para compartir nuevos enfoques de transformación creativa con visión de ingeniería.</p>
+            <p className="acerca-lead">CONITI es un espacio abierto de interacción entre actores del ecosistema innovador para compartir nuevos enfoques de transformación creativa con visión de ingeniería.</p>
             <a className="btn-register btn-reg-gold" onClick={(event) => { event.preventDefault(); onNavigate('lineas') }} href="#">Ver líneas temáticas</a>
           </div>
           <div className="content-summary-panel" data-anim="fade-left">
             <div className="summary-kicker">Call for papers now open</div>
-            <h3>XII CONIITI 2026</h3>
+            <h3>XII CONITI 2026</h3>
             <p>Del 30 de septiembre al 02 de octubre de 2026, Bogotá recibe un encuentro híbrido para investigadores, docentes, estudiantes y profesionales de ingeniería.</p>
             <div className="summary-meta">
               <span>Bogotá, Colombia</span>
@@ -748,7 +748,7 @@ function SchedulePage({ scheduleDays, dayIndex, onChangeDay }) {
       <div className="page-band" data-bg="CRONOGRAMA">
         <div className="container" style={{ maxWidth: 1200 }}>
           <span className="section-eyebrow eyebrow-gold">Programa oficial</span>
-          <h1>Cronograma 2025</h1>
+          <h1>Cronograma 2026</h1>
         </div>
       </div>
 
@@ -861,17 +861,17 @@ function AboutPage() {
       <div className="container py-6 content-page" style={{ maxWidth: 1180 }}>
         <div className="content-hero-grid nosotros-hero">
           <div className="content-intro" data-anim="fade-right">
-            <span className="section-eyebrow eyebrow-cerulean">Inicios de CONIITI</span>
+            <span className="section-eyebrow eyebrow-cerulean">Inicios de CONITI</span>
             <h2 className="section-title">Innovación con<br /><em>visión de ingeniería</em></h2>
             <div className="gold-rule" style={{ marginBottom: 36 }} />
-            <p className="acerca-lead"><strong>CONIITI</strong> es un espacio abierto de interacción entre actores del ecosistema innovador orientado a compartir nuevas aproximaciones para la transformación creativa de Colombia a través del diseño de soluciones con visión de ingeniería.</p>
+            <p className="acerca-lead"><strong>CONITI</strong> es un espacio abierto de interacción entre actores del ecosistema innovador orientado a compartir nuevas aproximaciones para la transformación creativa de Colombia a través del diseño de soluciones con visión de ingeniería.</p>
             <p className="acerca-lead">La Universidad Católica de Colombia, en el marco de la Semana de Ingeniería, desarrolló el I Congreso Internacional de Innovación y Tendencias en Ingeniería en 2015, realizado entre el 14 y el 17 de octubre en Bogotá.</p>
             <p className="acerca-lead">Desde entonces, el congreso ha reunido conferencistas, ponencias, workshops y pósteres alrededor de líneas como software inteligente, infraestructura, medio ambiente, creatividad, innovación, emprendimiento y gestión de organizaciones.</p>
           </div>
           <div className="content-summary-panel history-summary" data-anim="fade-left">
             <div className="summary-kicker">Universidad Católica de Colombia</div>
             <h3>De la Semana de Ingeniería a un congreso internacional</h3>
-            <p>CONIITI nace como un punto de encuentro académico para conectar investigación, industria y nuevas tendencias de ingeniería.</p>
+            <p>CONITI nace como un punto de encuentro académico para conectar investigación, industria y nuevas tendencias de ingeniería.</p>
             <div className="summary-meta">
               <span>Desde 2015</span>
               <span>Bogotá D.C.</span>
@@ -880,9 +880,9 @@ function AboutPage() {
         </div>
 
         <div className="metric-grid mt-5">
-          <div className="metric-card" data-anim="fade-up"><span className="metric-value">2015</span><span className="metric-label">I CONIITI</span></div>
-          <div className="metric-card" data-anim="fade-up" data-anim-delay="100"><span className="metric-value">2016</span><span className="metric-label">II CONIITI</span></div>
-          <div className="metric-card" data-anim="fade-up" data-anim-delay="200"><span className="metric-value">XII</span><span className="metric-label">CONIITI 2026</span></div>
+          <div className="metric-card" data-anim="fade-up"><span className="metric-value">2015</span><span className="metric-label">I CONITI</span></div>
+          <div className="metric-card" data-anim="fade-up" data-anim-delay="100"><span className="metric-value">2016</span><span className="metric-label">II CONITI</span></div>
+          <div className="metric-card" data-anim="fade-up" data-anim-delay="200"><span className="metric-value">XII</span><span className="metric-label">CONITI 2026</span></div>
         </div>
 
         <div className="history-grid mt-6">
@@ -962,7 +962,7 @@ function ContactPage() {
 }
 
 function buildCountdown() {
-  const diff = new Date('2025-10-15T08:00:00') - new Date()
+  const diff = new Date('2026-10-15T08:00:00') - new Date()
   if (diff <= 0) {
     return { days: '00', hours: '00', minutes: '00', seconds: '00' }
   }
@@ -1233,8 +1233,8 @@ export default function App() {
       <nav className="coniiti-navbar" id="main-nav">
         <div className="navbar-inner">
           <a className="brand" href="#" onClick={(event) => { event.preventDefault(); handleNavigate('inicio') }}>
-            <span className="brand-mark">CONIITI</span>
-            <span className="brand-year">Bogotá · 2025</span>
+            <span className="brand-mark">CONITI</span>
+            <span className="brand-year">Bogotá · 2026</span>
           </a>
 
           <ul className="nav-links">

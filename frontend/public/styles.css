@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   CONIITI 2025 — Luxury Italian Editorial Aesthetic
+   CONITI 2026 — Luxury Italian Editorial Aesthetic
    Bulma + Custom Design System
    ═══════════════════════════════════════════════════════════ */
 
@@ -719,7 +719,7 @@ body {
     radial-gradient(ellipse 50% 70% at 0% 50%, rgba(245,200,0,0.08) 0%, transparent 60%);
 }
 .sec-countdown::after {
-  content: 'OCT 2025';
+  content: 'OCT 2026';
   position: absolute; right: 40px; bottom: -30px;
   font-family: var(--font-title); font-size: 8rem; font-weight: 700;
   color: rgba(255,255,255,0.04); pointer-events: none; letter-spacing: -0.02em;
