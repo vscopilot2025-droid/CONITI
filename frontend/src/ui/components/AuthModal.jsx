@@ -17,6 +17,18 @@ function getErrorMessage(payload, fallback) {
   return payload?.message || fallback
 }
 
+function clearLoginPasswordField(setLoginForm) {
+  setLoginForm((current) => ({ ...current, password: '' }))
+}
+
+function clearRegisterPasswordFields(setRegisterForm) {
+  setRegisterForm((current) => ({
+    ...current,
+    password: '',
+    confirmPassword: ''
+  }))
+}
+
 export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthenticated }) {
   const [mode, setMode] = useState(initialMode)
   const [loginForm, setLoginForm] = useState(initialLoginState)
@@ -100,6 +112,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
       const payload = await parseJsonResponse(response)
 
       if (!response.ok || !payload?.ok) {
+        clearLoginPasswordField(setLoginForm)
         setMessage({
           text: getErrorMessage(payload, 'No fue posible iniciar sesión.'),
           type: 'error'
@@ -107,7 +120,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
         return
       }
 
-      localStorage.setItem('coniti.auth', JSON.stringify({
+      localStorage.setItem('coniiti.auth', JSON.stringify({
         token: payload.token,
         tokenType: payload.tokenType,
         user: payload.user
@@ -118,6 +131,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
       onClose()
       onAuthenticated?.(payload)
     } catch (_error) {
+      clearLoginPasswordField(setLoginForm)
       setMessage({
         text: 'No hay conexión con el servicio de autenticación.',
         type: 'error'
@@ -164,6 +178,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
       const payload = await parseJsonResponse(response)
 
       if (!response.ok || !payload?.ok) {
+        clearRegisterPasswordFields(setRegisterForm)
         setMessage({
           text: getErrorMessage(payload, 'No fue posible registrar el usuario.'),
           type: 'error'
@@ -171,7 +186,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
         return
       }
 
-      localStorage.setItem('coniti.auth', JSON.stringify({
+      localStorage.setItem('coniiti.auth', JSON.stringify({
         token: payload.token,
         tokenType: payload.tokenType,
         user: payload.user
@@ -182,6 +197,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
       onClose()
       onAuthenticated?.(payload)
     } catch (_error) {
+      clearRegisterPasswordFields(setRegisterForm)
       setMessage({
         text: 'No hay conexión con el servicio de autenticación.',
         type: 'error'
@@ -199,7 +215,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
           <i className="bi bi-x-lg" />
         </button>
 
-        <span className="section-eyebrow eyebrow-gold">Acceso CONITI</span>
+        <span className="section-eyebrow eyebrow-gold">Acceso CONIITI</span>
         <h3 className="section-title" id="auth-modal-title" style={{ fontSize: '2.2rem', marginBottom: 20, color: '#fff' }}>
           Bienvenido
         </h3>

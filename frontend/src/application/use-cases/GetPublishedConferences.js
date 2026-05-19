@@ -3,7 +3,7 @@ export class GetPublishedConferences {
     this.conferenceRepository = conferenceRepository
   }
 
-  async execute() {
-    return this.conferenceRepository.getPublishedConferences()
+  async execute(filters = {}) {
+    return this.conferenceRepository.getPublishedConferences(filters)
   }
 }

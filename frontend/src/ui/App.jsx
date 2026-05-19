@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { GetFeaturedSpeakers } from '../application/use-cases/GetFeaturedSpeakers'
 import { GetMasterAgenda } from '../application/use-cases/GetMasterAgenda'
+import { GetFeaturedSpeakers } from '../application/use-cases/GetFeaturedSpeakers'
 import { GetPublishedConferences } from '../application/use-cases/GetPublishedConferences'
 import { GetSpeakers } from '../application/use-cases/GetSpeakers'
 import { HttpConferenceRepository } from '../infrastructure/repositories/HttpConferenceRepository'
@@ -9,7 +9,7 @@ import { HttpScheduleRepository } from '../infrastructure/repositories/HttpSched
 import { HttpSpeakerRepository } from '../infrastructure/repositories/HttpSpeakerRepository'
 import { AuthModal } from './components/AuthModal'
 
-const authStorageKey = 'coniti.auth'
+const authStorageKey = 'coniiti.auth'
 
 const speakerRepository = new HttpSpeakerRepository()
 const conferenceRepository = new HttpConferenceRepository()
@@ -126,7 +126,7 @@ const topicGroups = [
 const historyCards = [
   {
     year: '2015',
-    title: 'Surge el I CONITI',
+    title: 'Surge el I CONIITI',
     description:
       'Encuentro académico organizado por la Facultad de Ingeniería para compartir nuevas tendencias y herramientas que impulsaran la innovación en el país.',
     items: [
@@ -137,7 +137,7 @@ const historyCards = [
   },
   {
     year: '2016',
-    title: 'II CONITI',
+    title: 'II CONIITI',
     description:
       'Realizado entre el 24 y el 26 de agosto de 2016 en Bogotá, con conferencias, ponencias, workshops y pósteres.',
     items: [
@@ -150,7 +150,7 @@ const historyCards = [
 ]
 
 const contactItems = [
-  ['bi-envelope', 'Correo electrónico', 'coniti2026@ucatolica.edu.co'],
+  ['bi-envelope', 'Correo electrónico', 'coniiti2026@ucatolica.edu.co'],
   ['bi-telephone', 'Teléfono', '+57 (601) 327 7300 Ext. 5000'],
   ['bi-geo-alt', 'Dirección', 'Av. Caracas #46-72, Bogotá D.C.'],
   ['bi-clock', 'Horario', 'Lun – Vie, 8:00 AM – 5:00 PM']
@@ -195,81 +195,101 @@ function formatDateRange(startDate, endDate, timezone = 'UTC') {
   return `${formatter.format(start)} - ${formatter.format(end)}`
 }
 
-function formatAgendaTime(value) {
+function formatAgendaTime(value, timezone = 'UTC') {
   return new Intl.DateTimeFormat('es-CO', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'UTC'
+    timeZone: timezone
   }).format(new Date(value))
 }
 
-function normalizeConferenceCards(conferences) {
-  if (!conferences.length) {
-    return defaultConferences
+function normalizeSpeakerKey(value) {
+  return (value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function buildSpeakerDirectory(speakers) {
+  const directory = new Map()
+  speakers.forEach((speaker) => {
+    directory.set(normalizeSpeakerKey(speaker.fullName), speaker)
+  })
+  return directory
+}
+
+function getConferenceLeadAgendaItem(conference) {
+  if (!conference?.agenda?.length) {
+    return null
   }
 
-  return conferences.slice(0, 6).map((conference, index) => ({
-    title: conference.title,
+  return conference.agenda.find((item) => item.title === conference.title) || conference.agenda[conference.agenda.length - 1]
+}
+
+function enrichConference(conference, speakerDirectory) {
+  const leadAgendaItem = getConferenceLeadAgendaItem(conference)
+  const speaker = leadAgendaItem ? speakerDirectory.get(normalizeSpeakerKey(leadAgendaItem.speaker)) : null
+
+  return {
+    ...conference,
+    leadAgendaItem,
+    leadSpeaker: speaker || null,
+    leadSpeakerName: speaker?.fullName || leadAgendaItem?.speaker || 'Conferencista por confirmar',
+    leadSpeakerSlug: speaker?.slug || null,
+    leadSpeakerInstitution: speaker?.institution || '',
+    room: leadAgendaItem?.room || 'Sala por confirmar',
+    metaLabel: `${formatDateRange(conference.startDate, conference.endDate, conference.timezone)} · ${conference.availableSeats} cupos`,
     subtitle: `${conference.category} · ${conference.modality}`,
-    description: conference.description,
-    meta: `${formatDateRange(conference.startDate, conference.endDate, conference.timezone)} · ${conference.availableSeats} cupos`,
-    action: index % 2 === 0 ? 'Ver cronograma' : 'Conferencistas',
-    actionClass: index % 3 === 0 ? 'btn-reg-gold' : index % 3 === 1 ? 'btn-reg-outline' : 'btn-reg-teal',
-    target: index % 2 === 0 ? 'cronograma' : 'conferencistas'
+    dateKey: conference.startDate.slice(0, 10)
+  }
+}
+
+function hydrateScheduleDays(days, speakers) {
+  if (!days.length) {
+    return []
+  }
+
+  const speakerDirectory = buildSpeakerDirectory(speakers)
+
+  return days.map((day) => ({
+    ...day,
+    entries: (day.entries || [])
+      .map((entry) => {
+        const speaker = entry.leadSpeakerName
+          ? speakerDirectory.get(normalizeSpeakerKey(entry.leadSpeakerName))
+          : null
+
+        return {
+          ...entry,
+          leadSpeaker: speaker || null,
+          leadSpeakerSlug: speaker?.slug || null,
+          leadSpeakerInstitution: speaker?.institution || '',
+          dateKey: day.id
+        }
+      })
+      .sort((left, right) => new Date(left.startDate) - new Date(right.startDate))
   }))
 }
 
-function normalizeScheduleDays(entries) {
-  if (!entries.length) {
-    return [
-      {
-        label: 'Día 1 · Oct 15',
-        rows: [
-          ['8:00 AM', 'Registro', 'Acreditación y bienvenida', 'Comité organizador CONITI', 'badge-br'],
-          ['9:00 AM', 'Keynote', 'Ingeniería e innovación: el puente entre Italia y América Latina', 'Giuseppe Moretti · Politecnico di Milano', 'badge-k'],
-          ['11:00 AM', 'Panel', 'Transformación digital en la industria 4.0', 'Panel internacional de expertos', 'badge-p']
-        ]
-      },
-      {
-        label: 'Día 2 · Oct 16',
-        rows: [
-          ['9:00 AM', 'Keynote', 'Nanomateriales: la próxima revolución industrial', 'Laura Fontana · Università di Bologna', 'badge-k'],
-          ['11:00 AM', 'Panel', 'Energías renovables para una ingeniería sostenible', 'Dr. Jorge Arévalo · Universidad Nacional', 'badge-p']
-        ]
-      },
-      {
-        label: 'Día 3 · Oct 17',
-        rows: [
-          ['9:00 AM', 'Keynote', 'El futuro de la movilidad: ciudades inteligentes e infraestructura', '', 'badge-k'],
-          ['3:00 PM', 'Ceremonia', 'Premiación de mejores trabajos y clausura oficial', '', 'badge-br']
-        ]
-      }
-    ]
+function getConferenceLineLabel(category) {
+  const labels = {
+    'Creativity, Innovation and Entrepreneurship': 'Innovación y emprendimiento',
+    'Infrastructure and Environment': 'Infraestructura y ambiente',
+    'Energy Efficiency and Renewable Energy': 'Energía y renovables',
+    'Intelligent Software and Technological Convergence': 'Software inteligente',
+    'Integral and Dynamic Management of Organizations': 'Gestión organizacional',
+    'Telecommunication Systems and Technologies': 'Telecomunicaciones',
+    'Engineering Education': 'Educación en ingeniería'
   }
 
-  const grouped = new Map()
-  entries.forEach((entry) => {
-    const key = new Date(entry.startsAt).toISOString().slice(0, 10)
-    if (!grouped.has(key)) grouped.set(key, [])
-    grouped.get(key).push(entry)
-  })
+  return labels[category] || category
+}
 
-  return Array.from(grouped.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .slice(0, 3)
-    .map(([date, dayEntries], index) => ({
-      label: `Día ${index + 1} · ${new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'short', timeZone: 'UTC' }).format(new Date(date))}`,
-      rows: dayEntries
-        .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))
-        .map((entry) => [
-          formatAgendaTime(entry.startsAt),
-          entry.eventType || 'Agenda',
-          entry.title,
-          entry.location || entry.owner || '',
-          index % 3 === 0 ? 'badge-k' : index % 3 === 1 ? 'badge-p' : 'badge-t'
-        ])
-    }))
+function getFallbackConferenceCategories() {
+  return topicGroups.map(([, category]) => category)
 }
 
 function SimpleFooter({ dark = false, full = false }) {
@@ -280,7 +300,7 @@ function SimpleFooter({ dark = false, full = false }) {
           <>
             <div className="columns is-variable is-6">
               <div className="column is-3-desktop">
-                <div className="footer-brand">CONITI</div>
+                <div className="footer-brand">CONIITI</div>
                 <div style={{ display: 'flex', gap: 3, margin: '10px 0' }}>
                   <div style={{ width: 22, height: 10, background: '#009246' }} />
                   <div style={{ width: 22, height: 10, background: '#fff', opacity: 0.5 }} />
@@ -328,7 +348,7 @@ function SimpleFooter({ dark = false, full = false }) {
           </>
         ) : null}
         <div className="is-flex is-justify-content-space-between is-flex-wrap-wrap" style={{ gap: 12 }}>
-          <p className="footer-copy mb-0">{full ? '© 2026 CONITI — Universidad Católica de Colombia. Todos los derechos reservados.' : '© 2026 CONITI — Universidad Católica de Colombia.'}</p>
+          <p className="footer-copy mb-0">{full ? '© 2026 CONIITI — Universidad Católica de Colombia. Todos los derechos reservados.' : '© 2026 CONIITI — Universidad Católica de Colombia.'}</p>
           <p className="footer-motto mb-0">Con il cuore in Italia 🇮🇹</p>
         </div>
       </div>
@@ -355,7 +375,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
               <div className="hero-noise" />
               <div className="glow glow-gold" />
               <div className="glow glow-teal" />
-              <div className="hero-bg-text">CONITI</div>
+              <div className="hero-bg-text">CONIITI</div>
 
               <div className="container" style={{ width: '100%', maxWidth: 1380, padding: '0 60px', position: 'relative', zIndex: 2 }}>
                 <div className="columns is-vcentered" style={{ minHeight: 'calc(100vh - 180px)', paddingTop: 60 }}>
@@ -387,7 +407,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
               <div className="hero-sidebar">
                 <div className="hero-sidebar-item">
                   <div className="hero-sidebar-label">Fecha</div>
-                  <div className="hero-sidebar-val">Oct 15–17</div>
+                  <div className="hero-sidebar-val">30 Sep - 02 Oct</div>
                 </div>
                 <div className="hero-sidebar-item">
                   <div className="hero-sidebar-label">Sede</div>
@@ -407,7 +427,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
                 <div className="columns is-gapless mb-0">
                   <div className="column"><div className="stat-unit"><span className="stat-num">{featuredSpeakers.length || 48}</span><span className="stat-lbl">Conferencistas</span></div></div>
                   <div className="column"><div className="stat-unit"><span className="stat-num">12</span><span className="stat-lbl">Países</span></div></div>
-                  <div className="column"><div className="stat-unit"><span className="stat-num">6</span><span className="stat-lbl">Líneas temáticas</span></div></div>
+                  <div className="column"><div className="stat-unit"><span className="stat-num">7</span><span className="stat-lbl">Lineas tematicas</span></div></div>
                   <div className="column"><div className="stat-unit"><span className="stat-num">3</span><span className="stat-lbl">Días</span></div></div>
                   <div className="column"><div className="stat-unit"><span className="stat-num">+800</span><span className="stat-lbl">Asistentes</span></div></div>
                 </div>
@@ -434,7 +454,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
                       <span className="pais-em">La República Italiana</span>
                     </h2>
                     <p className="pais-desc">
-                      Italia, cuna del Renacimiento y la innovación, llega a CONITI 2026 trayendo su legado de excelencia en diseño, ingeniería y ciencia para inspirar a la próxima generación de ingenieros latinoamericanos.
+                      Italia, cuna del Renacimiento y la innovación, llega a CONIITI 2026 trayendo su legado de excelencia en diseño, ingeniería y ciencia para inspirar a la próxima generación de ingenieros latinoamericanos.
                     </p>
                     <div className="pais-chips">
                       <span className="pais-chip">Politecnico di Milano</span>
@@ -477,7 +497,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
                 ['05', 'Sep', 'Notificación de aceptación', 'El comité revisor comunicará los resultados de evaluación a los autores postulantes.'],
                 ['20', 'Sep', 'Cierre de inscripciones con descuento', 'Precio reducido disponible hasta esta fecha. Luego aplica tarifa regular.'],
                 ['30', 'Sep', 'Entrega de artículos completos', 'Fecha límite para cargar las versiones definitivas de los artículos aceptados.'],
-                ['15', 'Oct', '¡Inauguración del Congreso!', 'Apertura oficial de CONITI 2026 en la Universidad Católica de Colombia, Bogotá.']
+                ['30', 'Sep', 'Inauguracion del Congreso', 'Apertura oficial de CONIITI 2026 en la Universidad Catolica de Colombia, Bogota.']
               ].map(([day, month, title, desc], index) => (
                 <div className="fecha-item" key={title} data-anim="fade-up" data-anim-delay={60 + index * 50}>
                   <div className="fecha-date"><span className="fecha-day" style={index === 4 ? { color: 'var(--gold)' } : undefined}>{day}</span><span className="fecha-month">{month}</span></div>
@@ -495,8 +515,8 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
                   {[
                     ['Agosto 2026', 'Convocatoria abierta', true],
                     ['Septiembre 2026', 'Evaluación y selección de ponencias'],
-                    ['1 – 14 Oct 2026', 'Registro de asistentes'],
-                    ['15 – 17 Oct 2026', 'Congreso CONITI 2026'],
+                    ['1 - 29 Sep 2026', 'Registro de asistentes'],
+                    ['30 Sep - 02 Oct 2026', 'Congreso CONIITI 2026'],
                     ['Noviembre 2026', 'Publicación de memorias oficiales']
                   ].map(([date, text, active]) => (
                     <div className="tl-entry" key={date}>
@@ -529,7 +549,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
             <div className="cd-card" data-anim="zoom-in" data-anim-delay="240"><span className="cd-number">{countdown.seconds}</span><span className="cd-label">Segundos</span></div>
           </div>
           <p className="has-text-centered mt-5" style={{ fontFamily: 'var(--font-title)', fontStyle: 'italic', color: 'rgba(255,255,255,0.28)', fontSize: '.95rem' }} data-anim="fade-up" data-anim-delay="300">
-            Bogotá D.C., Colombia · 15, 16 y 17 de Octubre de 2026
+            Bogota D.C., Colombia · 30 de septiembre, 1 y 2 de octubre de 2026
           </p>
         </div>
       </section>
@@ -573,7 +593,62 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
   )
 }
 
-function ConferencesPage({ conferenceCards, onNavigate }) {
+function ConferencesPage({
+  conferenceCards,
+  conferenceCategories,
+  selectedCategory,
+  onCategoryChange,
+  onOpenSchedule,
+  speakers,
+  onOpenSpeaker,
+  isLoading = false
+}) {
+  const conferencesPerPage = 4
+  const [conferenceSearch, setConferenceSearch] = useState('')
+  const [conferencePage, setConferencePage] = useState(1)
+  const speakerDirectory = useMemo(() => buildSpeakerDirectory(speakers), [speakers])
+  const filteredConferences = useMemo(() => {
+    const query = conferenceSearch.trim().toLowerCase()
+
+    return conferenceCards
+      .map((conference) => enrichConference(conference, speakerDirectory))
+      .filter((conference) => {
+      const searchableText = [
+        conference.title,
+        conference.subtitle,
+        conference.description,
+        conference.metaLabel,
+        conference.leadSpeakerName,
+        conference.leadSpeakerInstitution
+      ].join(' ').toLowerCase()
+
+      return !query || searchableText.includes(query)
+    })
+  }, [conferenceCards, conferenceSearch, speakerDirectory])
+  const selectedLineLabel = getConferenceLineLabel(selectedCategory)
+  const totalConferencePages = Math.max(1, Math.ceil(filteredConferences.length / conferencesPerPage))
+  const visibleConferenceCount = Math.min(conferencesPerPage, filteredConferences.length)
+  const conferencePageStart = filteredConferences.length ? (conferencePage - 1) * conferencesPerPage + 1 : 0
+  const conferencePageEnd = filteredConferences.length
+    ? Math.min(conferencePageStart + visibleConferenceCount - 1, filteredConferences.length)
+    : 0
+  const hasConferencePagination = filteredConferences.length > conferencesPerPage
+  const conferencePageNumbers = Array.from({ length: totalConferencePages }, (_, pageIndex) => pageIndex + 1)
+  const paginatedConferences = filteredConferences.slice(
+    (conferencePage - 1) * conferencesPerPage,
+    conferencePage * conferencesPerPage
+  )
+
+  useEffect(() => {
+    setConferencePage(1)
+  }, [selectedCategory, conferenceSearch])
+
+  useEffect(() => {
+    if (conferencePage > totalConferencePages) {
+      setConferencePage(totalConferencePages)
+    }
+  }, [conferencePage, totalConferencePages])
+
   return (
     <div className="page active" id="page-conferencias">
       <div className="page-band" data-bg="CONFERENCIAS">
@@ -583,19 +658,186 @@ function ConferencesPage({ conferenceCards, onNavigate }) {
         </div>
       </div>
 
-      <div className="container py-6" style={{ maxWidth: 1180 }}>
-        <div className="columns is-variable is-5 is-multiline">
-          {conferenceCards.map((conference, index) => (
-            <div className="column is-4-desktop" data-anim="fade-up" data-anim-delay={index * 100} key={`${conference.title}-${index}`}>
-              <div className="boleta-card">
-                <div className="boleta-name">{conference.title}</div>
-                <div className="boleta-for">{conference.subtitle}</div>
-                <p className="acerca-lead" style={{ fontSize: '1rem' }}>{conference.description}</p>
-                {'meta' in conference ? <p className="acerca-lead" style={{ fontSize: '.82rem', marginTop: 16 }}>{conference.meta}</p> : null}
-                <a className={`btn-register ${conference.actionClass}`} onClick={(event) => { event.preventDefault(); onNavigate(conference.target) }} href="#">{conference.action}</a>
+      <div className="conference-directory-shell">
+        <div className="conference-directory-inner">
+          <aside className="conference-sidebar">
+            <span className="section-eyebrow eyebrow-gold">Líneas temáticas</span>
+            <div className="conference-line-list" aria-label="Líneas temáticas">
+              {conferenceCategories.map((category, index) => (
+                <button
+                  type="button"
+                  className={`conference-line-row${selectedCategory === category ? ' active' : ''}`}
+                  onClick={() => onCategoryChange(category)}
+                  key={category}
+                >
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  {getConferenceLineLabel(category)}
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          <div className="conference-directory-main">
+            <div className="conference-directory-toolbar">
+              <div className="conference-control-copy">
+                <span className="section-eyebrow eyebrow-cerulean">Catálogo académico</span>
+                <h2>{selectedLineLabel}</h2>
+                <p>
+                  {isLoading
+                    ? 'Cargando conferencias'
+                    : `Mostrando ${conferencePageStart}-${conferencePageEnd} de ${filteredConferences.length} conferencias`}
+                </p>
+              </div>
+
+              <div className="conference-search-box">
+                <i className="bi bi-search" />
+                <input
+                  aria-label="Buscar conferencia"
+                  type="search"
+                  value={conferenceSearch}
+                  onChange={(event) => setConferenceSearch(event.target.value)}
+                  placeholder="Buscar por título, modalidad o tema"
+                />
               </div>
             </div>
-          ))}
+
+            {filteredConferences.length ? (
+              <div className="conference-pagination-summary">
+                <span>Página {conferencePage} de {totalConferencePages}</span>
+                <span>{visibleConferenceCount} conferencias por vista</span>
+              </div>
+            ) : null}
+
+            {hasConferencePagination ? (
+              <div className="conference-pagination compact" aria-label="Paginación superior de conferencias">
+                <button
+                  type="button"
+                  className="conference-page-btn"
+                  disabled={conferencePage === 1}
+                  onClick={() => setConferencePage((current) => Math.max(1, current - 1))}
+                >
+                  Anterior
+                </button>
+
+                <div className="conference-page-list">
+                  {conferencePageNumbers.map((pageNumber) => (
+                    <button
+                      type="button"
+                      className={`conference-page-btn number${conferencePage === pageNumber ? ' active' : ''}`}
+                      onClick={() => setConferencePage(pageNumber)}
+                      key={`top-${pageNumber}`}
+                    >
+                      {pageNumber}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  className="conference-page-btn"
+                  disabled={conferencePage === totalConferencePages}
+                  onClick={() => setConferencePage((current) => Math.min(totalConferencePages, current + 1))}
+                >
+                  Siguiente
+                </button>
+              </div>
+            ) : null}
+
+            <div className="conference-table" aria-live="polite">
+              {paginatedConferences.map((conference, index) => (
+                <details className="conference-table-row expandable" key={`${conference.slug || conference.title}-${index}`}>
+                  <summary className="conference-row-summary">
+                    <div className="conference-row-index">{String(conferencePageStart + index).padStart(2, '0')}</div>
+                    <div className="conference-row-body">
+                      <div className="conference-row-kicker">{conference.subtitle}</div>
+                      <div className="conference-row-title">{conference.title}</div>
+                      <p>{conference.description}</p>
+                      <div className="conference-row-meta">{conference.metaLabel}</div>
+                    </div>
+                    <div className="conference-row-action muted">Ver detalle</div>
+                  </summary>
+
+                  <div className="conference-row-panel">
+                    <div className="conference-row-panel-grid">
+                      <div>
+                        <span className="conference-panel-label">Conferencista</span>
+                        <div className="conference-panel-value">{conference.leadSpeakerName}</div>
+                        {conference.leadSpeakerInstitution ? (
+                          <div className="conference-panel-subtle">{conference.leadSpeakerInstitution}</div>
+                        ) : null}
+                      </div>
+                      <div>
+                        <span className="conference-panel-label">Horario</span>
+                        <div className="conference-panel-value">{formatDateRange(conference.startDate, conference.endDate, conference.timezone)}</div>
+                        <div className="conference-panel-subtle">{conference.room}</div>
+                      </div>
+                      <div>
+                        <span className="conference-panel-label">Etiquetas</span>
+                        <div className="conference-chip-row">
+                          {(conference.tags || []).slice(0, 4).map((tag) => (
+                            <span className="conference-chip" key={tag}>{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="conference-row-panel-actions">
+                      <button type="button" className="conference-inline-link" onClick={() => onOpenSchedule(conference)}>
+                        Ver en cronograma
+                      </button>
+                      {conference.leadSpeakerSlug ? (
+                        <button type="button" className="conference-inline-link primary" onClick={() => onOpenSpeaker(conference.leadSpeakerSlug)}>
+                          Ver conferencista
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                </details>
+              ))}
+            </div>
+
+            {!filteredConferences.length ? (
+              <div className="conference-empty-state">
+                <span className="section-eyebrow eyebrow-gold">Sin resultados</span>
+                <h3>No encontramos resultados para esta búsqueda</h3>
+              </div>
+            ) : null}
+
+            {hasConferencePagination ? (
+              <div className="conference-pagination" aria-label="Paginación de conferencias">
+                <button
+                  type="button"
+                  className="conference-page-btn"
+                  disabled={conferencePage === 1}
+                  onClick={() => setConferencePage((current) => Math.max(1, current - 1))}
+                >
+                  Anterior
+                </button>
+
+                <div className="conference-page-list">
+                  {conferencePageNumbers.map((pageNumber) => (
+                    <button
+                      type="button"
+                      className={`conference-page-btn number${conferencePage === pageNumber ? ' active' : ''}`}
+                      onClick={() => setConferencePage(pageNumber)}
+                      key={`bottom-${pageNumber}`}
+                    >
+                      {pageNumber}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  className="conference-page-btn"
+                  disabled={conferencePage === totalConferencePages}
+                  onClick={() => setConferencePage((current) => Math.min(totalConferencePages, current + 1))}
+                >
+                  Siguiente
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -604,7 +846,48 @@ function ConferencesPage({ conferenceCards, onNavigate }) {
   )
 }
 
-function SpeakersPage({ speakers }) {
+function SpeakersPage({ speakers, selectedSpeakerSlug, onOpenConference }) {
+  const speakersPerPage = 6
+  const [speakerSearch, setSpeakerSearch] = useState('')
+  const [speakerPage, setSpeakerPage] = useState(1)
+  const filteredSpeakers = useMemo(() => {
+    const query = speakerSearch.trim().toLowerCase()
+    const sorted = [...speakers].sort((left, right) => {
+      if (left.slug === selectedSpeakerSlug) return -1
+      if (right.slug === selectedSpeakerSlug) return 1
+      if (left.featured !== right.featured) return left.featured ? -1 : 1
+      return left.fullName.localeCompare(right.fullName)
+    })
+
+    return sorted.filter((speaker) => {
+      const searchableText = [
+        speaker.fullName,
+        speaker.institution,
+        speaker.bio,
+        ...(speaker.expertise || [])
+      ].join(' ').toLowerCase()
+
+      return !query || searchableText.includes(query)
+    })
+  }, [selectedSpeakerSlug, speakerSearch, speakers])
+  const totalSpeakerPages = Math.max(1, Math.ceil(filteredSpeakers.length / speakersPerPage))
+  const paginatedSpeakers = filteredSpeakers.slice((speakerPage - 1) * speakersPerPage, speakerPage * speakersPerPage)
+
+  useEffect(() => {
+    setSpeakerPage(1)
+  }, [speakerSearch])
+
+  useEffect(() => {
+    if (!selectedSpeakerSlug) {
+      return
+    }
+
+    const targetIndex = filteredSpeakers.findIndex((speaker) => speaker.slug === selectedSpeakerSlug)
+    if (targetIndex >= 0) {
+      setSpeakerPage(Math.floor(targetIndex / speakersPerPage) + 1)
+    }
+  }, [filteredSpeakers, selectedSpeakerSlug])
+
   return (
     <div className="page active" id="page-conferencistas" style={{ background: 'var(--ink)' }}>
       <div className="page-band" data-bg="PONENTES">
@@ -616,21 +899,107 @@ function SpeakersPage({ speakers }) {
 
       <div className="py-6" style={{ background: 'var(--ink)' }}>
         <div className="container" style={{ maxWidth: 1260 }}>
+          <div className="speaker-directory-header">
+            <div>
+              <span className="section-eyebrow eyebrow-gold">Directorio académico</span>
+              <h2 className="speaker-directory-title">{filteredSpeakers.length} perfiles disponibles</h2>
+            </div>
+            <div className="speaker-search-box">
+              <i className="bi bi-search" />
+              <input
+                aria-label="Buscar conferencista"
+                type="search"
+                value={speakerSearch}
+                onChange={(event) => setSpeakerSearch(event.target.value)}
+                placeholder="Buscar por nombre, institución o expertise"
+              />
+            </div>
+          </div>
+
           <div className="columns is-variable is-3 is-multiline">
-            {speakers.map((speaker, index) => (
-              <div className="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay={index * 80} key={speaker.slug || speaker.fullName}>
-                <div className="speaker-card">
-                  <div className="speaker-img" style={getSpeakerImageStyle(speaker, index)}><span className="speaker-initials">{speaker.initials}</span></div>
-                  <div className="speaker-info">
-                    <span className="speaker-name">{speaker.fullName}</span>
-                    <span className="speaker-role">{speaker.institution}</span>
-                    <p className="speaker-bio">{speaker.bio}</p>
-                    <span className="speaker-country">{getSpeakerCountryLabel(speaker)}</span>
+            {paginatedSpeakers.map((speaker, index) => (
+              <div className="column is-6-tablet is-4-desktop" key={speaker.slug || speaker.fullName}>
+                <details className={`speaker-card detailed${speaker.slug === selectedSpeakerSlug ? ' highlighted' : ''}`} open={speaker.slug === selectedSpeakerSlug}>
+                  <summary className="speaker-card-summary">
+                    <div className="speaker-img" style={getSpeakerImageStyle(speaker, index)}><span className="speaker-initials">{speaker.initials}</span></div>
+                    <div className="speaker-info">
+                      <span className="speaker-name">{speaker.fullName}</span>
+                      <span className="speaker-role">{speaker.institution}</span>
+                      <p className="speaker-bio">{speaker.bio}</p>
+                      <span className="speaker-country">{getSpeakerCountryLabel(speaker)}</span>
+                    </div>
+                  </summary>
+
+                  <div className="speaker-card-panel">
+                    <div className="speaker-expertise-row">
+                      {(speaker.expertise || []).map((item) => (
+                        <span className="speaker-chip" key={item}>{item}</span>
+                      ))}
+                    </div>
+
+                    {(speaker.talks || []).length ? (
+                      <div className="speaker-talk-list">
+                        {speaker.talks.map((talk) => (
+                          <article className="speaker-talk-item" key={talk.title}>
+                            <h4>{talk.title}</h4>
+                            <p>{talk.abstract}</p>
+                          </article>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    {(speaker.eventLinks || []).length ? (
+                      <div className="speaker-event-links">
+                        {speaker.eventLinks.slice(0, 3).map((eventLink) => (
+                          <button
+                            type="button"
+                            className="conference-inline-link"
+                            onClick={() => onOpenConference(eventLink.conferenceId, eventLink.scheduledAt)}
+                            key={`${speaker.slug}-${eventLink.id}`}
+                          >
+                            {eventLink.conferenceTitle}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
-                </div>
+                </details>
               </div>
             ))}
           </div>
+
+          {filteredSpeakers.length > speakersPerPage ? (
+            <div className="conference-pagination speaker-pagination" aria-label="Paginación de conferencistas">
+              <button
+                type="button"
+                className="conference-page-btn"
+                disabled={speakerPage === 1}
+                onClick={() => setSpeakerPage((current) => Math.max(1, current - 1))}
+              >
+                Anterior
+              </button>
+              <div className="conference-page-list">
+                {Array.from({ length: totalSpeakerPages }, (_, index) => index + 1).map((pageNumber) => (
+                  <button
+                    type="button"
+                    className={`conference-page-btn number${speakerPage === pageNumber ? ' active' : ''}`}
+                    onClick={() => setSpeakerPage(pageNumber)}
+                    key={`speaker-page-${pageNumber}`}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="conference-page-btn"
+                disabled={speakerPage === totalSpeakerPages}
+                onClick={() => setSpeakerPage((current) => Math.min(totalSpeakerPages, current + 1))}
+              >
+                Siguiente
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -644,7 +1013,7 @@ function CommitteePage() {
     <div className="page active" id="page-comite">
       <div className="page-band" data-bg="COMITÉ">
         <div className="container" style={{ maxWidth: 1200 }}>
-          <span className="section-eyebrow eyebrow-gold">Equipo CONITI</span>
+          <span className="section-eyebrow eyebrow-gold">Equipo CONIITI</span>
           <h1>Comité</h1>
         </div>
       </div>
@@ -681,16 +1050,16 @@ function ParticipationPage({ onNavigate }) {
       <div className="container py-6 content-page" style={{ maxWidth: 1180 }}>
         <div className="content-hero-grid">
           <div className="content-intro" data-anim="fade-right">
-            <span className="section-eyebrow eyebrow-cerulean">CONITI 2026</span>
+            <span className="section-eyebrow eyebrow-cerulean">CONIITI 2026</span>
             <h2 className="section-title">Participa con tu<br /><em>trabajo académico</em></h2>
             <div className="gold-rule" style={{ marginBottom: 28 }} />
             <p className="acerca-lead">La XII Conferencia Internacional sobre Innovación y Tendencias en Ingeniería se llevará a cabo en Bogotá, Colombia, del 30 de septiembre al 02 de octubre de 2026 en modalidad híbrida.</p>
-            <p className="acerca-lead">CONITI es un espacio abierto de interacción entre actores del ecosistema innovador para compartir nuevos enfoques de transformación creativa con visión de ingeniería.</p>
+            <p className="acerca-lead">CONIITI es un espacio abierto de interacción entre actores del ecosistema innovador para compartir nuevos enfoques de transformación creativa con visión de ingeniería.</p>
             <a className="btn-register btn-reg-gold" onClick={(event) => { event.preventDefault(); onNavigate('lineas') }} href="#">Ver líneas temáticas</a>
           </div>
           <div className="content-summary-panel" data-anim="fade-left">
             <div className="summary-kicker">Call for papers now open</div>
-            <h3>XII CONITI 2026</h3>
+            <h3>XII CONIITI 2026</h3>
             <p>Del 30 de septiembre al 02 de octubre de 2026, Bogotá recibe un encuentro híbrido para investigadores, docentes, estudiantes y profesionales de ingeniería.</p>
             <div className="summary-meta">
               <span>Bogotá, Colombia</span>
@@ -742,7 +1111,50 @@ function ParticipationPage({ onNavigate }) {
   )
 }
 
-function SchedulePage({ scheduleDays, dayIndex, onChangeDay }) {
+function SchedulePage({ scheduleDays, dayIndex, onChangeDay, onOpenSpeaker, selectedEntrySlug }) {
+  const conferencesPerDay = 4
+  const [schedulePageByDay, setSchedulePageByDay] = useState({})
+  const activeDay = scheduleDays[dayIndex] || null
+  const activePage = schedulePageByDay[activeDay?.id] || 1
+  const totalPages = activeDay ? Math.max(1, Math.ceil(activeDay.entries.length / conferencesPerDay)) : 1
+  const visibleEntries = activeDay
+    ? activeDay.entries.slice((activePage - 1) * conferencesPerDay, activePage * conferencesPerDay)
+    : []
+
+  useEffect(() => {
+    if (!activeDay?.id) {
+      return
+    }
+
+    setSchedulePageByDay((current) => ({
+      ...current,
+      [activeDay.id]: current[activeDay.id] || 1
+    }))
+  }, [activeDay])
+
+  useEffect(() => {
+    if (!activeDay?.id || !selectedEntrySlug) {
+      return
+    }
+
+    const targetIndex = activeDay.entries.findIndex((entry) => entry.slug === selectedEntrySlug)
+    if (targetIndex < 0) {
+      return
+    }
+
+    const targetPage = Math.floor(targetIndex / conferencesPerDay) + 1
+    setSchedulePageByDay((current) => {
+      if (current[activeDay.id] === targetPage) {
+        return current
+      }
+
+      return {
+        ...current,
+        [activeDay.id]: targetPage
+      }
+    })
+  }, [activeDay, conferencesPerDay, selectedEntrySlug])
+
   return (
     <div className="page active" id="page-cronograma">
       <div className="page-band" data-bg="CRONOGRAMA">
@@ -752,27 +1164,106 @@ function SchedulePage({ scheduleDays, dayIndex, onChangeDay }) {
         </div>
       </div>
 
-      <div className="container py-6" style={{ maxWidth: 960 }}>
+      <div className="container py-6" style={{ maxWidth: 1120 }}>
         <div className="sched-tabs-wrap" data-anim="fade-up">
           {scheduleDays.map((day, index) => (
             <button className={`sched-tab-btn${index === dayIndex ? ' active' : ''}`} key={day.label} onClick={() => onChangeDay(index)}>{day.label}</button>
           ))}
         </div>
 
-        {scheduleDays.map((day, index) => (
-          <div id={`sd${index + 1}`} className={`sched-panel${index === dayIndex ? ' active' : ''}`} key={day.label}>
-            {day.rows.map(([time, badge, title, speaker, badgeClass]) => (
-              <div className="sched-row" key={`${time}-${title}`}>
-                <div className="sched-time">{time}</div>
-                <div>
-                  <span className={`sched-badge ${badgeClass}`}>{badge}</span>
-                  <div className="sched-title">{title}</div>
-                  {speaker ? <div className="sched-speaker">{speaker}</div> : null}
+        {activeDay ? (
+          <div id={`sd${dayIndex + 1}`} className="sched-panel active">
+            <div className="conference-pagination-summary">
+              <span>{activeDay.entries.length} conferencias programadas</span>
+              <span>Página {activePage} de {totalPages}</span>
+            </div>
+
+            {visibleEntries.map((entry) => (
+              <details
+                className={`schedule-detail-row${selectedEntrySlug === entry.slug ? ' focused' : ''}`}
+                defaultOpen={selectedEntrySlug === entry.slug}
+                key={entry.slug}
+              >
+                <summary className="schedule-detail-summary">
+                  <div className="sched-time">{formatAgendaTime(entry.startDate, entry.timezone)}</div>
+                  <div className="schedule-summary-copy">
+                    <span className="sched-badge badge-k">{getConferenceLineLabel(entry.category)}</span>
+                    <div className="sched-title">{entry.title}</div>
+                    <div className="sched-speaker">{entry.leadSpeakerName}</div>
+                  </div>
+                </summary>
+
+                <div className="schedule-detail-panel">
+                  <p>{entry.description}</p>
+                  <div className="conference-row-panel-grid">
+                    <div>
+                      <span className="conference-panel-label">Horario</span>
+                      <div className="conference-panel-value">{formatDateRange(entry.startDate, entry.endDate, entry.timezone)}</div>
+                    </div>
+                    <div>
+                      <span className="conference-panel-label">Sala</span>
+                      <div className="conference-panel-value">{entry.room}</div>
+                    </div>
+                    <div>
+                      <span className="conference-panel-label">Modalidad</span>
+                      <div className="conference-panel-value">{entry.modality}</div>
+                    </div>
+                  </div>
+
+                  {entry.leadSpeakerSlug ? (
+                    <div className="conference-row-panel-actions">
+                      <button type="button" className="conference-inline-link primary" onClick={() => onOpenSpeaker(entry.leadSpeakerSlug)}>
+                        Ver conferencista
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
-              </div>
+              </details>
             ))}
+
+            {activeDay.entries.length > conferencesPerDay ? (
+              <div className="conference-pagination">
+                <button
+                  type="button"
+                  className="conference-page-btn"
+                  disabled={activePage === 1}
+                  onClick={() => setSchedulePageByDay((current) => ({
+                    ...current,
+                    [activeDay.id]: Math.max(1, activePage - 1)
+                  }))}
+                >
+                  Anterior
+                </button>
+                <div className="conference-page-list">
+                  {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                    <button
+                      type="button"
+                      className={`conference-page-btn number${activePage === pageNumber ? ' active' : ''}`}
+                      onClick={() => setSchedulePageByDay((current) => ({
+                        ...current,
+                        [activeDay.id]: pageNumber
+                      }))}
+                      key={`${activeDay.id}-page-${pageNumber}`}
+                    >
+                      {pageNumber}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="conference-page-btn"
+                  disabled={activePage === totalPages}
+                  onClick={() => setSchedulePageByDay((current) => ({
+                    ...current,
+                    [activeDay.id]: Math.min(totalPages, activePage + 1)
+                  }))}
+                >
+                  Siguiente
+                </button>
+              </div>
+            ) : null}
           </div>
-        ))}
+        ) : null}
       </div>
 
       <SimpleFooter />
@@ -861,17 +1352,17 @@ function AboutPage() {
       <div className="container py-6 content-page" style={{ maxWidth: 1180 }}>
         <div className="content-hero-grid nosotros-hero">
           <div className="content-intro" data-anim="fade-right">
-            <span className="section-eyebrow eyebrow-cerulean">Inicios de CONITI</span>
+            <span className="section-eyebrow eyebrow-cerulean">Inicios de CONIITI</span>
             <h2 className="section-title">Innovación con<br /><em>visión de ingeniería</em></h2>
             <div className="gold-rule" style={{ marginBottom: 36 }} />
-            <p className="acerca-lead"><strong>CONITI</strong> es un espacio abierto de interacción entre actores del ecosistema innovador orientado a compartir nuevas aproximaciones para la transformación creativa de Colombia a través del diseño de soluciones con visión de ingeniería.</p>
+            <p className="acerca-lead"><strong>CONIITI</strong> es un espacio abierto de interacción entre actores del ecosistema innovador orientado a compartir nuevas aproximaciones para la transformación creativa de Colombia a través del diseño de soluciones con visión de ingeniería.</p>
             <p className="acerca-lead">La Universidad Católica de Colombia, en el marco de la Semana de Ingeniería, desarrolló el I Congreso Internacional de Innovación y Tendencias en Ingeniería en 2015, realizado entre el 14 y el 17 de octubre en Bogotá.</p>
             <p className="acerca-lead">Desde entonces, el congreso ha reunido conferencistas, ponencias, workshops y pósteres alrededor de líneas como software inteligente, infraestructura, medio ambiente, creatividad, innovación, emprendimiento y gestión de organizaciones.</p>
           </div>
           <div className="content-summary-panel history-summary" data-anim="fade-left">
             <div className="summary-kicker">Universidad Católica de Colombia</div>
             <h3>De la Semana de Ingeniería a un congreso internacional</h3>
-            <p>CONITI nace como un punto de encuentro académico para conectar investigación, industria y nuevas tendencias de ingeniería.</p>
+            <p>CONIITI nace como un punto de encuentro académico para conectar investigación, industria y nuevas tendencias de ingeniería.</p>
             <div className="summary-meta">
               <span>Desde 2015</span>
               <span>Bogotá D.C.</span>
@@ -880,9 +1371,9 @@ function AboutPage() {
         </div>
 
         <div className="metric-grid mt-5">
-          <div className="metric-card" data-anim="fade-up"><span className="metric-value">2015</span><span className="metric-label">I CONITI</span></div>
-          <div className="metric-card" data-anim="fade-up" data-anim-delay="100"><span className="metric-value">2016</span><span className="metric-label">II CONITI</span></div>
-          <div className="metric-card" data-anim="fade-up" data-anim-delay="200"><span className="metric-value">XII</span><span className="metric-label">CONITI 2026</span></div>
+          <div className="metric-card" data-anim="fade-up"><span className="metric-value">2015</span><span className="metric-label">I CONIITI</span></div>
+          <div className="metric-card" data-anim="fade-up" data-anim-delay="100"><span className="metric-value">2016</span><span className="metric-label">II CONIITI</span></div>
+          <div className="metric-card" data-anim="fade-up" data-anim-delay="200"><span className="metric-value">XII</span><span className="metric-label">CONIITI 2026</span></div>
         </div>
 
         <div className="history-grid mt-6">
@@ -962,7 +1453,7 @@ function ContactPage() {
 }
 
 function buildCountdown() {
-  const diff = new Date('2026-10-15T08:00:00') - new Date()
+  const diff = new Date('2026-09-30T08:00:00-05:00') - new Date()
   if (diff <= 0) {
     return { days: '00', hours: '00', minutes: '00', seconds: '00' }
   }
@@ -984,6 +1475,8 @@ export default function App() {
   const [currentHomeSlide, setCurrentHomeSlide] = useState(0)
   const [countdown, setCountdown] = useState(buildCountdown())
   const [scheduleDayIndex, setScheduleDayIndex] = useState(0)
+  const [selectedSpeakerSlug, setSelectedSpeakerSlug] = useState(null)
+  const [selectedScheduleEntry, setSelectedScheduleEntry] = useState(null)
   const [featuredSpeakers, setFeaturedSpeakers] = useState([
     { fullName: 'Giuseppe Moretti', initials: 'GM', institution: 'Politecnico di Milano', bio: 'Experto en robótica avanzada y sistemas autónomos con 25 años de investigación en Europa.', country: 'Italia', countryCode: 'IT', featured: true },
     { fullName: 'Claudia Russo', initials: 'CR', institution: 'Università La Sapienza', bio: 'Pionera en inteligencia artificial aplicada a la ingeniería biomédica y salud digital.', country: 'Italia', countryCode: 'IT', featured: true },
@@ -991,11 +1484,15 @@ export default function App() {
     { fullName: 'Laura Fontana', initials: 'LF', institution: 'Università di Bologna', bio: 'Especialista en nanomateriales y su aplicación en la ingeniería de materiales del futuro.', country: 'Italia', countryCode: 'IT', featured: true }
   ])
   const [speakers, setSpeakers] = useState(featuredSpeakers)
-  const [conferenceCards, setConferenceCards] = useState(defaultConferences)
-  const [scheduleDays, setScheduleDays] = useState(normalizeScheduleDays([]))
+  const [conferenceCards, setConferenceCards] = useState([])
+  const [conferenceCategories, setConferenceCategories] = useState(getFallbackConferenceCategories())
+  const [selectedConferenceCategory, setSelectedConferenceCategory] = useState(getFallbackConferenceCategories()[0])
+  const [scheduleDays, setScheduleDays] = useState([])
   const [featuredSpeakersLoaded, setFeaturedSpeakersLoaded] = useState(false)
   const [speakersLoaded, setSpeakersLoaded] = useState(false)
   const [conferenceCardsLoaded, setConferenceCardsLoaded] = useState(false)
+  const [conferenceCategoriesLoaded, setConferenceCategoriesLoaded] = useState(false)
+  const [conferenceCardsLoading, setConferenceCardsLoading] = useState(false)
   const [scheduleDaysLoaded, setScheduleDaysLoaded] = useState(false)
 
   useEffect(() => {
@@ -1109,7 +1606,27 @@ export default function App() {
     })
 
     return () => observer.disconnect()
-  }, [page, currentHomeSlide, scheduleDayIndex, conferenceCards, featuredSpeakers, speakers, scheduleDays])
+  }, [page, currentHomeSlide, scheduleDayIndex, conferenceCards, conferenceCategories, featuredSpeakers, speakers, scheduleDays])
+
+  useEffect(() => {
+    if (scheduleDayIndex >= scheduleDays.length && scheduleDays.length) {
+      setScheduleDayIndex(0)
+    }
+  }, [scheduleDayIndex, scheduleDays])
+
+  useEffect(() => {
+    if (!selectedScheduleEntry || !scheduleDays.length) {
+      return
+    }
+
+    const targetIndex = scheduleDays.findIndex(
+      (day) => day.id === selectedScheduleEntry.dateKey || day.entries.some((entry) => entry.slug === selectedScheduleEntry.slug)
+    )
+
+    if (targetIndex >= 0 && targetIndex !== scheduleDayIndex) {
+      setScheduleDayIndex(targetIndex)
+    }
+  }, [scheduleDayIndex, scheduleDays, selectedScheduleEntry])
 
   useEffect(() => {
     let active = true
@@ -1124,26 +1641,43 @@ export default function App() {
           return
         }
 
-        if (page === 'conferencistas' && !speakersLoaded) {
+        let speakerCatalog = speakers
+        if (['conferencistas', 'conferencias', 'cronograma'].includes(page) && !speakersLoaded) {
           const result = await getSpeakersUseCase.execute()
           if (!active) return
-          if (result.length) setSpeakers(result)
+          if (result.length) {
+            setSpeakers(result)
+            speakerCatalog = result
+          }
           setSpeakersLoaded(true)
-          return
         }
 
-        if (page === 'conferencias' && !conferenceCardsLoaded) {
-          const result = await getPublishedConferencesUseCase.execute()
+        if (page === 'conferencias' && !conferenceCategoriesLoaded) {
+          const result = await conferenceRepository.getCategories()
           if (!active) return
-          if (result.length) setConferenceCards(normalizeConferenceCards(result))
+          if (result.length) {
+            setConferenceCategories(result)
+            setSelectedConferenceCategory((current) => result.includes(current) ? current : result[0])
+          }
+          setConferenceCategoriesLoaded(true)
+        }
+
+        if (page === 'conferencias' && !conferenceCardsLoaded && selectedConferenceCategory) {
+          setConferenceCardsLoading(true)
+          const result = await getPublishedConferencesUseCase.execute({ category: selectedConferenceCategory })
+          if (!active) return
+          setConferenceCards(result.length ? result : [])
           setConferenceCardsLoaded(true)
+          setConferenceCardsLoading(false)
           return
         }
 
         if (page === 'cronograma' && !scheduleDaysLoaded) {
           const result = await getMasterAgendaUseCase.execute()
           if (!active) return
-          if (result.length) setScheduleDays(normalizeScheduleDays(result))
+          if (result.length) {
+            setScheduleDays(hydrateScheduleDays(result, speakerCatalog))
+          }
           setScheduleDaysLoaded(true)
         }
       } catch {
@@ -1151,8 +1685,14 @@ export default function App() {
 
         if (page === 'inicio') setFeaturedSpeakersLoaded(true)
         if (page === 'conferencistas') setSpeakersLoaded(true)
-        if (page === 'conferencias') setConferenceCardsLoaded(true)
-        if (page === 'cronograma') setScheduleDaysLoaded(true)
+        if (page === 'conferencias') {
+          setConferenceCategoriesLoaded(true)
+          setConferenceCardsLoaded(true)
+          setConferenceCardsLoading(false)
+        }
+        if (page === 'cronograma') {
+          setScheduleDaysLoaded(true)
+        }
       }
     }
 
@@ -1161,22 +1701,33 @@ export default function App() {
     return () => {
       active = false
     }
-  }, [page, featuredSpeakersLoaded, speakersLoaded, conferenceCardsLoaded, scheduleDaysLoaded])
+  }, [page, featuredSpeakersLoaded, speakersLoaded, conferenceCategoriesLoaded, conferenceCardsLoaded, selectedConferenceCategory, scheduleDaysLoaded])
 
   const currentView = useMemo(() => {
     switch (page) {
       case 'inicio':
         return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={setPage} />
       case 'conferencias':
-        return <ConferencesPage conferenceCards={conferenceCards} onNavigate={setPage} />
+        return (
+          <ConferencesPage
+            conferenceCards={conferenceCards}
+            conferenceCategories={conferenceCategories}
+            selectedCategory={selectedConferenceCategory}
+            onCategoryChange={handleConferenceCategoryChange}
+            onOpenSchedule={handleOpenConferenceSchedule}
+            speakers={speakers}
+            onOpenSpeaker={handleOpenSpeaker}
+            isLoading={conferenceCardsLoading}
+          />
+        )
       case 'conferencistas':
-        return <SpeakersPage speakers={speakers} />
+        return <SpeakersPage speakers={speakers} selectedSpeakerSlug={selectedSpeakerSlug} onOpenConference={handleOpenConferenceFromSpeaker} />
       case 'comite':
         return <CommitteePage />
       case 'participacion':
         return <ParticipationPage onNavigate={setPage} />
       case 'cronograma':
-        return <SchedulePage scheduleDays={scheduleDays} dayIndex={scheduleDayIndex} onChangeDay={setScheduleDayIndex} />
+        return <SchedulePage scheduleDays={scheduleDays} dayIndex={scheduleDayIndex} onChangeDay={setScheduleDayIndex} onOpenSpeaker={handleOpenSpeaker} selectedEntrySlug={selectedScheduleEntry?.slug || null} />
       case 'boletas':
         return <TicketsPage />
       case 'lineas':
@@ -1188,12 +1739,85 @@ export default function App() {
       default:
         return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={setPage} />
     }
-  }, [authSession, conferenceCards, countdown, currentHomeSlide, featuredSpeakers, page, scheduleDayIndex, scheduleDays, speakers])
+  }, [authSession, conferenceCards, conferenceCardsLoading, conferenceCategories, countdown, currentHomeSlide, featuredSpeakers, page, scheduleDayIndex, scheduleDays, selectedConferenceCategory, selectedScheduleEntry, selectedSpeakerSlug, speakers])
 
   function handleNavigate(nextPage) {
     setPage(nextPage)
     setDropdownOpen(false)
     setScheduleDayIndex(0)
+    if (nextPage !== 'cronograma') {
+      setSelectedScheduleEntry(null)
+    }
+    if (nextPage !== 'conferencistas') {
+      setSelectedSpeakerSlug(null)
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function handleConferenceCategoryChange(category) {
+    setSelectedConferenceCategory(category)
+    setConferenceCards([])
+    setConferenceCardsLoaded(false)
+    setConferenceCardsLoading(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function handleOpenSpeaker(speakerSlug) {
+    setSelectedSpeakerSlug(speakerSlug)
+    setPage('conferencistas')
+    setDropdownOpen(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function handleOpenConferenceSchedule(conference) {
+    const nextSelection = {
+      slug: conference.slug,
+      dateKey: conference.startDate.slice(0, 10)
+    }
+
+    setSelectedScheduleEntry(nextSelection)
+
+    const targetIndex = scheduleDays.findIndex((day) => day.id === nextSelection.dateKey)
+    if (targetIndex >= 0) {
+      setScheduleDayIndex(targetIndex)
+    }
+
+    setPage('cronograma')
+    setDropdownOpen(false)
+    setSelectedSpeakerSlug(null)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function handleOpenConferenceFromSpeaker(conferenceId, scheduledAt) {
+    const matchingDay = scheduleDays.find((day) =>
+      day.entries.some((entry) => entry.conferenceId === conferenceId)
+    )
+
+    if (matchingDay) {
+      const matchingEntry = matchingDay.entries.find((entry) => entry.conferenceId === conferenceId)
+      setSelectedScheduleEntry({
+        slug: matchingEntry.slug,
+        dateKey: matchingDay.id
+      })
+      setScheduleDayIndex(scheduleDays.findIndex((day) => day.id === matchingDay.id))
+    } else if (scheduledAt) {
+      setSelectedScheduleEntry({
+        slug: null,
+        dateKey: scheduledAt.slice(0, 10)
+      })
+    }
+
+    if (scheduledAt) {
+      const targetDate = scheduledAt.slice(0, 10)
+      const targetIndex = scheduleDays.findIndex((day) => day.id === targetDate)
+      if (targetIndex >= 0) {
+        setScheduleDayIndex(targetIndex)
+      }
+    }
+
+    setPage('cronograma')
+    setDropdownOpen(false)
+    setSelectedSpeakerSlug(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -1233,7 +1857,7 @@ export default function App() {
       <nav className="coniiti-navbar" id="main-nav">
         <div className="navbar-inner">
           <a className="brand" href="#" onClick={(event) => { event.preventDefault(); handleNavigate('inicio') }}>
-            <span className="brand-mark">CONITI</span>
+            <span className="brand-mark">CONIITI</span>
             <span className="brand-year">Bogotá · 2026</span>
           </a>
 

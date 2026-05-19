@@ -89,6 +89,6 @@ Content-Type: application/json
   "timezone": "America/Bogota",
   "startsAt": "2026-11-10T09:00:00.000Z",
   "endsAt": "2026-11-10T18:00:00.000Z",
-  "owner": "Comité Organizador CONITI",
+  "owner": "Comité Organizador CONIITI",
   "location": "Auditorio Principal"
 }

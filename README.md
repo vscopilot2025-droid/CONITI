@@ -1,6 +1,6 @@
-# CONITI
+# CONIITI
 
-Monorepo web para CONITI con frontend en React + Vite y backend dividido en microservicios Node.js + Express + MySQL.
+Monorepo web para CONIITI con frontend en React + Vite y microservicios backend Node.js + Express + MySQL.
 
 ## Estructura
 
@@ -66,7 +66,7 @@ AUTH_SERVICE_STORAGE=mysql
 AUTH_SERVICE_JWT_SECRET=un_secreto_seguro
 AUTH_SERVICE_DB_HOST=localhost
 AUTH_SERVICE_DB_PORT=3306
-AUTH_SERVICE_DB_NAME=CONITI_AUTH
+AUTH_SERVICE_DB_NAME=CONIITI_AUTH
 AUTH_SERVICE_DB_USER=root
 AUTH_SERVICE_DB_PASSWORD=
 ```
@@ -113,27 +113,79 @@ Invoke-RestMethod http://127.0.0.1:3005/health
 Invoke-RestMethod http://127.0.0.1:3006/health
 ```
 
+## Docker
+
+Tambien puedes levantar todo el proyecto con Docker. Esta opcion crea un contenedor de MySQL, los cuatro microservicios y el frontend.
+
+Requisito:
+
+- Docker Desktop instalado y en ejecucion.
+
+Levantar todo:
+
+```powershell
+docker compose up --build
+```
+
+Abrir la aplicacion:
+
+```text
+http://127.0.0.1:5173
+```
+
+Servicios publicados:
+
+- Frontend: `http://127.0.0.1:5173`
+- Auth service: `http://127.0.0.1:3003`
+- Conferencias service: `http://127.0.0.1:3004`
+- Conferencistas service: `http://127.0.0.1:3005`
+- Fechas service: `http://127.0.0.1:3006`
+- MySQL: `127.0.0.1:3306`
+
+Validar health checks con Docker arriba:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:3003/health
+Invoke-RestMethod http://127.0.0.1:3004/health
+Invoke-RestMethod http://127.0.0.1:3005/health
+Invoke-RestMethod http://127.0.0.1:3006/health
+```
+
+Apagar contenedores:
+
+```powershell
+docker compose down
+```
+
+Apagar y borrar la base de datos local de Docker:
+
+```powershell
+docker compose down -v
+```
+
+El archivo `Dockerfile` raiz se reutiliza para todos los servicios mediante el argumento `APP_DIR`. La orquestacion completa esta en `docker-compose.yml`.
+
 ## Base de datos
 
 La instancia local de MySQL funciona como el contenedor madre, equivalente a la vista de SQL Server Management Studio donde una instancia contiene varias bases de datos.
 
 Dentro de esa instancia, cada microservicio tiene su propia base:
 
-- `CONITI_AUTH`: tablas de `auth-service`
-- `CONITI_CONFERENCIAS`: tablas de `conferencias-service`
-- `CONITI_CONFERENCISTAS`: tablas de `conferencistas-service`
-- `CONITI_FECHAS`: tablas de `fechas-service`
+- `CONIITI_AUTH`: tablas de `auth-service`
+- `CONIITI_CONFERENCIAS`: tablas de `conferencias-service`
+- `CONIITI_CONFERENCISTAS`: tablas de `conferencistas-service`
+- `CONIITI_FECHAS`: tablas de `fechas-service`
 
 Esto mantiene separacion por responsabilidad y es mas cercano a una arquitectura de microservicios.
 
 El esquema general de todas las bases esta en:
 
-- `database/001_coniti_databases.sql`
+- `database/001_coniiti_databases.sql`
 
 Para crear o validar todas las bases manualmente en MySQL:
 
 ```powershell
-mysql -u root -p < database\001_coniti_databases.sql
+mysql -u root -p < database\001_coniiti_databases.sql
 ```
 
 Tambien existen esquemas versionados por microservicio:
@@ -152,18 +204,18 @@ mysql -u root -p < conferencistas-service\sql\001_schema.sql
 mysql -u root -p < fechas-service\sql\001_schema.sql
 ```
 
-Si antes usaste la base `CONITI` para autenticacion, puedes migrar esos datos a `CONITI_AUTH` con:
+Si antes usaste la base `CONIITI` para autenticacion, puedes migrar esos datos a `CONIITI_AUTH` con:
 
 ```powershell
-mysql -u root -p < database\002_migrate_auth_from_coniti.sql
+mysql -u root -p < database\002_migrate_auth_from_coniiti.sql
 ```
 
-Los repositorios MySQL todavia crean tablas automaticamente al iniciar en modo `mysql`. Eso se mantiene para desarrollo local, pero `database/001_coniti_databases.sql` es la fuente estable para instalacion, revision y despliegue.
+Los repositorios MySQL todavia crean tablas automaticamente al iniciar en modo `mysql`. Eso se mantiene para desarrollo local, pero `database/001_coniiti_databases.sql` es la fuente estable para instalacion, revision y despliegue.
 
 ## Estado actual
 
 - La arquitectura activa esta en la raiz del repositorio.
-- La antigua carpeta duplicada `CONITI/` fue eliminada.
+- La antigua carpeta legacy `backend/` fue eliminada; la arquitectura activa son los microservicios de la raiz.
 - El frontend aun conserva una landing legacy, pero ya consume servicios desde configuracion `VITE_*`.
 - Los tests E2E no dependen de tener el backend encendido porque mockean el login.
 

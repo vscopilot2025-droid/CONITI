@@ -132,18 +132,36 @@ class SpeakerMySqlRepository {
   }
 
   async seedDefaults() {
-    const [rows] = await this.pool.query('SELECT COUNT(*) AS total FROM speakers')
-    if (rows[0].total > 0) {
-      return
-    }
-
     for (const speaker of defaultSpeakers) {
-      const createdSpeaker = await this.create(speaker)
-      for (const talk of speaker.talks) {
-        await this.addTalk(createdSpeaker.id, talk)
+      const [existingRows] = await this.pool.query(
+        'SELECT id FROM speakers WHERE slug = ? LIMIT 1',
+        [speaker.slug]
+      )
+
+      let speakerId = existingRows[0]?.id || null
+      if (!speakerId) {
+        const createdSpeaker = await this.create(speaker)
+        speakerId = createdSpeaker.id
       }
-      for (const eventLink of speaker.eventLinks) {
-        await this.addEventLink(createdSpeaker.id, eventLink)
+
+      const [talkRows] = await this.pool.query(
+        'SELECT COUNT(*) AS total FROM speaker_talks WHERE speaker_id = ?',
+        [speakerId]
+      )
+      if (!talkRows[0].total) {
+        for (const talk of speaker.talks) {
+          await this.addTalk(speakerId, talk)
+        }
+      }
+
+      const [eventRows] = await this.pool.query(
+        'SELECT COUNT(*) AS total FROM speaker_event_links WHERE speaker_id = ?',
+        [speakerId]
+      )
+      if (!eventRows[0].total) {
+        for (const eventLink of speaker.eventLinks) {
+          await this.addEventLink(speakerId, eventLink)
+        }
       }
     }
   }

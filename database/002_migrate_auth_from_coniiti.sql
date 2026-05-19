@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS `CONITI_AUTH`
+CREATE DATABASE IF NOT EXISTS `CONIITI_AUTH`
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-USE `CONITI_AUTH`;
+USE `CONIITI_AUTH`;
 
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   INDEX idx_password_reset_tokens_expires_at (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT IGNORE INTO `CONITI_AUTH`.users (
+INSERT IGNORE INTO `CONIITI_AUTH`.users (
   id,
   full_name,
   email,
@@ -51,9 +51,9 @@ SELECT
   last_login_at,
   created_at,
   updated_at
-FROM `CONITI`.users;
+FROM `CONIITI`.users;
 
-INSERT IGNORE INTO `CONITI_AUTH`.password_reset_tokens (
+INSERT IGNORE INTO `CONIITI_AUTH`.password_reset_tokens (
   id,
   token,
   user_id,
@@ -68,4 +68,4 @@ SELECT
   expires_at,
   used_at,
   created_at
-FROM `CONITI`.password_reset_tokens;
+FROM `CONIITI`.password_reset_tokens;

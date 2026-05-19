@@ -1,4 +1,4 @@
-name: CONITI CI
+name: CONIITI CI
 
 on:
   push:
@@ -8,12 +8,12 @@ on:
       - develop
 
 concurrency:
-  group: coniti-ci-${{ github.ref }}
+  group: coniiti-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   validate:
-    name: Validar backend y frontend
+    name: Validar microservicios y frontend
     runs-on: ubuntu-latest
 
     steps:
@@ -51,7 +51,7 @@ jobs:
       - name: Instalar dependencias fechas-service
         run: npm ci --prefix fechas-service
 
-      - name: Validar sintaxis backend
+      - name: Validar sintaxis de microservicios
         shell: bash
         run: |
           node --check auth-service/server.js
