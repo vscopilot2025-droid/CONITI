@@ -53,6 +53,7 @@ Los `.env` estan ignorados por Git.
 
 ```dotenv
 VITE_AUTH_API_URL=http://127.0.0.1:3003
+VITE_PAYMENTS_API_URL=http://127.0.0.1:3003
 VITE_SPEAKERS_API_URL=http://127.0.0.1:3005
 ```
 
@@ -69,6 +70,38 @@ AUTH_SERVICE_DB_PORT=3306
 AUTH_SERVICE_DB_NAME=CONITI_AUTH
 AUTH_SERVICE_DB_USER=root
 AUTH_SERVICE_DB_PASSWORD=
+AUTH_SERVICE_PAYMENTS_MODE=stripe
+AUTH_SERVICE_STRIPE_SECRET_KEY=sk_test_xxx
+AUTH_SERVICE_STRIPE_WEBHOOK_SECRET=whsec_xxx
+AUTH_SERVICE_PAYMENTS_CURRENCY=cop
+AUTH_SERVICE_PAYMENTS_SUCCESS_URL=http://localhost:5173/?payment=success
+AUTH_SERVICE_PAYMENTS_CANCEL_URL=http://localhost:5173/?payment=cancelled
+```
+
+### Pagos Stripe (modo test)
+
+- Checkout: `POST /payments/create-checkout-session`.
+- Webhook: `POST /payments/webhook`.
+- Estado de una sesión: `GET /payments/sessions/:sessionId` (requiere token Bearer).
+- El usuario debe iniciar sesión para comprar boletas.
+- El frontend redirige a Stripe Checkout y retorna con `?payment=success` o `?payment=cancelled`.
+- Si `AUTH_SERVICE_STORAGE=mysql`, los pagos quedan persistidos en la tabla `payments` de `CONITI_AUTH`.
+
+Modos de prueba disponibles:
+
+- `AUTH_SERVICE_PAYMENTS_MODE=mock`: no requiere Stripe, crea sesiones simuladas y las marca como `paid` para validar flujo completo de UI/API sin transacción real.
+- `AUTH_SERVICE_PAYMENTS_MODE=stripe`: usa Stripe en test mode (`sk_test_*`) y confirma pago por webhook.
+
+Buenas prácticas implementadas:
+
+- El monto y moneda se validan en backend por catálogo de boletas (no se confía en valores enviados desde frontend).
+- Se soporta idempotencia opcional con header `x-idempotency-key` al crear checkout.
+- El webhook valida firma cuando existe `AUTH_SERVICE_STRIPE_WEBHOOK_SECRET`.
+
+Para testear webhook localmente:
+
+```powershell
+stripe listen --forward-to http://127.0.0.1:3003/payments/webhook
 ```
 
 Credenciales demo creadas automaticamente:

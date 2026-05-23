@@ -29,6 +29,7 @@ class AuthMemoryRepository {
       }
     ]
     this.resetTokens = []
+    this.payments = []
   }
 
   async initialize() {}
@@ -133,6 +134,67 @@ class AuthMemoryRepository {
 
   async listUsers() {
     return this.users.map((user) => this.sanitizeUser(user))
+  }
+
+  async createPaymentSession({
+    sessionId,
+    userId,
+    userEmail,
+    ticketType,
+    amountInMinorUnit,
+    currency,
+    checkoutUrl,
+    status = 'created'
+  }) {
+    const now = new Date().toISOString()
+    const payment = {
+      sessionId,
+      userId: Number(userId),
+      userEmail,
+      ticketType,
+      amountInMinorUnit: Number(amountInMinorUnit),
+      currency: String(currency || 'cop').toLowerCase(),
+      checkoutUrl,
+      status,
+      providerPaymentId: null,
+      providerEventId: null,
+      createdAt: now,
+      updatedAt: now
+    }
+
+    this.payments = this.payments.filter((item) => item.sessionId !== sessionId)
+    this.payments.push(payment)
+    return { ...payment }
+  }
+
+  async markPaymentCompleted({ sessionId, providerPaymentId, providerEventId }) {
+    const payment = this.payments.find((item) => item.sessionId === sessionId)
+    if (!payment) {
+      return null
+    }
+
+    payment.status = 'paid'
+    payment.providerPaymentId = providerPaymentId || payment.providerPaymentId
+    payment.providerEventId = providerEventId || payment.providerEventId
+    payment.updatedAt = new Date().toISOString()
+    return { ...payment }
+  }
+
+  async markPaymentFailed({ sessionId, providerEventId }) {
+    const payment = this.payments.find((item) => item.sessionId === sessionId)
+    if (!payment) {
+      return null
+    }
+
+    payment.status = 'failed'
+    payment.providerEventId = providerEventId || payment.providerEventId
+    payment.updatedAt = new Date().toISOString()
+    return { ...payment }
+  }
+
+  async findPaymentSessionById(sessionId) {
+    const payment = this.payments.find((item) => item.sessionId === sessionId)
+    return payment ? { ...payment } : null
   }
 }
 

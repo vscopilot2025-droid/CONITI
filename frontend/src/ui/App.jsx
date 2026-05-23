@@ -77,6 +77,7 @@ const defaultTickets = [
     title: 'Visitante',
     subtitle: 'Público general',
     price: '180K',
+    amountInMinorUnit: 180000,
     buttonClass: 'btn-reg-outline',
     features: [
       'Acceso a conferencias magistrales',
@@ -89,6 +90,7 @@ const defaultTickets = [
     title: 'Ponente',
     subtitle: 'Investigadores y académicos',
     price: '320K',
+    amountInMinorUnit: 320000,
     featured: true,
     buttonClass: 'btn-reg-gold',
     features: [
@@ -103,6 +105,7 @@ const defaultTickets = [
     title: 'Estudiante',
     subtitle: 'Pregrado y posgrado',
     price: '90K',
+    amountInMinorUnit: 90000,
     buttonClass: 'btn-reg-teal',
     features: [
       'Conferencias y talleres',
@@ -780,7 +783,121 @@ function SchedulePage({ scheduleDays, dayIndex, onChangeDay }) {
   )
 }
 
-function TicketsPage() {
+function getPaymentBanner() {
+  const params = new URLSearchParams(window.location.search)
+  const status = params.get('payment')
+
+  if (status === 'success') {
+    return {
+      type: 'success',
+      text: 'Pago en modo test completado. Puedes validar el evento en Stripe Dashboard o con Stripe CLI.'
+    }
+  }
+
+  if (status === 'cancelled') {
+    return {
+      type: 'warning',
+      text: 'Pago cancelado. Puedes intentar nuevamente cuando quieras.'
+    }
+  }
+
+  return null
+}
+
+function getPaymentSessionIdFromQuery() {
+  const params = new URLSearchParams(window.location.search)
+  return params.get('session_id')
+}
+
+function TicketsPage({ authSession, onAuthRequired }) {
+  const [processingTicket, setProcessingTicket] = useState('')
+  const [checkoutError, setCheckoutError] = useState('')
+  const [paymentStatus, setPaymentStatus] = useState(null)
+  const [paymentStatusError, setPaymentStatusError] = useState('')
+  const paymentBanner = getPaymentBanner()
+  const paymentSessionId = getPaymentSessionIdFromQuery()
+
+  useEffect(() => {
+    if (!paymentSessionId || !authSession?.token) {
+      return
+    }
+
+    const controller = new AbortController()
+
+    async function fetchPaymentStatus() {
+      try {
+        setPaymentStatusError('')
+        const response = await fetch(
+          buildApiUrl(apiConfig.paymentsApiUrl, `/payments/sessions/${encodeURIComponent(paymentSessionId)}`),
+          {
+            headers: {
+              Authorization: `${authSession.tokenType || 'Bearer'} ${authSession.token}`
+            },
+            signal: controller.signal
+          }
+        )
+
+        const payload = await response.json().catch(() => null)
+
+        if (!response.ok || !payload?.ok || !payload?.payment) {
+          setPaymentStatusError(payload?.message || 'No fue posible consultar el estado del pago.')
+          return
+        }
+
+        setPaymentStatus(payload.payment)
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setPaymentStatusError('No fue posible consultar el estado del pago.')
+        }
+      }
+    }
+
+    fetchPaymentStatus()
+
+    return () => controller.abort()
+  }, [authSession, paymentSessionId])
+
+  async function startCheckout(event, ticket) {
+    event.preventDefault()
+    setCheckoutError('')
+
+    if (!authSession?.token) {
+      onAuthRequired()
+      return
+    }
+
+    try {
+      setProcessingTicket(ticket.title)
+
+      const response = await fetch(buildApiUrl(apiConfig.paymentsApiUrl, '/payments/create-checkout-session'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${authSession.tokenType || 'Bearer'} ${authSession.token}`
+        },
+        body: JSON.stringify({
+          ticketType: ticket.title,
+          amountInMinorUnit: ticket.amountInMinorUnit,
+          currency: 'cop',
+          description: `Boleta ${ticket.title} para CONIITI`
+        })
+      })
+
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok || !payload?.ok || !payload?.url) {
+        setCheckoutError(payload?.message || 'No fue posible iniciar el checkout de Stripe.')
+        return
+      }
+
+      window.location.href = payload.url
+    } catch (_error) {
+      setCheckoutError('No hay conexión con el servicio de pagos.')
+    } finally {
+      setProcessingTicket('')
+    }
+  }
+
   return (
     <div className="page active" id="page-boletas">
       <div className="page-band" data-bg="BOLETAS">
@@ -791,6 +908,33 @@ function TicketsPage() {
       </div>
 
       <div className="container py-6" style={{ maxWidth: 1100 }}>
+        {paymentBanner ? (
+          <div
+            className={`auth-info ${paymentBanner.type === 'success' ? 'success' : ''}`}
+            style={{ marginBottom: 20 }}
+          >
+            {paymentBanner.text}
+          </div>
+        ) : null}
+
+        {checkoutError ? (
+          <div className="auth-info error" style={{ marginBottom: 20 }}>
+            {checkoutError}
+          </div>
+        ) : null}
+
+        {paymentStatus ? (
+          <div className="auth-info success" style={{ marginBottom: 20 }}>
+            Estado de pago: {paymentStatus.status.toUpperCase()} · Sesión: {paymentStatus.sessionId} · Boleta: {paymentStatus.ticketType}
+          </div>
+        ) : null}
+
+        {paymentStatusError ? (
+          <div className="auth-info error" style={{ marginBottom: 20 }}>
+            {paymentStatusError}
+          </div>
+        ) : null}
+
         <div className="columns is-variable is-4">
           {defaultTickets.map((ticket, index) => (
             <div className="column is-4-desktop" data-anim="fade-up" data-anim-delay={index * 120} key={ticket.title}>
@@ -802,7 +946,15 @@ function TicketsPage() {
                 <ul className="boleta-features">
                   {ticket.features.map((feature) => <li className="boleta-feature" key={feature}>{feature}</li>)}
                 </ul>
-                <a className={`btn-register ${ticket.buttonClass}`} href="#" onClick={(event) => event.preventDefault()}>Comprar aquí</a>
+                <a
+                  className={`btn-register ${ticket.buttonClass}`}
+                  href="#"
+                  onClick={(event) => startCheckout(event, ticket)}
+                  aria-disabled={processingTicket === ticket.title}
+                  style={processingTicket === ticket.title ? { pointerEvents: 'none', opacity: 0.7 } : undefined}
+                >
+                  {processingTicket === ticket.title ? 'Redirigiendo...' : 'Comprar aquí'}
+                </a>
               </div>
             </div>
           ))}
@@ -976,7 +1128,10 @@ function buildCountdown() {
 }
 
 export default function App() {
-  const [page, setPage] = useState('inicio')
+  const [page, setPage] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    return params.get('payment') ? 'boletas' : 'inicio'
+  })
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
@@ -1178,7 +1333,7 @@ export default function App() {
       case 'cronograma':
         return <SchedulePage scheduleDays={scheduleDays} dayIndex={scheduleDayIndex} onChangeDay={setScheduleDayIndex} />
       case 'boletas':
-        return <TicketsPage />
+        return <TicketsPage authSession={authSession} onAuthRequired={handleAuthEntry} />
       case 'lineas':
         return <TopicsPage />
       case 'nosotros':

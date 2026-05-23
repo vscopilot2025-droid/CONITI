@@ -20,6 +20,14 @@ function getAuthConfig() {
     port: Number(process.env.AUTH_SERVICE_PORT || 3003),
     jwtSecret: process.env.AUTH_SERVICE_JWT_SECRET || 'coniiti-auth-service-secret',
     storage: (process.env.AUTH_SERVICE_STORAGE || 'memory').toLowerCase(),
+    payments: {
+      mode: (process.env.AUTH_SERVICE_PAYMENTS_MODE || 'stripe').toLowerCase(),
+      stripeSecretKey: process.env.AUTH_SERVICE_STRIPE_SECRET_KEY || '',
+      stripeWebhookSecret: process.env.AUTH_SERVICE_STRIPE_WEBHOOK_SECRET || '',
+      currency: (process.env.AUTH_SERVICE_PAYMENTS_CURRENCY || 'cop').toLowerCase(),
+      successUrl: process.env.AUTH_SERVICE_PAYMENTS_SUCCESS_URL || 'http://localhost:5173/?payment=success',
+      cancelUrl: process.env.AUTH_SERVICE_PAYMENTS_CANCEL_URL || 'http://localhost:5173/?payment=cancelled'
+    },
     database: {
       host: process.env.AUTH_SERVICE_DB_HOST || process.env.DB_HOST || 'localhost',
       port: Number(process.env.AUTH_SERVICE_DB_PORT || process.env.DB_PORT || 3306),
