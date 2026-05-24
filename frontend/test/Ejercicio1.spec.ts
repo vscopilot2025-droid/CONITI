@@ -68,7 +68,7 @@ test('navegación principal: abre módulos nuevos y desplegable', async ({ page 
   await expect(page.getByRole('heading', { name: 'Conferencias' })).toBeVisible()
 
   await page.getByRole('link', { name: 'Cronograma', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Cronograma 2025' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Cronograma 2026' })).toBeVisible()
 
   await page.getByRole('link', { name: 'Conferencistas', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Conferencistas' })).toBeVisible()

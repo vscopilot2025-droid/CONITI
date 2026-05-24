@@ -111,7 +111,7 @@
     <div class="glow glow-teal"></div>
     <div class="hero-bg-text">CONIITI</div>
 
-    <div class="container" style="width:100%; max-width:1340px; padding:0 60px; position:relative; z-index:2;">
+    <div class="container" style="width:100%; max-width:1380px; padding:0 60px; position:relative; z-index:2;">
       <div class="columns is-vcentered" style="min-height:calc(100vh - 170px); padding-top:60px;">
         <div class="column is-8-widescreen is-10-desktop">
 
@@ -344,7 +344,7 @@
           <span class="map-pin-icon">📍</span>
           <h3>Universidad Católica de Colombia</h3>
           <p>Av. Caracas #46-72, Bogotá D.C.<br>Edificio El Claustro — Bloque L<br><br>Acceso fácil en transporte público.</p>
-          <a href="https://maps.google.com" target="_blank" class="map-link">
+          <a href="https://maps.app.goo.gl/1cVbbtcHSBKMEGgx8" target="_blank" class="map-link">
             <i class="bi bi-map"></i> Abrir en Google Maps
           </a>
         </div>
@@ -1002,7 +1002,7 @@
 
         <!-- Form -->
         <div class="column is-8-desktop" data-anim="fade-left">
-          <form onsubmit="return false;">
+          <form onsubmit="enviarContacto(event)">
             <div class="columns is-variable is-3 is-multiline">
               <div class="column is-6">
                 <label class="form-label-custom">Nombre</label>
@@ -1444,6 +1444,41 @@ styleTag.textContent = `
 }
 `;
 document.head.appendChild(styleTag);
+
+
+// ── Formulario de contacto ──
+async function enviarContacto(event) {
+  event.preventDefault()
+  const form = event.target
+  const inputs = form.querySelectorAll('input, select, textarea')
+  const [firstName, lastName, email, institution, queryType, message] = [...inputs].map(i => i.value.trim())
+
+  const btn = form.querySelector('button[type="submit"]')
+  btn.disabled = true
+  btn.innerHTML = '<i class="bi bi-hourglass"></i> Enviando...'
+
+  try {
+    const res = await fetch('http://127.0.0.1:3007/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firstName, lastName, email, institution, queryType, message })
+    })
+    const data = await res.json()
+    if (data.ok) {
+      btn.innerHTML = '<i class="bi bi-check-circle"></i> ¡Mensaje enviado!'
+      btn.style.background = '#2ecc71'
+      form.reset()
+    } else {
+      alert('Error: ' + data.error)
+      btn.disabled = false
+      btn.innerHTML = '<i class="bi bi-send"></i> Enviar mensaje'
+    }
+  } catch (err) {
+    alert('No se pudo conectar con el servidor')
+    btn.disabled = false
+    btn.innerHTML = '<i class="bi bi-send"></i> Enviar mensaje'
+  }
+}
 </script>
 </body>
 </html>

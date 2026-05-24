@@ -1,4 +1,5 @@
 const { Router } = require('express')
+const { requireAuth, requireRole } = require('../middleware/auth.middleware')
 
 const allowedAvailabilityStatuses = ['available', 'reserved', 'blocked', 'tentative']
 const allowedConflictSeverities = ['low', 'medium', 'high']
@@ -58,8 +59,89 @@ function validateAgendaPayload(body) {
   return null
 }
 
-function createDatesRouter(repository) {
+function buildScheduleDayLabel(dateKey, index) {
+  const [, month, day] = dateKey.split('-')
+  const monthLabels = {
+    '09': 'Sep',
+    '10': 'Oct'
+  }
+  const formattedDate = `${day} ${monthLabels[month] || month}`
+
+  return `Día ${index + 1} · ${formattedDate}`
+}
+
+function getConferenceLeadAgendaItem(conference) {
+  if (!conference?.agenda?.length) {
+    return null
+  }
+
+  return conference.agenda.find((item) => item.title === conference.title) || conference.agenda[conference.agenda.length - 1]
+}
+
+function mapConferenceToScheduleEntry(conference) {
+  const leadAgendaItem = getConferenceLeadAgendaItem(conference)
+
+  return {
+    conferenceId: conference.id,
+    slug: conference.slug,
+    title: conference.title,
+    description: conference.description,
+    category: conference.category,
+    modality: conference.modality,
+    timezone: conference.timezone,
+    startDate: conference.startDate,
+    endDate: conference.endDate,
+    room: leadAgendaItem?.room || 'Sala por confirmar',
+    leadSpeakerName: leadAgendaItem?.speaker || 'Conferencista por confirmar',
+    availableSeats: conference.availableSeats,
+    tags: conference.tags || []
+  }
+}
+
+async function fetchPublishedConferences(config) {
+  const url = new URL('/conferencias', config.conferencesServiceUrl)
+  url.searchParams.set('status', 'published')
+
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error('No fue posible sincronizar las conferencias para construir el cronograma')
+  }
+
+  const payload = await response.json()
+  return payload.conferences || []
+}
+
+async function buildMasterAgenda(config) {
+  const conferences = await fetchPublishedConferences(config)
+  const grouped = new Map()
+
+  conferences.forEach((conference) => {
+    const dateKey = conference.startDate.slice(0, 10)
+    if (!grouped.has(dateKey)) {
+      grouped.set(dateKey, [])
+    }
+
+    grouped.get(dateKey).push(mapConferenceToScheduleEntry(conference))
+  })
+
+  const days = Array.from(grouped.entries())
+    .sort(([left], [right]) => left.localeCompare(right))
+    .slice(0, 3)
+    .map(([dateKey, entries], index) => ({
+      id: dateKey,
+      label: buildScheduleDayLabel(dateKey, index),
+      entries: entries.sort((left, right) => new Date(left.startDate) - new Date(right.startDate))
+    }))
+
+  return {
+    total: conferences.length,
+    days
+  }
+}
+
+function createDatesRouter(repository, config) {
   const router = Router()
+  const writeGuards = [requireAuth(config), requireRole('admin', 'organizer')]
 
   router.get('/availability', asyncHandler(async (req, res) => {
     const availabilities = await repository.listAvailabilities({
@@ -76,7 +158,7 @@ function createDatesRouter(repository) {
     })
   }))
 
-  router.post('/availability', asyncHandler(async (req, res) => {
+  router.post('/availability', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateAvailabilityPayload(req.body)
     if (validationError) {
       return res.status(400).json({ ok: false, message: validationError })
@@ -114,7 +196,7 @@ function createDatesRouter(repository) {
     })
   }))
 
-  router.post('/conflicts', asyncHandler(async (req, res) => {
+  router.post('/conflicts', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateConflictPayload(req.body)
     if (validationError) {
       return res.status(400).json({ ok: false, message: validationError })
@@ -143,20 +225,16 @@ function createDatesRouter(repository) {
   }))
 
   router.get('/master-agenda', asyncHandler(async (req, res) => {
-    const entries = await repository.listMasterAgenda({
-      owner: req.query.owner,
-      eventType: req.query.eventType,
-      timezone: req.query.timezone
-    })
+    const agenda = await buildMasterAgenda(config)
 
     res.status(200).json({
       ok: true,
-      total: entries.length,
-      entries
+      total: agenda.total,
+      days: agenda.days
     })
   }))
 
-  router.post('/master-agenda', asyncHandler(async (req, res) => {
+  router.post('/master-agenda', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateAgendaPayload(req.body)
     if (validationError) {
       return res.status(400).json({ ok: false, message: validationError })
@@ -193,3 +271,4 @@ function createDatesRouter(repository) {
 module.exports = {
   createDatesRouter
 }
+

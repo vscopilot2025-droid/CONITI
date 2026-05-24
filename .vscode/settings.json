@@ -7,13 +7,13 @@
             },
             "ssh": "Disabled",
             "previewLimit": 50,
-            "server": "localhost",
-            "port": 3306,
+            "server": "127.0.0.1",
+            "port": 3307,
             "driver": "MySQL",
-            "name": "CONITI Local",
-            "group": "CONITI",
-            "database": "CONITI",
-            "username": "root"
+            "name": "CONIITI Docker",
+            "group": "CONIITI",
+            "database": "CONIITI_CONFERENCIAS",
+            "username": "coniiti_local"
         }
     ]
 }

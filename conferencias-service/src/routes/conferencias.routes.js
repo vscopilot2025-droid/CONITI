@@ -1,4 +1,5 @@
 const { Router } = require('express')
+const { requireAuth, requireRole } = require('../middleware/auth.middleware')
 
 const allowedStatuses = ['draft', 'published', 'cancelled', 'completed']
 const allowedModalities = ['virtual', 'onsite', 'hybrid']
@@ -105,8 +106,9 @@ function validateAgendaPayload(body) {
   return null
 }
 
-function createConferenceRouter(repository) {
+function createConferenceRouter(repository, config) {
   const router = Router()
+  const writeGuards = [requireAuth(config), requireRole('admin', 'organizer')]
 
   router.get('/', asyncHandler(async (req, res) => {
     const conferences = await repository.list({
@@ -154,7 +156,7 @@ function createConferenceRouter(repository) {
     })
   }))
 
-  router.post('/', asyncHandler(async (req, res) => {
+  router.post('/', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateConferencePayload(req.body)
     if (validationError) {
       return res.status(400).json({
@@ -184,7 +186,7 @@ function createConferenceRouter(repository) {
     })
   }))
 
-  router.put('/:id', asyncHandler(async (req, res) => {
+  router.put('/:id', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateConferencePayload(req.body)
     if (validationError) {
       return res.status(400).json({
@@ -221,7 +223,7 @@ function createConferenceRouter(repository) {
     })
   }))
 
-  router.patch('/:id', asyncHandler(async (req, res) => {
+  router.patch('/:id', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateConferencePayload(req.body, { partial: true })
     if (validationError) {
       return res.status(400).json({
@@ -245,7 +247,7 @@ function createConferenceRouter(repository) {
     })
   }))
 
-  router.delete('/:id', asyncHandler(async (req, res) => {
+  router.delete('/:id', ...writeGuards, asyncHandler(async (req, res) => {
     const deletedConference = await repository.remove(req.params.id)
     if (!deletedConference) {
       return res.status(404).json({
@@ -276,7 +278,7 @@ function createConferenceRouter(repository) {
     })
   }))
 
-  router.post('/:id/agenda', asyncHandler(async (req, res) => {
+  router.post('/:id/agenda', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateAgendaPayload(req.body)
     if (validationError) {
       return res.status(400).json({

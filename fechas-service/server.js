@@ -1,15 +1,30 @@
 const cors = require('cors')
 const express = require('express')
+const helmet = require('helmet')
 const { getScheduleConfig } = require('./src/config/env')
 const { createScheduleRepository } = require('./src/repositories')
 const { createDatesRouter } = require('./src/routes/fechas.routes')
+
+function createCorsOptions(corsOrigins) {
+  return {
+    credentials: true,
+    origin(origin, callback) {
+      if (!origin || corsOrigins.includes(origin)) {
+        return callback(null, true)
+      }
+
+      return callback(new Error('Origen no permitido por CORS'))
+    }
+  }
+}
 
 async function bootstrap() {
   const app = express()
   const config = getScheduleConfig()
   const repository = await createScheduleRepository()
 
-  app.use(cors())
+  app.use(helmet())
+  app.use(cors(createCorsOptions(config.corsOrigins)))
   app.use(express.json())
 
   app.get('/health', (_req, res) => {
@@ -21,7 +36,7 @@ async function bootstrap() {
     })
   })
 
-  app.use('/fechas', createDatesRouter(repository))
+  app.use('/fechas', createDatesRouter(repository, config))
 
   app.listen(config.port, () => {
     console.log(`fechas-service corriendo en http://localhost:${config.port}`)

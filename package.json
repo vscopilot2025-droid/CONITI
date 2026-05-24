@@ -18,6 +18,8 @@
     "conferencistas-service:dev": "npm run dev --prefix conferencistas-service",
     "conferencistas-service:start": "npm run start --prefix conferencistas-service",
     "fechas-service:dev": "npm run dev --prefix fechas-service",
-    "fechas-service:start": "npm run start --prefix fechas-service"
+    "fechas-service:start": "npm run start --prefix fechas-service",
+    "contact-service:dev": "npm run dev --prefix contact-service",
+    "contact-service:start": "npm run start --prefix contact-service"
   }
 }

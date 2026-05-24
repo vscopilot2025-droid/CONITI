@@ -8,6 +8,7 @@ const commandSets = {
     { name: 'conferencias-service', command: 'npm run conferencias-service:dev' },
     { name: 'conferencistas-service', command: 'npm run conferencistas-service:dev' },
     { name: 'fechas-service', command: 'npm run fechas-service:dev' },
+    { name: 'contact-service', command: 'npm run contact-service:dev' },
     { name: 'frontend', command: 'npm run frontend:dev' }
   ],
   start: [
@@ -15,6 +16,7 @@ const commandSets = {
     { name: 'conferencias-service', command: 'npm run conferencias-service:start' },
     { name: 'conferencistas-service', command: 'npm run conferencistas-service:start' },
     { name: 'fechas-service', command: 'npm run fechas-service:start' },
+    { name: 'contact-service', command: 'npm run contact-service:start' },
     { name: 'frontend', command: 'npm run frontend:dev' }
   ]
 }

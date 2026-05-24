@@ -1,4 +1,5 @@
 const { Router } = require('express')
+const { requireAuth, requireRole } = require('../middleware/auth.middleware')
 
 function asyncHandler(handler) {
   return (req, res, next) => {
@@ -56,8 +57,9 @@ function validateEventLinkPayload(body) {
   return null
 }
 
-function createSpeakersRouter(repository) {
+function createSpeakersRouter(repository, config) {
   const router = Router()
+  const writeGuards = [requireAuth(config), requireRole('admin', 'organizer')]
 
   router.get('/', asyncHandler(async (req, res) => {
     const speakers = await repository.list({
@@ -83,7 +85,7 @@ function createSpeakersRouter(repository) {
     res.status(200).json({ ok: true, speaker })
   }))
 
-  router.post('/', asyncHandler(async (req, res) => {
+  router.post('/', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateSpeakerPayload(req.body)
     if (validationError) {
       return res.status(400).json({ ok: false, message: validationError })
@@ -109,7 +111,7 @@ function createSpeakersRouter(repository) {
     })
   }))
 
-  router.put('/:id', asyncHandler(async (req, res) => {
+  router.put('/:id', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateSpeakerPayload(req.body)
     if (validationError) {
       return res.status(400).json({ ok: false, message: validationError })
@@ -139,7 +141,7 @@ function createSpeakersRouter(repository) {
     })
   }))
 
-  router.patch('/:id', asyncHandler(async (req, res) => {
+  router.patch('/:id', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateSpeakerPayload(req.body, { partial: true })
     if (validationError) {
       return res.status(400).json({ ok: false, message: validationError })
@@ -157,7 +159,7 @@ function createSpeakersRouter(repository) {
     })
   }))
 
-  router.delete('/:id', asyncHandler(async (req, res) => {
+  router.delete('/:id', ...writeGuards, asyncHandler(async (req, res) => {
     const speaker = await repository.remove(req.params.id)
     if (!speaker) {
       return res.status(404).json({ ok: false, message: 'Conferencista no encontrado' })
@@ -179,7 +181,7 @@ function createSpeakersRouter(repository) {
     res.status(200).json({ ok: true, talks })
   }))
 
-  router.post('/:id/ponencias', asyncHandler(async (req, res) => {
+  router.post('/:id/ponencias', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateTalkPayload(req.body)
     if (validationError) {
       return res.status(400).json({ ok: false, message: validationError })
@@ -212,7 +214,7 @@ function createSpeakersRouter(repository) {
     res.status(200).json({ ok: true, eventLinks })
   }))
 
-  router.post('/:id/eventos', asyncHandler(async (req, res) => {
+  router.post('/:id/eventos', ...writeGuards, asyncHandler(async (req, res) => {
     const validationError = validateEventLinkPayload(req.body)
     if (validationError) {
       return res.status(400).json({ ok: false, message: validationError })

@@ -68,7 +68,7 @@ function createAuthRouter(repository) {
       fullName: req.body.fullName,
       email: normalizedEmail,
       password: req.body.password.trim(),
-      role: req.body.role || 'attendee'
+      role: 'attendee'
     })
 
     return res.status(201).json({
@@ -158,9 +158,7 @@ function createAuthRouter(repository) {
 
     return res.status(200).json({
       ok: true,
-      message: 'Solicitud de reseteo creada',
-      resetToken: result.token,
-      expiresAt: result.expiresAt
+      message: 'Si el correo existe, se generó una solicitud de reseteo'
     })
   })
 

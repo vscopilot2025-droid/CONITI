@@ -9,6 +9,6 @@ export class HttpScheduleRepository extends ScheduleRepository {
     }
 
     const payload = await response.json()
-    return payload.entries || []
+    return payload.days || []
   }
 }

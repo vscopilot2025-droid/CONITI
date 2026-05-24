@@ -113,12 +113,29 @@ class ConferenceMySqlRepository {
   }
 
   async seedDefaults() {
-    const [rows] = await this.pool.query('SELECT COUNT(*) AS total FROM conferences')
-    if (rows[0].total > 0) {
-      return
-    }
+    await this.pool.query(
+      'DELETE FROM conferences WHERE slug IN (?, ?)',
+      [
+        'arquitectura-de-microservicios-con-node-js',
+        'observabilidad-para-plataformas-de-eventos'
+      ]
+    )
 
     for (const conference of defaultConferences) {
+      const slug = buildSlug(conference.title)
+      const [rows] = await this.pool.query(
+        'SELECT id FROM conferences WHERE slug = ? LIMIT 1',
+        [slug]
+      )
+      if (rows.length) {
+        await this.update(rows[0].id, conference)
+        await this.pool.query('DELETE FROM conference_agenda WHERE conference_id = ?', [rows[0].id])
+        for (const agendaItem of conference.agenda) {
+          await this.addAgendaItem(rows[0].id, agendaItem)
+        }
+        continue
+      }
+
       const createdConference = await this.create(conference)
       for (const agendaItem of conference.agenda) {
         await this.addAgendaItem(createdConference.id, agendaItem)
