@@ -39,6 +39,12 @@ services:
       AUTH_SERVICE_DB_USER: coniiti_app
       AUTH_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
       AUTH_SERVICE_DB_BOOTSTRAP: "false"
+      AUTH_SERVICE_DB_BOOTSTRAP: "false"
+      EMAIL_HOST: smtp.gmail.com
+      EMAIL_PORT: "465"
+      EMAIL_USER: jorgegg2618@gmail.com
+      EMAIL_PASS: cjkphozxogyaetrh
+      EMAIL_FROM: "CONITI <jorgegg2618@gmail.com>"
     ports:
       - "127.0.0.1:3003:3003"
 

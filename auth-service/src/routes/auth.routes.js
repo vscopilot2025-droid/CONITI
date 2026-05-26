@@ -3,6 +3,8 @@ const { requireAuth, requireRole } = require('../middleware/auth.middleware')
 const { createRateLimiter } = require('../middleware/request-limit.middleware')
 const { allowedRoles, allowedTicketProfiles } = require('../repositories')
 const { createJwt } = require('../services/token.service')
+const { EmailService } = require('../services/EmailService')
+const emailService = new EmailService()
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -153,7 +155,9 @@ function createAuthRouter(repository, config) {
       role: 'attendee',
       ticketProfile: req.body.ticketProfile
     })
-
+    emailService
+  .sendWelcomeEmail({ fullName: user.fullName, email: user.email })
+  .catch(err => console.error('Error enviando correo:', err))
     return res.status(201).json({
       ok: true,
       message: 'Usuario registrado correctamente',
