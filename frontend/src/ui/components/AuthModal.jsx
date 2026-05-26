@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react'
 import { apiConfig, buildApiUrl } from '../../infrastructure/config/api'
 
+const authStorageKey = 'coniiti.auth'
+
+function persistAuthSession(session) {
+  sessionStorage.setItem(authStorageKey, JSON.stringify(session))
+  localStorage.removeItem(authStorageKey)
+}
+
 const initialLoginState = {
   email: '',
   password: ''
@@ -120,11 +127,11 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
         return
       }
 
-      localStorage.setItem('coniiti.auth', JSON.stringify({
+      persistAuthSession({
         token: payload.token,
         tokenType: payload.tokenType,
         user: payload.user
-      }))
+      })
 
       setMessage({ text: 'Inicio de sesión exitoso.', type: 'success' })
       setLoginForm(initialLoginState)
@@ -186,11 +193,11 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
         return
       }
 
-      localStorage.setItem('coniiti.auth', JSON.stringify({
+      persistAuthSession({
         token: payload.token,
         tokenType: payload.tokenType,
         user: payload.user
-      }))
+      })
 
       setMessage({ text: 'Cuenta creada correctamente.', type: 'success' })
       setRegisterForm(initialRegisterState)

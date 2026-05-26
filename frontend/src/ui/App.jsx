@@ -11,6 +11,32 @@ import { AuthModal } from './components/AuthModal'
 
 const authStorageKey = 'coniiti.auth'
 
+function readStoredAuthSession() {
+  const sessionValue = sessionStorage.getItem(authStorageKey)
+  if (sessionValue) {
+    return sessionValue
+  }
+
+  const legacyLocalValue = localStorage.getItem(authStorageKey)
+  if (legacyLocalValue) {
+    sessionStorage.setItem(authStorageKey, legacyLocalValue)
+    localStorage.removeItem(authStorageKey)
+    return legacyLocalValue
+  }
+
+  return null
+}
+
+function persistAuthSession(session) {
+  sessionStorage.setItem(authStorageKey, JSON.stringify(session))
+  localStorage.removeItem(authStorageKey)
+}
+
+function clearStoredAuthSession() {
+  sessionStorage.removeItem(authStorageKey)
+  localStorage.removeItem(authStorageKey)
+}
+
 const speakerRepository = new HttpSpeakerRepository()
 const conferenceRepository = new HttpConferenceRepository()
 const scheduleRepository = new HttpScheduleRepository()
@@ -1496,7 +1522,7 @@ export default function App() {
   const [scheduleDaysLoaded, setScheduleDaysLoaded] = useState(false)
 
   useEffect(() => {
-    const storedValue = localStorage.getItem(authStorageKey)
+    const storedValue = readStoredAuthSession()
     if (!storedValue) {
       return undefined
     }
@@ -1505,12 +1531,12 @@ export default function App() {
     try {
       storedSession = JSON.parse(storedValue)
     } catch (_error) {
-      localStorage.removeItem(authStorageKey)
+      clearStoredAuthSession()
       return undefined
     }
 
     if (!storedSession?.user) {
-      localStorage.removeItem(authStorageKey)
+      clearStoredAuthSession()
       return undefined
     }
 
@@ -1532,7 +1558,7 @@ export default function App() {
         })
 
         if (response.status === 401) {
-          localStorage.removeItem(authStorageKey)
+          clearStoredAuthSession()
           setAuthSession(null)
           return
         }
@@ -1547,7 +1573,7 @@ export default function App() {
             ...storedSession,
             user: payload.user
           }
-          localStorage.setItem(authStorageKey, JSON.stringify(refreshedSession))
+          persistAuthSession(refreshedSession)
           setAuthSession(refreshedSession)
         }
       } catch (error) {
@@ -1833,11 +1859,14 @@ export default function App() {
 
   function handleAuthenticated(payload) {
     if (payload?.user) {
-      setAuthSession({
+      const nextSession = {
         token: payload.token,
         tokenType: payload.tokenType || 'Bearer',
         user: payload.user
-      })
+      }
+
+      persistAuthSession(nextSession)
+      setAuthSession(nextSession)
     }
 
     setIsAuthOpen(false)
@@ -1845,7 +1874,7 @@ export default function App() {
   }
 
   function handleLogout() {
-    localStorage.removeItem(authStorageKey)
+    clearStoredAuthSession()
     setAuthSession(null)
     setIsAuthOpen(false)
     setPage('inicio')

@@ -1,8 +1,6 @@
 const crypto = require('crypto')
 const { getAuthConfig } = require('../config/env')
 
-const expiresInSeconds = 60 * 60 * 2
-
 function toBase64Url(value) {
   return Buffer.from(value)
     .toString('base64')
@@ -35,11 +33,12 @@ function createJwt(payload) {
     typ: 'JWT'
   }
 
+  const { jwtExpiresInSeconds } = getAuthConfig()
   const now = Math.floor(Date.now() / 1000)
   const body = {
     ...payload,
     iat: now,
-    exp: now + expiresInSeconds
+    exp: now + jwtExpiresInSeconds
   }
 
   const encodedHeader = toBase64Url(JSON.stringify(header))
@@ -56,7 +55,12 @@ function verifyJwt(token) {
   }
 
   const expectedSignature = sign(`${encodedHeader}.${encodedPayload}`)
-  if (signature !== expectedSignature) {
+  const signatureBuffer = Buffer.from(signature)
+  const expectedSignatureBuffer = Buffer.from(expectedSignature)
+  if (
+    signatureBuffer.length !== expectedSignatureBuffer.length ||
+    !crypto.timingSafeEqual(signatureBuffer, expectedSignatureBuffer)
+  ) {
     throw new Error('Firma del token inválida')
   }
 

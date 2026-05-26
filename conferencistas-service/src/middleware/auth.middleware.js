@@ -49,7 +49,7 @@ function requireAuth(config) {
     if (scheme !== 'Bearer' || !token) {
       return res.status(401).json({
         ok: false,
-        message: 'Token de acceso requerido'
+        message: 'Autenticacion requerida'
       })
     }
 
@@ -62,7 +62,7 @@ function requireAuth(config) {
     } catch (error) {
       return res.status(401).json({
         ok: false,
-        message: error.message || 'Token invalido'
+        message: 'Autenticacion requerida'
       })
     }
   }

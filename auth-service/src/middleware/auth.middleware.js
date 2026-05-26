@@ -8,7 +8,7 @@ function requireAuth(repository) {
     if (scheme !== 'Bearer' || !token) {
       return res.status(401).json({
         ok: false,
-        message: 'Token de acceso requerido'
+        message: 'Autenticación requerida'
       })
     }
 
@@ -19,7 +19,7 @@ function requireAuth(repository) {
       if (!user) {
         return res.status(401).json({
           ok: false,
-          message: 'Usuario no válido para este token'
+          message: 'Autenticación requerida'
         })
       }
 
@@ -30,10 +30,10 @@ function requireAuth(repository) {
       }
 
       return next()
-    } catch (error) {
+    } catch (_error) {
       return res.status(401).json({
         ok: false,
-        message: error.message || 'Token inválido'
+        message: 'Autenticación requerida'
       })
     }
   }

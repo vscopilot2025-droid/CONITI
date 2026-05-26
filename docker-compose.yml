@@ -4,14 +4,15 @@ services:
     container_name: coniiti-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
     ports:
-      - "3307:3306"
+      - "127.0.0.1:3307:3306"
     volumes:
       - coniiti-mysql-data:/var/lib/mysql
       - ./database/001_coniiti_databases.sql:/docker-entrypoint-initdb.d/001_coniiti_databases.sql:ro
+      - ./database/003_coniiti_security.sql:/docker-entrypoint-initdb.d/003_coniiti_security.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p${MYSQL_ROOT_PASSWORD:-root} --silent"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -35,10 +36,11 @@ services:
       AUTH_SERVICE_DB_HOST: mysql
       AUTH_SERVICE_DB_PORT: 3306
       AUTH_SERVICE_DB_NAME: CONIITI_AUTH
-      AUTH_SERVICE_DB_USER: root
-      AUTH_SERVICE_DB_PASSWORD: root
+      AUTH_SERVICE_DB_USER: coniiti_app
+      AUTH_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
+      AUTH_SERVICE_DB_BOOTSTRAP: "false"
     ports:
-      - "3003:3003"
+      - "127.0.0.1:3003:3003"
 
   conferencias-service:
     build:
@@ -58,10 +60,11 @@ services:
       CONFERENCIAS_SERVICE_DB_HOST: mysql
       CONFERENCIAS_SERVICE_DB_PORT: 3306
       CONFERENCIAS_SERVICE_DB_NAME: CONIITI_CONFERENCIAS
-      CONFERENCIAS_SERVICE_DB_USER: root
-      CONFERENCIAS_SERVICE_DB_PASSWORD: root
+      CONFERENCIAS_SERVICE_DB_USER: coniiti_app
+      CONFERENCIAS_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
+      CONFERENCIAS_SERVICE_DB_BOOTSTRAP: "false"
     ports:
-      - "3004:3004"
+      - "127.0.0.1:3004:3004"
 
   conferencistas-service:
     build:
@@ -81,10 +84,11 @@ services:
       CONFERENCISTAS_SERVICE_DB_HOST: mysql
       CONFERENCISTAS_SERVICE_DB_PORT: 3306
       CONFERENCISTAS_SERVICE_DB_NAME: CONIITI_CONFERENCISTAS
-      CONFERENCISTAS_SERVICE_DB_USER: root
-      CONFERENCISTAS_SERVICE_DB_PASSWORD: root
+      CONFERENCISTAS_SERVICE_DB_USER: coniiti_app
+      CONFERENCISTAS_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
+      CONFERENCISTAS_SERVICE_DB_BOOTSTRAP: "false"
     ports:
-      - "3005:3005"
+      - "127.0.0.1:3005:3005"
 
   fechas-service:
     build:
@@ -105,10 +109,11 @@ services:
       FECHAS_SERVICE_DB_HOST: mysql
       FECHAS_SERVICE_DB_PORT: 3306
       FECHAS_SERVICE_DB_NAME: CONIITI_FECHAS
-      FECHAS_SERVICE_DB_USER: root
-      FECHAS_SERVICE_DB_PASSWORD: root
+      FECHAS_SERVICE_DB_USER: coniiti_app
+      FECHAS_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
+      FECHAS_SERVICE_DB_BOOTSTRAP: "false"
     ports:
-      - "3006:3006"
+      - "127.0.0.1:3006:3006"
 
   frontend:
     build:
@@ -129,7 +134,7 @@ services:
       VITE_DATES_API_URL: http://127.0.0.1:3006
     command: npm run dev -- --host 0.0.0.0
     ports:
-      - "5173:5173"
+      - "127.0.0.1:5173:5173"
 
 volumes:
   coniiti-mysql-data:

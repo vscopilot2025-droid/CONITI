@@ -20,18 +20,20 @@ class AuthMySqlRepository {
   }
 
   async initialize() {
-    const serverPool = mysql.createPool({
-      host: this.databaseConfig.host,
-      port: this.databaseConfig.port,
-      user: this.databaseConfig.user,
-      password: this.databaseConfig.password,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0
-    })
+    if (this.databaseConfig.bootstrapDatabase !== false) {
+      const serverPool = mysql.createPool({
+        host: this.databaseConfig.host,
+        port: this.databaseConfig.port,
+        user: this.databaseConfig.user,
+        password: this.databaseConfig.password,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+      })
 
-    await serverPool.query(`CREATE DATABASE IF NOT EXISTS \`${this.databaseConfig.name}\``)
-    await serverPool.end()
+      await serverPool.query(`CREATE DATABASE IF NOT EXISTS \`${this.databaseConfig.name}\``)
+      await serverPool.end()
+    }
 
     this.pool = mysql.createPool({
       host: this.databaseConfig.host,

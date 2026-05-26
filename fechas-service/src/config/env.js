@@ -15,6 +15,9 @@ function getScheduleConfig() {
       .split(',')
       .map((origin) => origin.trim())
       .filter(Boolean),
+    requestBodyLimit: process.env.FECHAS_SERVICE_REQUEST_BODY_LIMIT || '150kb',
+    writeRateLimitWindowMs: Number(process.env.FECHAS_SERVICE_WRITE_RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),
+    writeRateLimitMax: Number(process.env.FECHAS_SERVICE_WRITE_RATE_LIMIT_MAX || 60),
     storage: (process.env.FECHAS_SERVICE_STORAGE || 'mysql').toLowerCase(),
     conferencesServiceUrl:
       process.env.FECHAS_SERVICE_CONFERENCIAS_URL ||
@@ -25,7 +28,8 @@ function getScheduleConfig() {
       port: Number(process.env.FECHAS_SERVICE_DB_PORT || 3306),
       name: process.env.FECHAS_SERVICE_DB_NAME || 'CONIITI_FECHAS',
       user: process.env.FECHAS_SERVICE_DB_USER || 'root',
-      password: process.env.FECHAS_SERVICE_DB_PASSWORD || ''
+      password: process.env.FECHAS_SERVICE_DB_PASSWORD || '',
+      bootstrapDatabase: process.env.FECHAS_SERVICE_DB_BOOTSTRAP !== 'false'
     }
   }
 }

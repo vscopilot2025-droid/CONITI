@@ -4,11 +4,13 @@ ARG APP_DIR
 
 WORKDIR /app
 
-COPY ${APP_DIR}/package*.json ./
+COPY --chown=node:node ${APP_DIR}/package*.json ./
 RUN npm ci
 
-COPY ${APP_DIR}/ ./
+COPY --chown=node:node ${APP_DIR}/ ./
 
 EXPOSE 3003 3004 3005 3006 5173
+
+USER node
 
 CMD ["npm", "start"]
