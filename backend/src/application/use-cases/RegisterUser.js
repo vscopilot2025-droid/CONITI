@@ -1,8 +1,9 @@
 import bcrypt from 'bcrypt'
 
 export class RegisterUser {
-  constructor(userRepository) {
+  constructor(userRepository, emailService) {
     this.userRepository = userRepository
+    this.emailService = emailService
   }
 
   async execute({ fullName, email, password }) {
@@ -34,7 +35,9 @@ export class RegisterUser {
       email: normalizedEmail,
       passwordHash
     })
-
+    this.emailService
+      .sendWelcomeEmail({ fullName: createdUser.fullName, email: createdUser.email })
+      .catch(err => console.error('Error enviando correo:', err))
     return {
       id: createdUser.id,
       fullName: createdUser.fullName,

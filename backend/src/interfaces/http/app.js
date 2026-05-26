@@ -7,13 +7,15 @@ import { SystemHealthRepository } from '../../infrastructure/repositories/System
 import { MySqlUserRepository } from '../../infrastructure/repositories/MySqlUserRepository.js'
 import { createAuthRouter } from './auth.routes.js'
 import { createHealthRouter } from './health.routes.js'
+import { EmailService } from '../../infrastructure/services/EmailService.js'
 
 export function createApp() {
   const app = express()
   const healthRepository = new SystemHealthRepository()
   const userRepository = new MySqlUserRepository()
+  const emailService = new EmailService()
   const getHealthStatusUseCase = new GetHealthStatus(healthRepository)
-  const registerUserUseCase = new RegisterUser(userRepository)
+  const registerUserUseCase = new RegisterUser(userRepository, emailService)
   const loginUserUseCase = new LoginUser(userRepository)
 
   app.use(cors())
