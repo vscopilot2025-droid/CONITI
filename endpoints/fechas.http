@@ -1,0 +1,94 @@
+# ============================================================
+# fechas-service  →  http://localhost:3006
+# ============================================================
+
+@baseUrl = http://localhost:3006
+
+# ──────────────────────────────────────────────────────────────
+# HEALTH CHECK
+# ──────────────────────────────────────────────────────────────
+
+### GET /health — Estado del servicio
+GET {{baseUrl}}/health
+
+
+# ──────────────────────────────────────────────────────────────
+# ZONAS HORARIAS
+# ──────────────────────────────────────────────────────────────
+
+### GET /fechas/timezones — Listar zonas horarias disponibles
+GET {{baseUrl}}/fechas/timezones
+
+
+# ──────────────────────────────────────────────────────────────
+# DISPONIBILIDAD
+# ──────────────────────────────────────────────────────────────
+
+### GET /fechas/availability — Listar disponibilidades
+# Filtros opcionales: resourceType, resourceId, status, timezone
+GET {{baseUrl}}/fechas/availability?resourceType=speaker&status=available
+
+
+### POST /fechas/availability — Registrar disponibilidad
+POST {{baseUrl}}/fechas/availability
+Content-Type: application/json
+
+{
+  "resourceType": "speaker",
+  "resourceId": 1,
+  "resourceName": "Dr. Carlos Rodríguez",
+  "timezone": "America/Bogota",
+  "startsAt": "2026-11-10T08:00:00.000Z",
+  "endsAt": "2026-11-10T18:00:00.000Z",
+  "status": "available",
+  "notes": "Disponible todo el día del evento"
+}
+
+
+# ──────────────────────────────────────────────────────────────
+# CONFLICTOS
+# ──────────────────────────────────────────────────────────────
+
+### GET /fechas/conflicts — Listar conflictos de horario
+# Filtros opcionales: resourceType, resourceId, severity
+GET {{baseUrl}}/fechas/conflicts?severity=high
+
+
+### POST /fechas/conflicts — Registrar un conflicto de horario
+POST {{baseUrl}}/fechas/conflicts
+Content-Type: application/json
+
+{
+  "resourceType": "room",
+  "resourceId": 2,
+  "resourceName": "Auditorio B",
+  "startsAt": "2026-11-10T10:00:00.000Z",
+  "endsAt": "2026-11-10T12:00:00.000Z",
+  "severity": "high",
+  "reason": "Sala reservada para mantenimiento"
+}
+
+
+# ──────────────────────────────────────────────────────────────
+# AGENDA MAESTRA
+# ──────────────────────────────────────────────────────────────
+
+### GET /fechas/master-agenda — Listar agenda maestra
+# Filtros opcionales: owner, eventType, timezone
+GET {{baseUrl}}/fechas/master-agenda?eventType=conferencia
+
+
+### POST /fechas/master-agenda — Crear entrada en la agenda maestra
+POST {{baseUrl}}/fechas/master-agenda
+Content-Type: application/json
+
+{
+  "eventType": "conferencia",
+  "eventId": 1,
+  "title": "IA en la Educación Superior",
+  "timezone": "America/Bogota",
+  "startsAt": "2026-11-10T09:00:00.000Z",
+  "endsAt": "2026-11-10T18:00:00.000Z",
+  "owner": "Comité Organizador CONIITI",
+  "location": "Auditorio Principal"
+}

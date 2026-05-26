@@ -1,0 +1,80 @@
+# ============================================================
+# auth-service  →  http://localhost:3003
+# ============================================================
+
+@baseUrl = http://localhost:3003
+@token   = <PEGA_AQUI_EL_TOKEN_JWT>
+
+# ──────────────────────────────────────────────────────────────
+# HEALTH CHECK
+# ──────────────────────────────────────────────────────────────
+
+### GET /health — Estado del servicio
+GET {{baseUrl}}/health
+
+
+# ──────────────────────────────────────────────────────────────
+# REGISTRO E INICIO DE SESIÓN
+# ──────────────────────────────────────────────────────────────
+
+### POST /auth/register — Registrar nuevo usuario
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Juan Pérez",
+  "email": "juan@example.com",
+  "password": "secret123",
+  "role": "attendee"
+}
+
+
+### POST /auth/login — Iniciar sesión
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@example.com",
+  "password": "secret123"
+}
+
+
+# ──────────────────────────────────────────────────────────────
+# USUARIO AUTENTICADO  (requiere Authorization: Bearer <token>)
+# ──────────────────────────────────────────────────────────────
+
+### GET /auth/me — Obtener perfil del usuario autenticado
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+
+### GET /auth/roles — Listar roles disponibles
+GET {{baseUrl}}/auth/roles
+Authorization: Bearer {{token}}
+
+
+# ──────────────────────────────────────────────────────────────
+# ADMINISTRACIÓN DE ROLES  (requiere rol admin)
+# ──────────────────────────────────────────────────────────────
+
+### PATCH /auth/users/:id/role — Cambiar rol de un usuario (solo admin)
+PATCH {{baseUrl}}/auth/users/1/role
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "role": "organizer"
+}
+
+
+# ──────────────────────────────────────────────────────────────
+# RECUPERACIÓN DE CONTRASEÑA
+# ──────────────────────────────────────────────────────────────
+
+### POST /auth/reset-password/request — Solicitar recuperación de contraseña
+POST {{baseUrl}}/auth/reset-password/request
+Content-Type: application/json
+
+{
+  "email": "juan@example.com"
+}
