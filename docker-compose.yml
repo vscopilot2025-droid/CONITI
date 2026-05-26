@@ -1,0 +1,174 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: coniiti-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - coniiti-mysql-data:/var/lib/mysql
+      - ./database/001_coniiti_databases.sql:/docker-entrypoint-initdb.d/001_coniiti_databases.sql:ro
+      - ./database/003_coniiti_security.sql:/docker-entrypoint-initdb.d/003_coniiti_security.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p${MYSQL_ROOT_PASSWORD:-root} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  auth-service:
+    build:
+      context: .
+      args:
+        APP_DIR: auth-service
+    container_name: coniiti-auth-service
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      AUTH_SERVICE_PORT: 3003
+      AUTH_SERVICE_STORAGE: mysql
+      AUTH_SERVICE_JWT_SECRET: coniiti-docker-secret
+      AUTH_SERVICE_CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      AUTH_SERVICE_DB_HOST: mysql
+      AUTH_SERVICE_DB_PORT: 3306
+      AUTH_SERVICE_DB_NAME: CONIITI_AUTH
+      AUTH_SERVICE_DB_USER: coniiti_app
+      AUTH_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
+      AUTH_SERVICE_DB_BOOTSTRAP: "false"
+      AUTH_SERVICE_DB_BOOTSTRAP: "false"
+      EMAIL_HOST: smtp.gmail.com
+      EMAIL_PORT: "465"
+      EMAIL_USER: jorgegg2618@gmail.com
+      EMAIL_PASS: cjkphozxogyaetrh
+      EMAIL_FROM: "CONITI <jorgegg2618@gmail.com>"
+    ports:
+      - "127.0.0.1:3003:3003"
+
+  conferencias-service:
+    build:
+      context: .
+      args:
+        APP_DIR: conferencias-service
+    container_name: coniiti-conferencias-service
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      CONFERENCIAS_SERVICE_PORT: 3004
+      CONFERENCIAS_SERVICE_STORAGE: mysql
+      CONFERENCIAS_SERVICE_JWT_SECRET: coniiti-docker-secret
+      CONFERENCIAS_SERVICE_CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      CONFERENCIAS_SERVICE_DB_HOST: mysql
+      CONFERENCIAS_SERVICE_DB_PORT: 3306
+      CONFERENCIAS_SERVICE_DB_NAME: CONIITI_CONFERENCIAS
+      CONFERENCIAS_SERVICE_DB_USER: coniiti_app
+      CONFERENCIAS_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
+      CONFERENCIAS_SERVICE_DB_BOOTSTRAP: "false"
+    ports:
+      - "127.0.0.1:3004:3004"
+
+  conferencistas-service:
+    build:
+      context: .
+      args:
+        APP_DIR: conferencistas-service
+    container_name: coniiti-conferencistas-service
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      CONFERENCISTAS_SERVICE_PORT: 3005
+      CONFERENCISTAS_SERVICE_STORAGE: mysql
+      CONFERENCISTAS_SERVICE_JWT_SECRET: coniiti-docker-secret
+      CONFERENCISTAS_SERVICE_CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      CONFERENCISTAS_SERVICE_DB_HOST: mysql
+      CONFERENCISTAS_SERVICE_DB_PORT: 3306
+      CONFERENCISTAS_SERVICE_DB_NAME: CONIITI_CONFERENCISTAS
+      CONFERENCISTAS_SERVICE_DB_USER: coniiti_app
+      CONFERENCISTAS_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
+      CONFERENCISTAS_SERVICE_DB_BOOTSTRAP: "false"
+    ports:
+      - "127.0.0.1:3005:3005"
+
+  fechas-service:
+    build:
+      context: .
+      args:
+        APP_DIR: fechas-service
+    container_name: coniiti-fechas-service
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      FECHAS_SERVICE_PORT: 3006
+      FECHAS_SERVICE_STORAGE: mysql
+      FECHAS_SERVICE_JWT_SECRET: coniiti-docker-secret
+      FECHAS_SERVICE_CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      FECHAS_SERVICE_CONFERENCIAS_URL: http://conferencias-service:3004
+      FECHAS_SERVICE_DB_HOST: mysql
+      FECHAS_SERVICE_DB_PORT: 3306
+      FECHAS_SERVICE_DB_NAME: CONIITI_FECHAS
+      FECHAS_SERVICE_DB_USER: coniiti_app
+      FECHAS_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
+      FECHAS_SERVICE_DB_BOOTSTRAP: "false"
+    ports:
+      - "127.0.0.1:3006:3006"
+
+  contacto-service:
+    build:
+      context: .
+      args:
+        APP_DIR: contacto-service
+    container_name: coniiti-contacto-service
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      CONTACTO_SERVICE_PORT: 3007
+      CONTACTO_SERVICE_STORAGE: mysql
+      CONTACTO_SERVICE_JWT_SECRET: coniiti-docker-secret
+      CONTACTO_SERVICE_CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      CONTACTO_SERVICE_DB_HOST: mysql
+      CONTACTO_SERVICE_DB_PORT: 3306
+      CONTACTO_SERVICE_DB_NAME: CONIITI_CONTACTO
+      CONTACTO_SERVICE_DB_USER: coniiti_app
+      CONTACTO_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
+      CONTACTO_SERVICE_DB_BOOTSTRAP: "true"
+      CONTACTO_SERVICE_DB_BOOTSTRAP_USER: root
+      CONTACTO_SERVICE_DB_BOOTSTRAP_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    ports:
+      - "127.0.0.1:3007:3007"
+
+  frontend:
+    build:
+      context: .
+      args:
+        APP_DIR: frontend
+    container_name: coniiti-frontend
+    restart: unless-stopped
+    depends_on:
+      - auth-service
+      - conferencias-service
+      - conferencistas-service
+      - fechas-service
+      - contacto-service
+    environment:
+      VITE_AUTH_API_URL: http://127.0.0.1:3003
+      VITE_CONFERENCES_API_URL: http://127.0.0.1:3004
+      VITE_SPEAKERS_API_URL: http://127.0.0.1:3005
+      VITE_DATES_API_URL: http://127.0.0.1:3006
+      VITE_CONTACT_API_URL: http://127.0.0.1:3007
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "127.0.0.1:5173:5173"
+
+volumes:
+  coniiti-mysql-data:

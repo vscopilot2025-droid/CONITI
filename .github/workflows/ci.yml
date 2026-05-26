@@ -1,131 +1,135 @@
-  
-
-# --------------------------------------------------------- 
-
-# EVENTOS QUE ACTIVAN EL WORKFLOW 
-
-# Este flujo se ejecuta cuando hay cambios en la rama main 
-
-# --------------------------------------------------------- 
-
-on: 
-
-  # Se ejecuta cuando alguien hace push al repositorio 
-
-  push: 
-
-    branches: 
-
-      - main   # rama principal del repositorio 
-
-  
-
-  # También se ejecuta cuando alguien crea o actualiza un Pull Request 
-
-  pull_request: 
-
-    branches: 
-
-      - main   # rama donde se revisan los cambios 
-
-  
-
-# --------------------------------------------------------- 
-
-# DEFINICIÓN DE LOS TRABAJOS (JOBS) 
-
-# --------------------------------------------------------- 
-
-jobs: 
-
-  
-
-  # Nombre del trabajo 
-
-  build: 
-
-  
-
-    # Sistema operativo donde se ejecutará el proceso 
-
-    runs-on: windows-latest 
-
-  
-
-    # ----------------------------------------------------- 
-
-    # PASOS QUE SE EJECUTAN EN EL JOB 
-
-    # ----------------------------------------------------- 
-
-    steps: 
-
-  
-
-      # ------------------------------------------------- 
-
-      # PASO 1: Descargar el código del repositorio 
-
-      # ------------------------------------------------- 
-
-      - name: Checkout code 
-
-        uses: actions/checkout@v2 
-
-  
-
-      # ------------------------------------------------- 
-
-      # PASO 2: Instalar y configurar Node.js 
-
-      # ------------------------------------------------- 
-
-      - name: Set up Node.js 
-
-        uses: actions/setup-node@v2 
-
-        with: 
-
-          node-version: '14'   # versión de Node que usará el servidor 
-
-  
-
-          # ------------------------------------------------- 
-
-      # PASO 3: Instalar dependencias 
-
-      # ------------------------------------------------- 
-
-      - name: Install dependencies 
-
-        run: npm install 
-
-        working-directory: produccion/react_coniiti 
-
-       
-
-      # ------------------------------------------------- 
-
-      # PASO 4: Ejecutar pruebas automáticas 
-
-      # (solo funciona si el proyecto tiene tests) 
-
-      # ------------------------------------------------- 
-
-      - name: Run tests 
-
-        run: npm test 
-
-        working-directory: produccion/react_coniiti 
-
-       
-
-      # ------------------------------------------------- 
-
-     
-
-      - name: Build project 
-
-        run: npm run build 
-
-        working-directory: produccion/react_coniiti 
+name: CONIITI CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: coniiti-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validar microservicios y frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+            auth-service/package-lock.json
+            conferencias-service/package-lock.json
+            conferencistas-service/package-lock.json
+            fechas-service/package-lock.json
+
+      - name: Instalar dependencias raiz
+        run: npm ci
+
+      - name: Instalar dependencias frontend
+        run: npm ci --prefix frontend
+
+      - name: Instalar dependencias auth-service
+        run: npm ci --prefix auth-service
+
+      - name: Instalar dependencias conferencias-service
+        run: npm ci --prefix conferencias-service
+
+      - name: Instalar dependencias conferencistas-service
+        run: npm ci --prefix conferencistas-service
+
+      - name: Instalar dependencias fechas-service
+        run: npm ci --prefix fechas-service
+
+      - name: Validar sintaxis de microservicios
+        shell: bash
+        run: |
+          node --check auth-service/server.js
+          node --check auth-service/src/routes/auth.routes.js
+          node --check auth-service/src/middleware/auth.middleware.js
+          node --check auth-service/src/services/token.service.js
+          node --check conferencias-service/server.js
+          node --check conferencias-service/src/routes/conferencias.routes.js
+          node --check conferencias-service/src/repositories/conference-mysql.repository.js
+          node --check conferencistas-service/server.js
+          node --check conferencistas-service/src/routes/conferencistas.routes.js
+          node --check conferencistas-service/src/repositories/speaker-mysql.repository.js
+          node --check fechas-service/server.js
+          node --check fechas-service/src/routes/fechas.routes.js
+          node --check fechas-service/src/repositories/schedule-mysql.repository.js
+
+      - name: Probar health checks de microservicios en memoria
+        shell: bash
+        env:
+          AUTH_SERVICE_STORAGE: memory
+          AUTH_SERVICE_PORT: 3003
+          CONFERENCIAS_SERVICE_STORAGE: memory
+          CONFERENCIAS_SERVICE_PORT: 3004
+          CONFERENCISTAS_SERVICE_STORAGE: memory
+          CONFERENCISTAS_SERVICE_PORT: 3005
+          FECHAS_SERVICE_STORAGE: memory
+          FECHAS_SERVICE_PORT: 3006
+        run: |
+          set -e
+          npm run auth-service:start &
+          AUTH_PID=$!
+          npm run conferencias-service:start &
+          CONFERENCIAS_PID=$!
+          npm run conferencistas-service:start &
+          CONFERENCISTAS_PID=$!
+          npm run fechas-service:start &
+          FECHAS_PID=$!
+
+          cleanup() {
+            kill $AUTH_PID $CONFERENCIAS_PID $CONFERENCISTAS_PID $FECHAS_PID 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          for url in \
+            http://127.0.0.1:3003/health \
+            http://127.0.0.1:3004/health \
+            http://127.0.0.1:3005/health \
+            http://127.0.0.1:3006/health
+          do
+            for attempt in {1..30}
+            do
+              if curl --silent --fail "$url" > /dev/null
+              then
+                echo "$url disponible"
+                break
+              fi
+
+              if [ "$attempt" -eq 30 ]
+              then
+                echo "No fue posible conectar con $url"
+                exit 1
+              fi
+
+              sleep 1
+            done
+          done
+
+          curl --fail http://127.0.0.1:3003/health
+          curl --fail http://127.0.0.1:3004/health
+          curl --fail http://127.0.0.1:3005/health
+          curl --fail http://127.0.0.1:3006/health
+
+      - name: Instalar navegadores Playwright
+        run: npx playwright install --with-deps chromium
+        working-directory: frontend
+
+      - name: Compilar frontend
+        run: npm run frontend:build
+
+      - name: Ejecutar pruebas E2E
+        run: npm run test:e2e
