@@ -14,6 +14,10 @@ CREATE DATABASE IF NOT EXISTS `CONIITI_FECHAS`
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
+CREATE DATABASE IF NOT EXISTS `CONIITI_CONTACTO`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
 USE `CONIITI_AUTH`;
 
 CREATE TABLE IF NOT EXISTS users (
@@ -22,6 +26,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(160) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   role VARCHAR(40) NOT NULL DEFAULT 'attendee',
+  ticket_profile VARCHAR(40) NOT NULL DEFAULT 'visitor',
   last_login_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -42,6 +47,19 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
     ON DELETE CASCADE,
   INDEX idx_password_reset_tokens_user_id (user_id),
   INDEX idx_password_reset_tokens_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS favorite_conferences (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  conference_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uq_favorite_conferences_user_conference UNIQUE (user_id, conference_id),
+  CONSTRAINT fk_favorite_conferences_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE,
+  INDEX idx_favorite_conferences_user_id (user_id),
+  INDEX idx_favorite_conferences_conference_id (conference_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 USE `CONIITI_CONFERENCIAS`;
@@ -192,4 +210,20 @@ CREATE TABLE IF NOT EXISTS master_agenda (
   INDEX idx_master_agenda_owner (owner),
   INDEX idx_master_agenda_timezone (timezone),
   INDEX idx_master_agenda_starts_at (starts_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+USE `CONIITI_CONTACTO`;
+
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(120) NOT NULL,
+  last_name VARCHAR(120) NOT NULL,
+  email VARCHAR(160) NOT NULL,
+  institution VARCHAR(180) NOT NULL,
+  inquiry_type VARCHAR(80) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_contact_messages_email (email),
+  INDEX idx_contact_messages_inquiry_type (inquiry_type),
+  INDEX idx_contact_messages_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

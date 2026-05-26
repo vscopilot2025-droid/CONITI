@@ -1,11 +1,16 @@
 const { hashPassword, verifyPassword } = require('../utils/password.util')
 
 const allowedRoles = ['admin', 'organizer', 'attendee']
+const allowedTicketProfiles = ['visitor', 'speaker', 'student']
 
 class AuthMemoryRepository {
   constructor() {
     const now = new Date().toISOString()
     this.nextUserId = 3
+    this.favoriteConferences = new Map([
+      [1, [1, 2]],
+      [2, [3]]
+    ])
     this.users = [
       {
         id: 1,
@@ -13,6 +18,7 @@ class AuthMemoryRepository {
         email: 'admin@coniiti.test',
         passwordHash: hashPassword('Admin123*'),
         role: 'admin',
+        ticketProfile: 'speaker',
         createdAt: now,
         updatedAt: now,
         lastLoginAt: null
@@ -23,6 +29,7 @@ class AuthMemoryRepository {
         email: 'organizer@coniiti.test',
         passwordHash: hashPassword('Organizer123*'),
         role: 'organizer',
+        ticketProfile: 'visitor',
         createdAt: now,
         updatedAt: now,
         lastLoginAt: null
@@ -39,6 +46,7 @@ class AuthMemoryRepository {
       fullName: user.fullName,
       email: user.email,
       role: user.role,
+      ticketProfile: user.ticketProfile || 'visitor',
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       lastLoginAt: user.lastLoginAt
@@ -53,7 +61,7 @@ class AuthMemoryRepository {
     return this.users.find((user) => user.id === Number(id)) || null
   }
 
-  async createUser({ fullName, email, password, role = 'attendee' }) {
+  async createUser({ fullName, email, password, role = 'attendee', ticketProfile = 'visitor' }) {
     const timestamp = new Date().toISOString()
     const user = {
       id: this.nextUserId++,
@@ -61,6 +69,7 @@ class AuthMemoryRepository {
       email: email.trim().toLowerCase(),
       passwordHash: hashPassword(password),
       role,
+      ticketProfile,
       createdAt: timestamp,
       updatedAt: timestamp,
       lastLoginAt: null
@@ -90,6 +99,28 @@ class AuthMemoryRepository {
     user.role = role
     user.updatedAt = new Date().toISOString()
     return this.sanitizeUser(user)
+  }
+
+  async listFavoriteConferenceIds(userId) {
+    return [...(this.favoriteConferences.get(Number(userId)) || [])]
+  }
+
+  async addFavoriteConference(userId, conferenceId) {
+    const normalizedUserId = Number(userId)
+    const normalizedConferenceId = Number(conferenceId)
+    const favorites = new Set(this.favoriteConferences.get(normalizedUserId) || [])
+    favorites.add(normalizedConferenceId)
+    this.favoriteConferences.set(normalizedUserId, [...favorites])
+    return this.listFavoriteConferenceIds(normalizedUserId)
+  }
+
+  async removeFavoriteConference(userId, conferenceId) {
+    const normalizedUserId = Number(userId)
+    const normalizedConferenceId = Number(conferenceId)
+    const favorites = new Set(this.favoriteConferences.get(normalizedUserId) || [])
+    favorites.delete(normalizedConferenceId)
+    this.favoriteConferences.set(normalizedUserId, [...favorites])
+    return this.listFavoriteConferenceIds(normalizedUserId)
   }
 
   async createResetToken(email) {
@@ -138,5 +169,6 @@ class AuthMemoryRepository {
 
 module.exports = {
   allowedRoles,
+  allowedTicketProfiles,
   AuthMemoryRepository
 }

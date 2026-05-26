@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(160) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   role VARCHAR(40) NOT NULL DEFAULT 'attendee',
+  ticket_profile VARCHAR(40) NOT NULL DEFAULT 'visitor',
   last_login_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -38,6 +39,7 @@ INSERT IGNORE INTO `CONIITI_AUTH`.users (
   email,
   password_hash,
   role,
+  ticket_profile,
   last_login_at,
   created_at,
   updated_at
@@ -48,6 +50,7 @@ SELECT
   email,
   password_hash,
   COALESCE(role, 'attendee'),
+  'visitor',
   last_login_at,
   created_at,
   updated_at

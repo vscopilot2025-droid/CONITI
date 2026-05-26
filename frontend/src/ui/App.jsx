@@ -100,44 +100,72 @@ const defaultParticipationResources = [
 
 const defaultTickets = [
   {
-    title: 'Visitante',
-    subtitle: 'Público general',
-    price: '180K',
+    key: 'speaker',
+    audience: 'members',
+    title: 'Miembros UCatolica e IEEE',
+    subtitle: 'Inscripcion como ponente',
+    price: '940.000',
     buttonClass: 'btn-reg-outline',
     features: [
-      'Acceso a conferencias magistrales',
-      'Material digital del evento',
-      'Certificado de asistencia',
-      'Feria de innovación tecnológica'
+      'Inscripcion como Ponente',
+      'Constancia de participacion para todos los autores',
+      'Publicacion de las memorias'
     ]
   },
   {
-    title: 'Ponente',
-    subtitle: 'Investigadores y académicos',
-    price: '320K',
+    key: 'speaker',
+    audience: 'non-members',
+    title: 'Si no eres miembro UCatolica o IEEE',
+    subtitle: 'Inscripcion como ponente',
+    price: '980.000',
     featured: true,
     buttonClass: 'btn-reg-gold',
     features: [
-      'Todo el paquete Visitante',
-      'Publicación en memorias IEEE',
-      'Presentación de artículo o póster',
-      'Acceso a sesiones cerradas',
-      'Almuerzo incluido los 3 días'
+      'Inscripcion como Ponente',
+      'Constancia de participacion para todos los autores',
+      'Publicacion de las memorias'
     ]
   },
   {
-    title: 'Estudiante',
-    subtitle: 'Pregrado y posgrado',
-    price: '90K',
-    buttonClass: 'btn-reg-teal',
+    key: 'visitor',
+    title: 'Si desea constancia por participacion en conferencias',
+    subtitle: 'Certificado de asistencia',
+    price: '120.000',
+    buttonClass: 'btn-reg-outline',
+    optional: true,
     features: [
-      'Conferencias y talleres',
-      'Certificado de participación',
-      'Mentorías con conferencistas',
-      'Red de contactos estudiantil'
+      'Certificado de Asistencia'
+    ]
+  },
+  {
+    key: 'student',
+    title: 'Si desea constancia por participacion en workshops',
+    subtitle: 'Certificado de asistencia',
+    price: '90.000',
+    buttonClass: 'btn-reg-teal',
+    optional: true,
+    features: [
+      'Certificado de Asistencia'
     ]
   }
 ]
+
+const ticketProfileLabels = {
+  visitor: 'Visitante',
+  speaker: 'Ponente',
+  student: 'Estudiante'
+}
+
+const favoritesFilterKey = '__favorites__'
+
+const initialContactFormState = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  institution: '',
+  inquiryType: '',
+  message: ''
+}
 
 const topicGroups = [
   ['01', 'Creativity, Innovation and Entrepreneurship', ['Collaborative Design', 'Creativity and Design', 'Creative Communities', 'Creative Industries', 'Entrepreneurship', 'Innovation Management', 'Intellectual Property', 'New Product Development', 'Product Lifecycle Management', 'Social Innovation', 'Technology Transfer']],
@@ -183,12 +211,29 @@ const contactItems = [
 ]
 
 const contactOptions = [
-  'Inscripción y boletas',
+  'Boleteria y acceso',
   'Ponencias y abstracts',
   'Patrocinio',
   'Prensa y medios',
   'Otra consulta'
 ]
+
+function splitFullName(fullName) {
+  const normalized = (fullName || '').trim()
+  if (!normalized) {
+    return { firstName: '', lastName: '' }
+  }
+
+  const parts = normalized.split(/\s+/)
+  if (parts.length === 1) {
+    return { firstName: parts[0], lastName: '' }
+  }
+
+  return {
+    firstName: parts.slice(0, -1).join(' '),
+    lastName: parts.slice(-1).join(' ')
+  }
+}
 
 function getSpeakerCountryLabel(speaker) {
   return `${speaker.countryCode || ''} ${speaker.country || ''}`.trim()
@@ -384,7 +429,7 @@ function SimpleFooter({ dark = false, full = false }) {
 
 function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, onOpenAuth, onNavigate }) {
   const nextSlide = () => onHomeSlide((currentHomeSlide + 1) % 2)
-  const prevSlide = () => onHomeSlide((currentHomeSlide + 1) % 2)
+  const prevSlide = () => onHomeSlide(currentHomeSlide === 0 ? 1 : currentHomeSlide - 1)
 
   return (
     <div className="page active" id="page-inicio">
@@ -403,8 +448,8 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
               <div className="glow glow-teal" />
               <div className="hero-bg-text">CONIITI</div>
 
-              <div className="container" style={{ width: '100%', maxWidth: 1380, padding: '0 60px', position: 'relative', zIndex: 2 }}>
-                <div className="columns is-vcentered" style={{ minHeight: 'calc(100vh - 180px)', paddingTop: 60 }}>
+              <div className="container hero-shell" style={{ width: '100%', maxWidth: 1380, padding: '0 60px', position: 'relative', zIndex: 2 }}>
+                <div className="columns is-vcentered hero-columns" style={{ minHeight: 'calc(100vh - 180px)', paddingTop: 60 }}>
                   <div className="column is-8-widescreen is-10-desktop">
                     <div className="hero-overline">
                       <span className="hero-overline-bar" />
@@ -449,7 +494,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
                 </div>
               </div>
 
-              <div className="stats-band" style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+              <div className="stats-band home-stats-band" style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
                 <div className="columns is-gapless mb-0">
                   <div className="column"><div className="stat-unit"><span className="stat-num">{featuredSpeakers.length || 48}</span><span className="stat-lbl">Conferencistas</span></div></div>
                   <div className="column"><div className="stat-unit"><span className="stat-num">12</span><span className="stat-lbl">Países</span></div></div>
@@ -521,7 +566,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
               {[
                 ['15', 'Ago', 'Cierre de envío de resúmenes', 'Fecha límite para el envío de abstracts y propuestas de ponencia al comité científico.'],
                 ['05', 'Sep', 'Notificación de aceptación', 'El comité revisor comunicará los resultados de evaluación a los autores postulantes.'],
-                ['20', 'Sep', 'Cierre de inscripciones con descuento', 'Precio reducido disponible hasta esta fecha. Luego aplica tarifa regular.'],
+                ['20', 'Sep', 'Cierre de boletería con descuento', 'Precio reducido disponible hasta esta fecha. Luego aplica tarifa regular.'],
                 ['30', 'Sep', 'Entrega de artículos completos', 'Fecha límite para cargar las versiones definitivas de los artículos aceptados.'],
                 ['30', 'Sep', 'Inauguracion del Congreso', 'Apertura oficial de CONIITI 2026 en la Universidad Catolica de Colombia, Bogota.']
               ].map(([day, month, title, desc], index) => (
@@ -534,7 +579,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
                 </div>
               ))}
             </div>
-            <div className="column is-6-desktop" data-anim="fade-left" data-anim-delay="100" style={{ paddingTop: 320 }}>
+            <div className="column is-6-desktop home-timeline-column" data-anim="fade-left" data-anim-delay="100" style={{ paddingTop: 320 }}>
               <div className="timeline-card">
                 <p className="tl-head">Línea de tiempo 2026</p>
                 <div className="tl-list">
@@ -596,9 +641,9 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
               </span>
             </div>
           </div>
-          <div className="columns is-variable is-3">
+          <div className="columns is-variable is-3 home-speakers-desktop">
             {featuredSpeakers.slice(0, 4).map((speaker, index) => (
-              <div className="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay={index * 80} key={speaker.slug || speaker.fullName}>
+              <div className="column is-6-tablet is-3-desktop" data-anim="fade-up" data-anim-delay={index * 80} key={`desktop-${speaker.slug || speaker.fullName}`}>
                 <div className="speaker-card">
                   <div className="speaker-img" style={getSpeakerImageStyle(speaker, index)}><span className="speaker-initials">{speaker.initials}</span></div>
                   <div className="speaker-info">
@@ -609,6 +654,16 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+          <div className="home-speakers-grid home-speakers-mobile">
+            {featuredSpeakers.slice(0, 4).map((speaker, index) => (
+              <article className="home-speaker-card" data-anim="fade-up" data-anim-delay={index * 80} key={`mobile-${speaker.slug || speaker.fullName}`}>
+                <span className="home-speaker-kicker">Invitado</span>
+                <h3 className="home-speaker-name">{speaker.fullName}</h3>
+                <p className="home-speaker-institution">{speaker.institution}</p>
+                <span className="home-speaker-country">{getSpeakerCountryLabel(speaker)}</span>
+              </article>
             ))}
           </div>
         </div>
@@ -627,17 +682,28 @@ function ConferencesPage({
   onOpenSchedule,
   speakers,
   onOpenSpeaker,
+  favoriteConferenceIds,
+  favoriteActionId,
+  onToggleFavorite,
   isLoading = false
 }) {
   const conferencesPerPage = 4
   const [conferenceSearch, setConferenceSearch] = useState('')
   const [conferencePage, setConferencePage] = useState(1)
   const speakerDirectory = useMemo(() => buildSpeakerDirectory(speakers), [speakers])
+  const favoriteIdSet = useMemo(() => new Set(favoriteConferenceIds), [favoriteConferenceIds])
   const filteredConferences = useMemo(() => {
     const query = conferenceSearch.trim().toLowerCase()
 
     return conferenceCards
       .map((conference) => enrichConference(conference, speakerDirectory))
+      .filter((conference) => {
+        if (selectedCategory !== favoritesFilterKey) {
+          return true
+        }
+
+        return favoriteIdSet.has(conference.id)
+      })
       .filter((conference) => {
       const searchableText = [
         conference.title,
@@ -650,8 +716,10 @@ function ConferencesPage({
 
       return !query || searchableText.includes(query)
     })
-  }, [conferenceCards, conferenceSearch, speakerDirectory])
-  const selectedLineLabel = getConferenceLineLabel(selectedCategory)
+  }, [conferenceCards, conferenceSearch, favoriteIdSet, selectedCategory, speakerDirectory])
+  const selectedLineLabel = selectedCategory === favoritesFilterKey
+    ? 'Favoritos'
+    : getConferenceLineLabel(selectedCategory)
   const totalConferencePages = Math.max(1, Math.ceil(filteredConferences.length / conferencesPerPage))
   const visibleConferenceCount = Math.min(conferencesPerPage, filteredConferences.length)
   const conferencePageStart = filteredConferences.length ? (conferencePage - 1) * conferencesPerPage + 1 : 0
@@ -689,6 +757,14 @@ function ConferencesPage({
           <aside className="conference-sidebar">
             <span className="section-eyebrow eyebrow-gold">Líneas temáticas</span>
             <div className="conference-line-list" aria-label="Líneas temáticas">
+              <button
+                type="button"
+                className={`conference-line-row${selectedCategory === favoritesFilterKey ? ' active' : ''}`}
+                onClick={() => onCategoryChange(favoritesFilterKey)}
+              >
+                <span>★</span>
+                Favoritos
+              </button>
               {conferenceCategories.map((category, index) => (
                 <button
                   type="button"
@@ -776,7 +852,12 @@ function ConferencesPage({
                     <div className="conference-row-index">{String(conferencePageStart + index).padStart(2, '0')}</div>
                     <div className="conference-row-body">
                       <div className="conference-row-kicker">{conference.subtitle}</div>
-                      <div className="conference-row-title">{conference.title}</div>
+                      <div className="conference-row-title">
+                        {conference.title}
+                        {favoriteIdSet.has(conference.id) ? (
+                          <span className="conference-favorite-mark" aria-label="Favorita">★</span>
+                        ) : null}
+                      </div>
                       <p>{conference.description}</p>
                       <div className="conference-row-meta">{conference.metaLabel}</div>
                     </div>
@@ -808,6 +889,14 @@ function ConferencesPage({
                     </div>
 
                     <div className="conference-row-panel-actions">
+                      <button
+                        type="button"
+                        className={`conference-inline-link${favoriteIdSet.has(conference.id) ? ' primary' : ''}`}
+                        disabled={favoriteActionId === conference.id}
+                        onClick={() => onToggleFavorite(conference.id)}
+                      >
+                        {favoriteIdSet.has(conference.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                      </button>
                       <button type="button" className="conference-inline-link" onClick={() => onOpenSchedule(conference)}>
                         Ver en cronograma
                       </button>
@@ -1137,12 +1226,22 @@ function ParticipationPage({ onNavigate }) {
   )
 }
 
-function SchedulePage({ scheduleDays, dayIndex, onChangeDay, onOpenSpeaker, selectedEntrySlug }) {
+function SchedulePage({
+  scheduleDays,
+  dayIndex,
+  onChangeDay,
+  onOpenSpeaker,
+  selectedEntrySlug,
+  favoriteConferenceIds,
+  favoriteActionId,
+  onToggleFavorite
+}) {
   const conferencesPerDay = 4
   const [schedulePageByDay, setSchedulePageByDay] = useState({})
   const activeDay = scheduleDays[dayIndex] || null
   const activePage = schedulePageByDay[activeDay?.id] || 1
   const totalPages = activeDay ? Math.max(1, Math.ceil(activeDay.entries.length / conferencesPerDay)) : 1
+  const favoriteIdSet = useMemo(() => new Set(favoriteConferenceIds), [favoriteConferenceIds])
   const visibleEntries = activeDay
     ? activeDay.entries.slice((activePage - 1) * conferencesPerDay, activePage * conferencesPerDay)
     : []
@@ -1181,6 +1280,17 @@ function SchedulePage({ scheduleDays, dayIndex, onChangeDay, onOpenSpeaker, sele
     })
   }, [activeDay, conferencesPerDay, selectedEntrySlug])
 
+  useEffect(() => {
+    if (!activeDay?.id || activePage <= totalPages) {
+      return
+    }
+
+    setSchedulePageByDay((current) => ({
+      ...current,
+      [activeDay.id]: totalPages
+    }))
+  }, [activeDay, activePage, totalPages])
+
   return (
     <div className="page active" id="page-cronograma">
       <div className="page-band" data-bg="CRONOGRAMA">
@@ -1212,11 +1322,16 @@ function SchedulePage({ scheduleDays, dayIndex, onChangeDay, onOpenSpeaker, sele
               >
                 <summary className="schedule-detail-summary">
                   <div className="sched-time">{formatAgendaTime(entry.startDate, entry.timezone)}</div>
-                  <div className="schedule-summary-copy">
-                    <span className="sched-badge badge-k">{getConferenceLineLabel(entry.category)}</span>
-                    <div className="sched-title">{entry.title}</div>
-                    <div className="sched-speaker">{entry.leadSpeakerName}</div>
-                  </div>
+                    <div className="schedule-summary-copy">
+                      <span className="sched-badge badge-k">{getConferenceLineLabel(entry.category)}</span>
+                      <div className="sched-title">
+                        {entry.title}
+                        {favoriteIdSet.has(entry.conferenceId) ? (
+                          <span className="conference-favorite-mark" aria-label="Favorita">★</span>
+                        ) : null}
+                      </div>
+                      <div className="sched-speaker">{entry.leadSpeakerName}</div>
+                    </div>
                 </summary>
 
                 <div className="schedule-detail-panel">
@@ -1236,16 +1351,37 @@ function SchedulePage({ scheduleDays, dayIndex, onChangeDay, onOpenSpeaker, sele
                     </div>
                   </div>
 
-                  {entry.leadSpeakerSlug ? (
+                  {entry.leadSpeakerSlug || entry.conferenceId ? (
                     <div className="conference-row-panel-actions">
+                      <button
+                        type="button"
+                        className={`conference-inline-link${favoriteIdSet.has(entry.conferenceId) ? ' primary' : ''}`}
+                        disabled={favoriteActionId === entry.conferenceId}
+                        onClick={() => onToggleFavorite(entry.conferenceId)}
+                      >
+                        {favoriteIdSet.has(entry.conferenceId) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                      </button>
+                      {entry.leadSpeakerSlug ? (
                       <button type="button" className="conference-inline-link primary" onClick={() => onOpenSpeaker(entry.leadSpeakerSlug)}>
                         Ver conferencista
                       </button>
+                      ) : null}
                     </div>
                   ) : null}
                 </div>
               </details>
             ))}
+
+            {!activeDay.entries.length ? (
+              <div className="conference-empty-state">
+                <span className="section-eyebrow eyebrow-gold">Sin conferencias</span>
+                <h3>
+                  {activeDay.id === favoritesFilterKey
+                    ? 'Aun no has marcado conferencias favoritas'
+                    : 'No hay conferencias programadas para esta vista'}
+                </h3>
+              </div>
+            ) : null}
 
             {activeDay.entries.length > conferencesPerDay ? (
               <div className="conference-pagination">
@@ -1297,29 +1433,48 @@ function SchedulePage({ scheduleDays, dayIndex, onChangeDay, onOpenSpeaker, sele
   )
 }
 
-function TicketsPage() {
+function TicketsPage({ authSession }) {
+  const ticketProfile = authSession?.user?.ticketProfile || null
+  const visibleTickets = ticketProfile
+    ? defaultTickets.filter((ticket) => ticket.key === ticketProfile)
+    : defaultTickets
+  const currentProfileLabel = ticketProfile ? ticketProfileLabels[ticketProfile] : null
+
   return (
     <div className="page active" id="page-boletas">
       <div className="page-band" data-bg="BOLETAS">
         <div className="container" style={{ maxWidth: 1200 }}>
-          <span className="section-eyebrow eyebrow-gold">Inscripciones abiertas</span>
-          <h1>Boletas de Acceso</h1>
+          <span className="section-eyebrow eyebrow-gold">Boletería abierta</span>
+          <h1>Boletería</h1>
         </div>
       </div>
 
       <div className="container py-6" style={{ maxWidth: 1100 }}>
-        <div className="columns is-variable is-4">
-          {defaultTickets.map((ticket, index) => (
-            <div className="column is-4-desktop" data-anim="fade-up" data-anim-delay={index * 120} key={ticket.title}>
+        <div className="conference-pagination-summary" style={{ marginBottom: 28 }}>
+          <span>
+            {currentProfileLabel
+              ? `Perfil registrado: ${currentProfileLabel}`
+              : 'Visualizando boletería general'}
+          </span>
+          <span>
+            {currentProfileLabel
+              ? 'Se muestra la boleta disponible para tu perfil'
+              : 'Inicia sesión o regístrate para ver tu boletería sugerida'}
+          </span>
+        </div>
+        <div className="columns is-variable is-4 tickets-grid">
+          {visibleTickets.map((ticket, index) => (
+            <div className="column is-6-desktop" data-anim="fade-up" data-anim-delay={index * 120} key={ticket.title}>
               <div className={`boleta-card${ticket.featured ? ' featured' : ''}`} style={ticket.featured ? { marginTop: -12 } : undefined}>
-                {ticket.featured ? <div className="boleta-hot-tag">Más popular</div> : null}
+                {ticket.featured ? <div className="boleta-hot-tag">Mas consultada</div> : null}
+                {ticket.optional ? <div className="boleta-hot-tag" style={{ background: 'var(--gold)', color: 'var(--ink)' }}>Opcional</div> : null}
                 <div className="boleta-name">{ticket.title}</div>
                 <div className="boleta-for">{ticket.subtitle}</div>
                 <div className="boleta-price"><sup>COP</sup> {ticket.price}</div>
                 <ul className="boleta-features">
                   {ticket.features.map((feature) => <li className="boleta-feature" key={feature}>{feature}</li>)}
                 </ul>
-                <a className={`btn-register ${ticket.buttonClass}`} href="#" onClick={(event) => event.preventDefault()}>Comprar aquí</a>
+                <a className={`btn-register ${ticket.buttonClass}`} href="#" onClick={(event) => event.preventDefault()}>Comprar aqui</a>
               </div>
             </div>
           ))}
@@ -1423,21 +1578,21 @@ function AboutPage() {
   )
 }
 
-function ContactPage() {
+function ContactPage({ form, submissionState, onFieldChange, onSubmit }) {
   return (
     <div className="page active" id="page-contacto" style={{ background: 'var(--ink)' }}>
       <div className="page-band" data-bg="CONTACTO">
         <div className="container" style={{ maxWidth: 1200 }}>
-          <span className="section-eyebrow eyebrow-gold">Escríbenos</span>
+          <span className="section-eyebrow eyebrow-gold">Escribenos</span>
           <h1>Contacto</h1>
         </div>
       </div>
 
       <div className="py-6" style={{ background: 'var(--ink)' }}>
         <div className="container" style={{ maxWidth: 1100 }}>
-          <div className="columns is-variable is-8">
-            <div className="column is-4-desktop" data-anim="fade-right">
-              <span className="section-eyebrow eyebrow-gold" style={{ marginBottom: 32, display: 'block' }}>Información de contacto</span>
+          <div className="contact-layout">
+            <div className="contact-info-column" data-anim="fade-right">
+              <span className="section-eyebrow eyebrow-gold" style={{ marginBottom: 32, display: 'block' }}>Informacion de contacto</span>
               {contactItems.map(([icon, label, value]) => (
                 <div className="contact-item" key={label}>
                   <div className="contact-icon"><i className={`bi ${icon}`} /></div>
@@ -1446,24 +1601,29 @@ function ContactPage() {
               ))}
             </div>
 
-            <div className="column is-8-desktop" data-anim="fade-left">
-              <form onSubmit={(event) => event.preventDefault()}>
-                <div className="columns is-variable is-3 is-multiline">
-                  <div className="column is-6"><label className="form-label-custom">Nombre</label><input className="form-input" type="text" placeholder="Tu nombre" /></div>
-                  <div className="column is-6"><label className="form-label-custom">Apellido</label><input className="form-input" type="text" placeholder="Tu apellido" /></div>
-                  <div className="column is-12"><label className="form-label-custom">Correo electrónico</label><input className="form-input" type="email" placeholder="correo@ejemplo.com" /></div>
-                  <div className="column is-6"><label className="form-label-custom">Institución</label><input className="form-input" type="text" placeholder="Tu universidad o empresa" /></div>
-                  <div className="column is-6">
+            <div className="contact-form-column" data-anim="fade-left">
+              <form onSubmit={onSubmit}>
+                <div className="contact-form-grid">
+                  <div className="contact-field"><label className="form-label-custom">Nombre</label><input className="form-input" type="text" placeholder="Tu nombre" value={form.firstName} onChange={(event) => onFieldChange('firstName', event.target.value)} /></div>
+                  <div className="contact-field"><label className="form-label-custom">Apellido</label><input className="form-input" type="text" placeholder="Tu apellido" value={form.lastName} onChange={(event) => onFieldChange('lastName', event.target.value)} /></div>
+                  <div className="contact-field"><label className="form-label-custom">Correo electronico</label><input className="form-input" type="email" placeholder="correo@ejemplo.com" value={form.email} onChange={(event) => onFieldChange('email', event.target.value)} /></div>
+                  <div className="contact-field"><label className="form-label-custom">Institucion</label><input className="form-input" type="text" placeholder="Tu universidad o empresa" value={form.institution} onChange={(event) => onFieldChange('institution', event.target.value)} /></div>
+                  <div className="contact-field span-2">
                     <label className="form-label-custom">Tipo de consulta</label>
-                    <select className="form-input">
-                      <option value="">Selecciona una opción</option>
+                    <select className="form-input" value={form.inquiryType} onChange={(event) => onFieldChange('inquiryType', event.target.value)}>
+                      <option value="">Selecciona una opcion</option>
                       {contactOptions.map((option) => <option key={option}>{option}</option>)}
                     </select>
                   </div>
-                  <div className="column is-12"><label className="form-label-custom">Mensaje</label><textarea className="form-input" rows="5" placeholder="Escribe tu mensaje aquí..." /></div>
-                  <div className="column is-12">
-                    <button type="submit" className="btn-primary" style={{ cursor: 'pointer', clipPath: 'none' }}>
-                      <i className="bi bi-send" /> Enviar mensaje
+                  <div className="contact-field span-2"><label className="form-label-custom">Mensaje</label><textarea className="form-input" rows="5" placeholder="Escribe tu mensaje aqui..." value={form.message} onChange={(event) => onFieldChange('message', event.target.value)} /></div>
+                  <div className="contact-field span-2">
+                    {submissionState.message ? (
+                      <div className={`contact-feedback ${submissionState.type}`}>{submissionState.message}</div>
+                    ) : null}
+                  </div>
+                  <div className="contact-field span-2">
+                    <button type="submit" className="btn-primary contact-submit-btn" style={{ cursor: 'pointer', clipPath: 'none' }} disabled={submissionState.submitting}>
+                      <i className="bi bi-send" /> {submissionState.submitting ? 'Enviando...' : 'Enviar mensaje'}
                     </button>
                   </div>
                 </div>
@@ -1495,6 +1655,7 @@ function buildCountdown() {
 export default function App() {
   const [page, setPage] = useState('inicio')
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [authSession, setAuthSession] = useState(null)
@@ -1520,6 +1681,22 @@ export default function App() {
   const [conferenceCategoriesLoaded, setConferenceCategoriesLoaded] = useState(false)
   const [conferenceCardsLoading, setConferenceCardsLoading] = useState(false)
   const [scheduleDaysLoaded, setScheduleDaysLoaded] = useState(false)
+  const [favoriteConferenceIds, setFavoriteConferenceIds] = useState([])
+  const [favoriteActionId, setFavoriteActionId] = useState(null)
+  const [contactForm, setContactForm] = useState(initialContactFormState)
+  const [contactSubmissionState, setContactSubmissionState] = useState({
+    submitting: false,
+    type: '',
+    message: ''
+  })
+
+  async function parseJsonResponse(response) {
+    try {
+      return await response.json()
+    } catch (_error) {
+      return null
+    }
+  }
 
   useEffect(() => {
     const storedValue = readStoredAuthSession()
@@ -1596,6 +1773,51 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    const nextEmail = authSession?.user?.email || ''
+    const { firstName, lastName } = splitFullName(authSession?.user?.fullName || '')
+
+    setContactForm((current) => ({
+      ...current,
+      firstName: current.firstName || firstName,
+      lastName: current.lastName || lastName,
+      email: current.email || nextEmail
+    }))
+  }, [authSession])
+
+  useEffect(() => {
+    if (!authSession?.token) {
+      setFavoriteConferenceIds([])
+      return undefined
+    }
+
+    const controller = new AbortController()
+
+    async function loadFavorites() {
+      try {
+        const response = await fetch(buildApiUrl(apiConfig.authApiUrl, '/auth/me/favorite-conferences'), {
+          headers: {
+            Authorization: `${authSession.tokenType || 'Bearer'} ${authSession.token}`
+          },
+          signal: controller.signal
+        })
+
+        const payload = await parseJsonResponse(response)
+        if (response.ok && payload?.ok) {
+          setFavoriteConferenceIds(payload.favorites || [])
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setFavoriteConferenceIds([])
+        }
+      }
+    }
+
+    loadFavorites()
+
+    return () => controller.abort()
+  }, [authSession])
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentHomeSlide((current) => (current + 1) % 2)
     }, 6500)
@@ -1635,7 +1857,8 @@ export default function App() {
   }, [page, currentHomeSlide, scheduleDayIndex, conferenceCards, conferenceCategories, featuredSpeakers, speakers, scheduleDays])
 
   useEffect(() => {
-    if (scheduleDayIndex >= scheduleDays.length && scheduleDays.length) {
+    const maxScheduleViews = scheduleDays.length ? scheduleDays.length + 1 : 0
+    if (maxScheduleViews && scheduleDayIndex >= maxScheduleViews) {
       setScheduleDayIndex(0)
     }
   }, [scheduleDayIndex, scheduleDays])
@@ -1653,6 +1876,27 @@ export default function App() {
       setScheduleDayIndex(targetIndex)
     }
   }, [scheduleDayIndex, scheduleDays, selectedScheduleEntry])
+
+  useEffect(() => {
+    if (!mobileNavOpen) {
+      document.body.style.removeProperty('overflow')
+      return undefined
+    }
+
+    document.body.style.overflow = 'hidden'
+    return () => document.body.style.removeProperty('overflow')
+  }, [mobileNavOpen])
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 992) {
+        setMobileNavOpen(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -1690,7 +1934,11 @@ export default function App() {
 
         if (page === 'conferencias' && !conferenceCardsLoaded && selectedConferenceCategory) {
           setConferenceCardsLoading(true)
-          const result = await getPublishedConferencesUseCase.execute({ category: selectedConferenceCategory })
+          const result = await getPublishedConferencesUseCase.execute(
+            selectedConferenceCategory === favoritesFilterKey
+              ? {}
+              : { category: selectedConferenceCategory }
+          )
           if (!active) return
           setConferenceCards(result.length ? result : [])
           setConferenceCardsLoaded(true)
@@ -1729,10 +1977,125 @@ export default function App() {
     }
   }, [page, featuredSpeakersLoaded, speakersLoaded, conferenceCategoriesLoaded, conferenceCardsLoaded, selectedConferenceCategory, scheduleDaysLoaded])
 
+  const scheduleTabs = useMemo(() => {
+    if (!scheduleDays.length) {
+      return []
+    }
+
+    const favoriteIdSet = new Set(favoriteConferenceIds)
+    const favoriteEntries = scheduleDays
+      .flatMap((day) => day.entries)
+      .filter((entry) => favoriteIdSet.has(entry.conferenceId))
+      .sort((left, right) => new Date(left.startDate) - new Date(right.startDate))
+
+    return [
+      ...scheduleDays,
+      {
+        id: favoritesFilterKey,
+        label: 'Favoritos',
+        entries: favoriteEntries
+      }
+    ]
+  }, [favoriteConferenceIds, scheduleDays])
+
+  async function handleToggleFavorite(conferenceId) {
+    if (!authSession?.token) {
+      setAuthMode('login')
+      setIsAuthOpen(true)
+      return
+    }
+
+    setFavoriteActionId(conferenceId)
+    const isFavorite = favoriteConferenceIds.includes(conferenceId)
+    const method = isFavorite ? 'DELETE' : 'POST'
+    const url = isFavorite
+      ? buildApiUrl(apiConfig.authApiUrl, `/auth/me/favorite-conferences/${conferenceId}`)
+      : buildApiUrl(apiConfig.authApiUrl, '/auth/me/favorite-conferences')
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${authSession.tokenType || 'Bearer'} ${authSession.token}`
+        },
+        body: isFavorite ? undefined : JSON.stringify({ conferenceId })
+      })
+
+      const payload = await parseJsonResponse(response)
+      if (response.ok && payload?.ok) {
+        setFavoriteConferenceIds(payload.favorites || [])
+      }
+    } finally {
+      setFavoriteActionId(null)
+    }
+  }
+
+  function handleContactFieldChange(field, value) {
+    setContactForm((current) => ({
+      ...current,
+      [field]: value
+    }))
+
+    setContactSubmissionState((current) => ({
+      ...current,
+      type: '',
+      message: ''
+    }))
+  }
+
+  async function handleContactSubmit(event) {
+    event.preventDefault()
+
+    try {
+      setContactSubmissionState({
+        submitting: true,
+        type: '',
+        message: ''
+      })
+
+      const response = await fetch(buildApiUrl(apiConfig.contactApiUrl, '/contacto/messages'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contactForm)
+      })
+
+      const payload = await parseJsonResponse(response)
+      if (!response.ok || !payload?.ok) {
+        setContactSubmissionState({
+          submitting: false,
+          type: 'error',
+          message: payload?.message || 'No fue posible enviar el mensaje.'
+        })
+        return
+      }
+
+      setContactSubmissionState({
+        submitting: false,
+        type: 'success',
+        message: 'Tu mensaje fue enviado y quedo registrado correctamente.'
+      })
+      setContactForm((current) => ({
+        ...initialContactFormState,
+        firstName: authSession?.user ? splitFullName(authSession.user.fullName).firstName : '',
+        lastName: authSession?.user ? splitFullName(authSession.user.fullName).lastName : '',
+        email: authSession?.user?.email || ''
+      }))
+    } catch (_error) {
+      setContactSubmissionState({
+        submitting: false,
+        type: 'error',
+        message: 'No hay conexion con el servicio de contacto.'
+      })
+    }
+  }
+
   const currentView = useMemo(() => {
     switch (page) {
       case 'inicio':
-        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={setPage} />
+        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={handleNavigate} />
       case 'conferencias':
         return (
           <ConferencesPage
@@ -1743,6 +2106,9 @@ export default function App() {
             onOpenSchedule={handleOpenConferenceSchedule}
             speakers={speakers}
             onOpenSpeaker={handleOpenSpeaker}
+            favoriteConferenceIds={favoriteConferenceIds}
+            favoriteActionId={favoriteActionId}
+            onToggleFavorite={handleToggleFavorite}
             isLoading={conferenceCardsLoading}
           />
         )
@@ -1751,25 +2117,37 @@ export default function App() {
       case 'comite':
         return <CommitteePage />
       case 'participacion':
-        return <ParticipationPage onNavigate={setPage} />
+        return <ParticipationPage onNavigate={handleNavigate} />
       case 'cronograma':
-        return <SchedulePage scheduleDays={scheduleDays} dayIndex={scheduleDayIndex} onChangeDay={setScheduleDayIndex} onOpenSpeaker={handleOpenSpeaker} selectedEntrySlug={selectedScheduleEntry?.slug || null} />
-      case 'boletas':
-        return <TicketsPage />
+        return (
+          <SchedulePage
+            scheduleDays={scheduleTabs}
+            dayIndex={scheduleDayIndex}
+            onChangeDay={setScheduleDayIndex}
+            onOpenSpeaker={handleOpenSpeaker}
+            selectedEntrySlug={selectedScheduleEntry?.slug || null}
+            favoriteConferenceIds={favoriteConferenceIds}
+            favoriteActionId={favoriteActionId}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        )
+      case 'boleteria':
+        return <TicketsPage authSession={authSession} />
       case 'lineas':
         return <TopicsPage />
       case 'nosotros':
         return <AboutPage />
       case 'contacto':
-        return <ContactPage />
+        return <ContactPage form={contactForm} submissionState={contactSubmissionState} onFieldChange={handleContactFieldChange} onSubmit={handleContactSubmit} />
       default:
-        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={setPage} />
+        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={handleNavigate} />
     }
-  }, [authSession, conferenceCards, conferenceCardsLoading, conferenceCategories, countdown, currentHomeSlide, featuredSpeakers, page, scheduleDayIndex, scheduleDays, selectedConferenceCategory, selectedScheduleEntry, selectedSpeakerSlug, speakers])
+  }, [authSession, conferenceCards, conferenceCardsLoading, conferenceCategories, contactForm, contactSubmissionState, countdown, currentHomeSlide, favoriteActionId, favoriteConferenceIds, featuredSpeakers, page, scheduleDayIndex, scheduleTabs, selectedConferenceCategory, selectedScheduleEntry, selectedSpeakerSlug, speakers])
 
   function handleNavigate(nextPage) {
     setPage(nextPage)
     setDropdownOpen(false)
+    setMobileNavOpen(false)
     setScheduleDayIndex(0)
     if (nextPage !== 'cronograma') {
       setSelectedScheduleEntry(null)
@@ -1785,6 +2163,7 @@ export default function App() {
     setConferenceCards([])
     setConferenceCardsLoaded(false)
     setConferenceCardsLoading(true)
+    setMobileNavOpen(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -1792,6 +2171,7 @@ export default function App() {
     setSelectedSpeakerSlug(speakerSlug)
     setPage('conferencistas')
     setDropdownOpen(false)
+    setMobileNavOpen(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -1810,6 +2190,7 @@ export default function App() {
 
     setPage('cronograma')
     setDropdownOpen(false)
+    setMobileNavOpen(false)
     setSelectedSpeakerSlug(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -1843,18 +2224,21 @@ export default function App() {
 
     setPage('cronograma')
     setDropdownOpen(false)
+    setMobileNavOpen(false)
     setSelectedSpeakerSlug(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function handleAuthEntry() {
     if (authSession?.user) {
-      setPage('boletas')
+      setPage('boleteria')
+      setMobileNavOpen(false)
       return
     }
 
     setAuthMode('login')
     setIsAuthOpen(true)
+    setMobileNavOpen(false)
   }
 
   function handleAuthenticated(payload) {
@@ -1870,7 +2254,8 @@ export default function App() {
     }
 
     setIsAuthOpen(false)
-    setPage('boletas')
+    setMobileNavOpen(false)
+    setPage('boleteria')
   }
 
   function handleLogout() {
@@ -1879,6 +2264,7 @@ export default function App() {
     setIsAuthOpen(false)
     setPage('inicio')
     setDropdownOpen(false)
+    setMobileNavOpen(false)
   }
 
   return (
@@ -1890,6 +2276,19 @@ export default function App() {
             <span className="brand-year">Bogotá · 2026</span>
           </a>
 
+          <button
+            type="button"
+            className={`nav-mobile-toggle${mobileNavOpen ? ' active' : ''}`}
+            onClick={() => setMobileNavOpen((current) => !current)}
+            aria-expanded={mobileNavOpen}
+            aria-controls="mobile-nav-panel"
+            aria-label="Abrir menu principal"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+
           <ul className="nav-links">
             <li><a id="nav-inicio" className={page === 'inicio' ? 'active' : ''} onClick={(event) => { event.preventDefault(); handleNavigate('inicio') }} href="#">Inicio</a></li>
             <li><a id="nav-conferencias" className={page === 'conferencias' ? 'active' : ''} onClick={(event) => { event.preventDefault(); handleNavigate('conferencias') }} href="#">Conferencias</a></li>
@@ -1897,14 +2296,14 @@ export default function App() {
             <li><a id="nav-conferencistas" className={page === 'conferencistas' ? 'active' : ''} onClick={(event) => { event.preventDefault(); handleNavigate('conferencistas') }} href="#">Conferencistas</a></li>
             <li><a id="nav-nosotros" className={page === 'nosotros' ? 'active' : ''} onClick={(event) => { event.preventDefault(); handleNavigate('nosotros') }} href="#">Nosotros</a></li>
             <li className={`has-dropdown${dropdownOpen ? ' open' : ''}`}>
-              <button id="nav-mas" type="button" className={['comite', 'participacion', 'lineas', 'boletas', 'contacto'].includes(page) ? 'active' : ''} onClick={() => setDropdownOpen((current) => !current)} aria-expanded={dropdownOpen}>
+              <button id="nav-mas" type="button" className={['comite', 'participacion', 'lineas', 'boleteria', 'contacto'].includes(page) ? 'active' : ''} onClick={() => setDropdownOpen((current) => !current)} aria-expanded={dropdownOpen}>
                 Más sobre nosotros <i className="bi bi-chevron-down ms-1" style={{ fontSize: '.5rem' }} />
               </button>
               <div className="nav-dropdown">
                 <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('comite') }}><span className="dot" /> Comité</a>
                 <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('participacion') }}><span className="dot" /> Guía de participación</a>
                 <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('lineas') }}><span className="dot" /> Líneas temáticas</a>
-                <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('boletas') }}><span className="dot" /> Inscripciones</a>
+                <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('boleteria') }}><span className="dot" /> Boletería</a>
                 <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('contacto') }}><span className="dot" /> Contacto</a>
               </div>
             </li>
@@ -1922,6 +2321,41 @@ export default function App() {
               <li><a className="nav-cta" onClick={(event) => { event.preventDefault(); handleAuthEntry() }} href="#">Inscríbete</a></li>
             )}
           </ul>
+        </div>
+
+        <div
+          className={`mobile-nav-backdrop${mobileNavOpen ? ' active' : ''}`}
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden={!mobileNavOpen}
+        />
+
+        <div id="mobile-nav-panel" className={`mobile-nav-panel${mobileNavOpen ? ' active' : ''}`} aria-hidden={!mobileNavOpen}>
+          <div className="mobile-nav-section">
+            <button type="button" className={`mobile-nav-link${page === 'inicio' ? ' active' : ''}`} onClick={() => handleNavigate('inicio')}>Inicio</button>
+            <button type="button" className={`mobile-nav-link${page === 'conferencias' ? ' active' : ''}`} onClick={() => handleNavigate('conferencias')}>Conferencias</button>
+            <button type="button" className={`mobile-nav-link${page === 'cronograma' ? ' active' : ''}`} onClick={() => handleNavigate('cronograma')}>Cronograma</button>
+            <button type="button" className={`mobile-nav-link${page === 'conferencistas' ? ' active' : ''}`} onClick={() => handleNavigate('conferencistas')}>Conferencistas</button>
+            <button type="button" className={`mobile-nav-link${page === 'nosotros' ? ' active' : ''}`} onClick={() => handleNavigate('nosotros')}>Nosotros</button>
+          </div>
+          <div className="mobile-nav-section subtle">
+            <span className="mobile-nav-label">Mas sobre nosotros</span>
+            <button type="button" className={`mobile-nav-link${page === 'comite' ? ' active' : ''}`} onClick={() => handleNavigate('comite')}>Comite</button>
+            <button type="button" className={`mobile-nav-link${page === 'participacion' ? ' active' : ''}`} onClick={() => handleNavigate('participacion')}>Guia de participacion</button>
+            <button type="button" className={`mobile-nav-link${page === 'lineas' ? ' active' : ''}`} onClick={() => handleNavigate('lineas')}>Lineas tematicas</button>
+            <button type="button" className={`mobile-nav-link${page === 'boleteria' ? ' active' : ''}`} onClick={() => handleNavigate('boleteria')}>Boleteria</button>
+            <button type="button" className={`mobile-nav-link${page === 'contacto' ? ' active' : ''}`} onClick={() => handleNavigate('contacto')}>Contacto</button>
+          </div>
+
+          <div className="mobile-nav-actions">
+            {authSession?.user ? (
+              <>
+                <div className="mobile-nav-user">{authSession.user.fullName || authSession.user.email}</div>
+                <button className="mobile-nav-secondary" type="button" onClick={handleLogout}>Cerrar sesion</button>
+              </>
+            ) : (
+              <button className="mobile-nav-cta" type="button" onClick={handleAuthEntry}>Inscribete</button>
+            )}
+          </div>
         </div>
       </nav>
 

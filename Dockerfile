@@ -8,8 +8,9 @@ COPY --chown=node:node ${APP_DIR}/package*.json ./
 RUN npm ci
 
 COPY --chown=node:node ${APP_DIR}/ ./
+RUN chown -R node:node /app
 
-EXPOSE 3003 3004 3005 3006 5173
+EXPOSE 3003 3004 3005 3006 3007 5173
 
 USER node
 

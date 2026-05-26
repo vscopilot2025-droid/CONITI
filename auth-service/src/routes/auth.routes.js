@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const { requireAuth, requireRole } = require('../middleware/auth.middleware')
 const { createRateLimiter } = require('../middleware/request-limit.middleware')
-const { allowedRoles } = require('../repositories')
+const { allowedRoles, allowedTicketProfiles } = require('../repositories')
 const { createJwt } = require('../services/token.service')
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -61,6 +61,10 @@ function validateRegistrationPayload(body) {
     return `El rol debe ser uno de: ${allowedRoles.join(', ')}`
   }
 
+  if (!allowedTicketProfiles.includes(body?.ticketProfile)) {
+    return `El perfil de boleteria debe ser uno de: ${allowedTicketProfiles.join(', ')}`
+  }
+
   return null
 }
 
@@ -76,6 +80,15 @@ function validateLoginPayload(body) {
   }
 
   return null
+}
+
+function validateFavoriteConferenceId(value) {
+  const conferenceId = Number(value)
+  if (!Number.isInteger(conferenceId) || conferenceId <= 0) {
+    return null
+  }
+
+  return conferenceId
 }
 
 function issueAuthResponse(user) {
@@ -137,7 +150,8 @@ function createAuthRouter(repository, config) {
       fullName: req.body.fullName.trim(),
       email: normalizedEmail,
       password: req.body.password.trim(),
-      role: 'attendee'
+      role: 'attendee',
+      ticketProfile: req.body.ticketProfile
     })
 
     return res.status(201).json({
@@ -183,6 +197,51 @@ function createAuthRouter(repository, config) {
       ok: true,
       currentRole: req.auth.user.role,
       availableRoles: allowedRoles
+    })
+  })
+
+  authRouter.get('/me/favorite-conferences', authGuard, async (req, res) => {
+    const favorites = await repository.listFavoriteConferenceIds(req.auth.user.id)
+
+    return res.status(200).json({
+      ok: true,
+      favorites
+    })
+  })
+
+  authRouter.post('/me/favorite-conferences', authGuard, async (req, res) => {
+    const conferenceId = validateFavoriteConferenceId(req.body?.conferenceId)
+    if (!conferenceId) {
+      return res.status(400).json({
+        ok: false,
+        message: 'El id de conferencia es invalido'
+      })
+    }
+
+    const favorites = await repository.addFavoriteConference(req.auth.user.id, conferenceId)
+
+    return res.status(200).json({
+      ok: true,
+      message: 'Conferencia agregada a favoritos',
+      favorites
+    })
+  })
+
+  authRouter.delete('/me/favorite-conferences/:conferenceId', authGuard, async (req, res) => {
+    const conferenceId = validateFavoriteConferenceId(req.params.conferenceId)
+    if (!conferenceId) {
+      return res.status(400).json({
+        ok: false,
+        message: 'El id de conferencia es invalido'
+      })
+    }
+
+    const favorites = await repository.removeFavoriteConference(req.auth.user.id, conferenceId)
+
+    return res.status(200).json({
+      ok: true,
+      message: 'Conferencia eliminada de favoritos',
+      favorites
     })
   })
 

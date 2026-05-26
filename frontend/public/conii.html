@@ -43,7 +43,7 @@
           <a href="#" onclick="navigate('comite'); return false;"><span class="dot"></span> Comité</a>
           <a href="#" onclick="navigate('participacion'); return false;"><span class="dot"></span> Guía de participación</a>
           <a href="#" onclick="navigate('lineas'); return false;"><span class="dot"></span> Líneas temáticas</a>
-          <a href="#" onclick="navigate('boletas'); return false;"><span class="dot"></span> Inscripciones</a>
+          <a href="#" onclick="navigate('boleteria'); return false;"><span class="dot"></span> Boletería</a>
           <a href="#" onclick="navigate('contacto'); return false;"><span class="dot"></span> Contacto</a>
         </div>
       </li>
@@ -200,7 +200,7 @@
           <div class="fecha-item" data-anim="fade-up" data-anim-delay="160">
             <div class="fecha-date"><span class="fecha-day">20</span><span class="fecha-month">Sep</span></div>
             <div>
-              <div class="fecha-title">Cierre de inscripciones con descuento</div>
+              <div class="fecha-title">Cierre de boletería con descuento</div>
               <p class="fecha-desc">Precio reducido disponible hasta esta fecha. Luego aplica tarifa regular.</p>
             </div>
           </div>
@@ -281,7 +281,7 @@
           <div class="gold-rule"></div>
         </div>
         <div class="column is-narrow" data-anim="fade-left">
-          <span class="btn-secondary" onclick="navigate('boletas')" style="cursor:pointer;">
+          <span class="btn-secondary" onclick="navigate('boleteria')" style="cursor:pointer;">
             Ver todos <i class="bi bi-arrow-right ms-2"></i>
           </span>
         </div>
@@ -728,8 +728,8 @@
 <div class="page" id="page-boletas">
   <div class="page-band" data-bg="BOLETAS">
     <div class="container" style="max-width:1200px;">
-      <span class="section-eyebrow eyebrow-gold">Inscripciones abiertas</span>
-      <h1>Boletas de Acceso</h1>
+      <span class="section-eyebrow eyebrow-gold">Boletería abierta</span>
+      <h1>Boletería</h1>
     </div>
   </div>
 
@@ -1024,7 +1024,7 @@
                 <label class="form-label-custom">Tipo de consulta</label>
                 <select class="form-input">
                   <option value="">Selecciona una opción</option>
-                  <option>Inscripción y boletas</option>
+                  <option>Boletería y acceso</option>
                   <option>Ponencias y abstracts</option>
                   <option>Patrocinio</option>
                   <option>Prensa y medios</option>
@@ -1104,7 +1104,7 @@ function navigate(page) {
   document.querySelectorAll('.nav-links li a, .nav-links li button').forEach(el => el.classList.remove('active'));
   const navEl = document.getElementById('nav-' + page);
   if (navEl) navEl.classList.add('active');
-  if (!navEl && ['comite', 'participacion', 'lineas', 'boletas', 'contacto'].includes(page)) {
+  if (!navEl && ['comite', 'participacion', 'lineas', 'boleteria', 'contacto'].includes(page)) {
     document.getElementById('nav-mas')?.classList.add('active');
   }
 

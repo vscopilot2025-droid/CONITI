@@ -16,9 +16,16 @@ const initialLoginState = {
 const initialRegisterState = {
   fullName: '',
   email: '',
+  ticketProfile: 'visitor',
   password: '',
   confirmPassword: ''
 }
+
+const ticketProfileOptions = [
+  { value: 'visitor', label: 'Visitante' },
+  { value: 'speaker', label: 'Ponente' },
+  { value: 'student', label: 'Estudiante' }
+]
 
 function getErrorMessage(payload, fallback) {
   return payload?.message || fallback
@@ -99,7 +106,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
     const errors = {}
 
     if (!email) errors.email = 'El correo es obligatorio'
-    if (!password) errors.password = 'La contraseña es obligatoria'
+    if (!password) errors.password = 'La contrasena es obligatoria'
 
     if (Object.keys(errors).length) {
       setFieldErrors(errors)
@@ -121,7 +128,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
       if (!response.ok || !payload?.ok) {
         clearLoginPasswordField(setLoginForm)
         setMessage({
-          text: getErrorMessage(payload, 'No fue posible iniciar sesión.'),
+          text: getErrorMessage(payload, 'No fue posible iniciar sesion.'),
           type: 'error'
         })
         return
@@ -133,14 +140,14 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
         user: payload.user
       })
 
-      setMessage({ text: 'Inicio de sesión exitoso.', type: 'success' })
+      setMessage({ text: 'Inicio de sesion exitoso.', type: 'success' })
       setLoginForm(initialLoginState)
       onClose()
       onAuthenticated?.(payload)
     } catch (_error) {
       clearLoginPasswordField(setLoginForm)
       setMessage({
-        text: 'No hay conexión con el servicio de autenticación.',
+        text: 'No hay conexion con el servicio de autenticacion.',
         type: 'error'
       })
     } finally {
@@ -159,12 +166,13 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
 
     if (!fullName) errors.fullName = 'El nombre es obligatorio'
     if (!email) errors.registerEmail = 'El correo es obligatorio'
-    if (!password) errors.registerPassword = 'La contraseña es obligatoria'
-    if (password && password.length < 6) {
-      errors.registerPassword = 'La contraseña debe tener mínimo 6 caracteres'
+    if (!registerForm.ticketProfile) errors.ticketProfile = 'Selecciona un perfil para boleteria'
+    if (!password) errors.registerPassword = 'La contrasena es obligatoria'
+    if (password && password.length < 8) {
+      errors.registerPassword = 'La contrasena debe tener minimo 8 caracteres'
     }
     if (password !== confirmPassword) {
-      errors.confirmPassword = 'Las contraseñas no coinciden'
+      errors.confirmPassword = 'Las contrasenas no coinciden'
     }
 
     if (Object.keys(errors).length) {
@@ -180,7 +188,12 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
       const response = await fetch(buildApiUrl(apiConfig.authApiUrl, '/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName, email, password })
+        body: JSON.stringify({
+          fullName,
+          email,
+          ticketProfile: registerForm.ticketProfile,
+          password
+        })
       })
       const payload = await parseJsonResponse(response)
 
@@ -206,7 +219,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
     } catch (_error) {
       clearRegisterPasswordFields(setRegisterForm)
       setMessage({
-        text: 'No hay conexión con el servicio de autenticación.',
+        text: 'No hay conexion con el servicio de autenticacion.',
         type: 'error'
       })
     } finally {
@@ -234,7 +247,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
             type="button"
             onClick={() => switchMode('login')}
           >
-            Iniciar sesión
+            Iniciar sesion
           </button>
           <button
             id="auth-tab-register"
@@ -252,7 +265,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
 
         {mode === 'login' ? (
           <form id="auth-login-form" className="auth-form" onSubmit={submitLogin} noValidate>
-            <label className="form-label-custom" htmlFor="auth-login-email">Correo electrónico</label>
+            <label className="form-label-custom" htmlFor="auth-login-email">Correo electronico</label>
             <input
               className="form-input"
               type="email"
@@ -264,12 +277,12 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
             />
             <p className="auth-error" id="auth-login-email-error">{fieldErrors.email || ''}</p>
 
-            <label className="form-label-custom" htmlFor="auth-login-password" style={{ marginTop: 14 }}>Contraseña</label>
+            <label className="form-label-custom" htmlFor="auth-login-password" style={{ marginTop: 14 }}>Contrasena</label>
             <input
               className="form-input"
               type="password"
               id="auth-login-password"
-              placeholder="Tu contraseña"
+              placeholder="Tu contrasena"
               value={loginForm.password}
               onChange={(event) => updateLoginField('password', event.target.value)}
               required
@@ -294,7 +307,7 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
             />
             <p className="auth-error">{fieldErrors.fullName || ''}</p>
 
-            <label className="form-label-custom" htmlFor="auth-register-email" style={{ marginTop: 14 }}>Correo electrónico</label>
+            <label className="form-label-custom" htmlFor="auth-register-email" style={{ marginTop: 14 }}>Correo electronico</label>
             <input
               className="form-input"
               type="email"
@@ -306,26 +319,43 @@ export function AuthModal({ initialMode = 'login', isOpen, onClose, onAuthentica
             />
             <p className="auth-error">{fieldErrors.registerEmail || ''}</p>
 
-            <label className="form-label-custom" htmlFor="auth-register-password" style={{ marginTop: 14 }}>Contraseña</label>
+            <label className="form-label-custom" htmlFor="auth-register-ticket-profile" style={{ marginTop: 14 }}>Perfil para boleteria</label>
+            <div className="auth-select-wrap">
+              <select
+                className="form-input auth-select-input"
+                id="auth-register-ticket-profile"
+                value={registerForm.ticketProfile}
+                onChange={(event) => updateRegisterField('ticketProfile', event.target.value)}
+                style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: '#ffffff' }}
+                required
+              >
+                {ticketProfileOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+            <p className="auth-error">{fieldErrors.ticketProfile || ''}</p>
+
+            <label className="form-label-custom" htmlFor="auth-register-password" style={{ marginTop: 14 }}>Contrasena</label>
             <input
               className="form-input"
               type="password"
               id="auth-register-password"
-              placeholder="Mínimo 6 caracteres"
-              minLength={6}
+              placeholder="Minimo 8 caracteres"
+              minLength={8}
               value={registerForm.password}
               onChange={(event) => updateRegisterField('password', event.target.value)}
               required
             />
             <p className="auth-error">{fieldErrors.registerPassword || ''}</p>
 
-            <label className="form-label-custom" htmlFor="auth-register-confirm" style={{ marginTop: 14 }}>Confirmar contraseña</label>
+            <label className="form-label-custom" htmlFor="auth-register-confirm" style={{ marginTop: 14 }}>Confirmar contrasena</label>
             <input
               className="form-input"
               type="password"
               id="auth-register-confirm"
-              placeholder="Repite tu contraseña"
-              minLength={6}
+              placeholder="Repite tu contrasena"
+              minLength={8}
               value={registerForm.confirmPassword}
               onChange={(event) => updateRegisterField('confirmPassword', event.target.value)}
               required

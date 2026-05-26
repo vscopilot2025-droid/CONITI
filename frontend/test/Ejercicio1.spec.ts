@@ -7,7 +7,7 @@ test('formulario de login: validación de campos requeridos', async ({ page }) =
   await page.getByRole('button', { name: 'Continuar' }).click()
 
   await expect(page.getByText('El correo es obligatorio')).toBeVisible()
-  await expect(page.getByText('La contraseña es obligatoria')).toBeVisible()
+  await expect(page.getByText('La contrasena es obligatoria')).toBeVisible()
 })
 
 test('formulario de login: credenciales válidas', async ({ page }) => {
@@ -30,10 +30,10 @@ test('formulario de login: credenciales válidas', async ({ page }) => {
   await page.fill('#auth-login-password', '123456')
   await page.getByRole('button', { name: 'Continuar' }).click()
 
-  await expect(page.getByRole('heading', { name: 'Boletas de Acceso' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Boletería' })).toBeVisible()
 })
 
-test('formulario de registro: crea cuenta y navega a boletas', async ({ page }) => {
+test('formulario de registro: crea cuenta y navega a boletería', async ({ page }) => {
   await page.route('**/auth/register', async (route) => {
     await route.fulfill({
       status: 201,
@@ -43,7 +43,7 @@ test('formulario de registro: crea cuenta y navega a boletas', async ({ page }) 
         message: 'Usuario registrado correctamente',
         token: 'token-demo',
         tokenType: 'Bearer',
-        user: { id: 3, email: 'nuevo@test.com', fullName: 'Usuario Nuevo' }
+        user: { id: 3, email: 'nuevo@test.com', fullName: 'Usuario Nuevo', ticketProfile: 'visitor' }
       })
     })
   })
@@ -54,11 +54,12 @@ test('formulario de registro: crea cuenta y navega a boletas', async ({ page }) 
   await page.getByRole('button', { name: 'Registrarse' }).click()
   await page.fill('#auth-register-name', 'Usuario Nuevo')
   await page.fill('#auth-register-email', 'nuevo@test.com')
-  await page.fill('#auth-register-password', '123456')
-  await page.fill('#auth-register-confirm', '123456')
-  await page.getByRole('button', { name: 'Crear cuenta' }).click()
+  await page.selectOption('#auth-register-ticket-profile', 'visitor')
+  await page.fill('#auth-register-password', 'Segura123')
+  await page.fill('#auth-register-confirm', 'Segura123')
+  await page.locator('#auth-register-form').evaluate((form) => form.requestSubmit())
 
-  await expect(page.getByRole('heading', { name: 'Boletas de Acceso' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Boletería' })).toBeVisible()
 })
 
 test('navegación principal: abre módulos nuevos y desplegable', async ({ page }) => {

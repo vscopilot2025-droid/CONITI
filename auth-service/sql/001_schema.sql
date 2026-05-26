@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(160) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   role VARCHAR(40) NOT NULL DEFAULT 'attendee',
+  ticket_profile VARCHAR(40) NOT NULL DEFAULT 'visitor',
   last_login_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -30,4 +31,17 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
     ON DELETE CASCADE,
   INDEX idx_password_reset_tokens_user_id (user_id),
   INDEX idx_password_reset_tokens_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS favorite_conferences (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  conference_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uq_favorite_conferences_user_conference UNIQUE (user_id, conference_id),
+  CONSTRAINT fk_favorite_conferences_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE,
+  INDEX idx_favorite_conferences_user_id (user_id),
+  INDEX idx_favorite_conferences_conference_id (conference_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

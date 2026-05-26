@@ -1,5 +1,5 @@
 const { getAuthConfig } = require('../config/env')
-const { AuthMemoryRepository, allowedRoles } = require('./auth-memory.repository')
+const { AuthMemoryRepository, allowedRoles, allowedTicketProfiles } = require('./auth-memory.repository')
 const { AuthMySqlRepository } = require('./auth-mysql.repository')
 
 async function createAuthRepository() {
@@ -18,5 +18,6 @@ async function createAuthRepository() {
 
 module.exports = {
   allowedRoles,
+  allowedTicketProfiles,
   createAuthRepository
 }

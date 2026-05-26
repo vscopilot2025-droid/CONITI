@@ -13,6 +13,7 @@ class AuthMySqlRepository {
       fullName: row.full_name,
       email: row.email,
       role: row.role,
+      ticketProfile: row.ticket_profile || 'visitor',
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       lastLoginAt: row.last_login_at
@@ -53,6 +54,7 @@ class AuthMySqlRepository {
         email VARCHAR(160) NOT NULL UNIQUE,
         password_hash VARCHAR(255) NOT NULL,
         role VARCHAR(40) NOT NULL DEFAULT 'attendee',
+        ticket_profile VARCHAR(40) NOT NULL DEFAULT 'visitor',
         last_login_at DATETIME NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -84,6 +86,31 @@ class AuthMySqlRepository {
       }
     }
 
+    const [ticketProfileRows] = await this.pool.query(
+      `
+      SELECT COLUMN_NAME
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'users'
+        AND COLUMN_NAME = 'ticket_profile'
+      LIMIT 1
+      `,
+      [this.databaseConfig.name]
+    )
+
+    if (!ticketProfileRows.length) {
+      try {
+        await this.pool.query(`
+          ALTER TABLE users
+          ADD COLUMN ticket_profile VARCHAR(40) NOT NULL DEFAULT 'visitor'
+        `)
+      } catch (error) {
+        if (error.code !== 'ER_DUP_FIELDNAME') {
+          throw error
+        }
+      }
+    }
+
     await this.pool.query(`
       CREATE TABLE IF NOT EXISTS password_reset_tokens (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -98,6 +125,21 @@ class AuthMySqlRepository {
       )
     `)
 
+    await this.pool.query(`
+      CREATE TABLE IF NOT EXISTS favorite_conferences (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        conference_id INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT uq_favorite_conferences_user_conference UNIQUE (user_id, conference_id),
+        CONSTRAINT fk_favorite_conferences_user
+          FOREIGN KEY (user_id) REFERENCES users(id)
+          ON DELETE CASCADE,
+        INDEX idx_favorite_conferences_user_id (user_id),
+        INDEX idx_favorite_conferences_conference_id (conference_id)
+      )
+    `)
+
     await this.seedDefaults()
   }
 
@@ -107,13 +149,15 @@ class AuthMySqlRepository {
         fullName: 'Admin CONIITI',
         email: 'admin@coniiti.test',
         password: 'Admin123*',
-        role: 'admin'
+        role: 'admin',
+        ticketProfile: 'speaker'
       },
       {
         fullName: 'Organizador Demo',
         email: 'organizer@coniiti.test',
         password: 'Organizer123*',
-        role: 'organizer'
+        role: 'organizer',
+        ticketProfile: 'visitor'
       }
     ]
 
@@ -143,11 +187,11 @@ class AuthMySqlRepository {
     return rows[0] || null
   }
 
-  async createUser({ fullName, email, password, role = 'attendee' }) {
+  async createUser({ fullName, email, password, role = 'attendee', ticketProfile = 'visitor' }) {
     const passwordHash = hashPassword(password)
     const [result] = await this.pool.query(
-      'INSERT INTO users (full_name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-      [fullName.trim(), email.trim().toLowerCase(), passwordHash, role]
+      'INSERT INTO users (full_name, email, password_hash, role, ticket_profile) VALUES (?, ?, ?, ?, ?)',
+      [fullName.trim(), email.trim().toLowerCase(), passwordHash, role, ticketProfile]
     )
 
     const user = await this.findUserById(result.insertId)
@@ -181,6 +225,45 @@ class AuthMySqlRepository {
 
     const user = await this.findUserById(userId)
     return this.sanitizeUser(user)
+  }
+
+  async listFavoriteConferenceIds(userId) {
+    const [rows] = await this.pool.query(
+      `
+      SELECT conference_id
+      FROM favorite_conferences
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+      `,
+      [Number(userId)]
+    )
+
+    return rows.map((row) => row.conference_id)
+  }
+
+  async addFavoriteConference(userId, conferenceId) {
+    await this.pool.query(
+      `
+      INSERT INTO favorite_conferences (user_id, conference_id)
+      VALUES (?, ?)
+      ON DUPLICATE KEY UPDATE conference_id = VALUES(conference_id)
+      `,
+      [Number(userId), Number(conferenceId)]
+    )
+
+    return this.listFavoriteConferenceIds(userId)
+  }
+
+  async removeFavoriteConference(userId, conferenceId) {
+    await this.pool.query(
+      `
+      DELETE FROM favorite_conferences
+      WHERE user_id = ? AND conference_id = ?
+      `,
+      [Number(userId), Number(conferenceId)]
+    )
+
+    return this.listFavoriteConferenceIds(userId)
   }
 
   async createResetToken(email) {
