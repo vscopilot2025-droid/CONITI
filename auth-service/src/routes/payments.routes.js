@@ -4,9 +4,9 @@ const crypto = require('crypto')
 const { requireAuth } = require('../middleware/auth.middleware')
 
 const ticketCatalog = {
-  Visitante: { amountInMinorUnit: 180000, currency: 'cop' },
-  Ponente: { amountInMinorUnit: 320000, currency: 'cop' },
-  Estudiante: { amountInMinorUnit: 90000, currency: 'cop' }
+  Visitante: { amountInMinorUnit: 4500, currency: 'usd' },
+  Ponente: { amountInMinorUnit: 8000, currency: 'usd' },
+  Estudiante: { amountInMinorUnit: 2500, currency: 'usd' }
 }
 
 function buildSuccessUrl(baseUrl, sessionId) {

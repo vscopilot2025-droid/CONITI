@@ -98,6 +98,31 @@ Buenas prácticas implementadas:
 - Se soporta idempotencia opcional con header `x-idempotency-key` al crear checkout.
 - El webhook valida firma cuando existe `AUTH_SERVICE_STRIPE_WEBHOOK_SECRET`.
 
+#### Tarjetas de prueba (Stripe test mode)
+
+Usa cualquiera de estas en el checkout. Todos los demás campos pueden ser inventados (fecha futura `12/34`, CVC `123`, ZIP `12345`, nombre cualquiera).
+
+| Escenario               | Número de tarjeta       |
+| ----------------------- | ----------------------- |
+| Pago exitoso (Visa)     | `4242 4242 4242 4242`   |
+| Pago exitoso (Mastercard) | `5555 5555 5555 4444` |
+| Pago exitoso (Amex)     | `3782 822463 10005`     |
+| Requiere autenticación 3DS | `4000 0025 0000 3155` |
+| Tarjeta declinada       | `4000 0000 0000 0002`   |
+| Fondos insuficientes    | `4000 0000 0000 9995`   |
+| CVC incorrecto          | `4000 0000 0000 0127`   |
+| Tarjeta expirada        | `4000 0000 0000 0069`   |
+
+Datos comunes para todas:
+
+- **Fecha de expiración:** cualquiera futura, p. ej. `12/34`
+- **CVC:** `123` (Amex: `1234`)
+- **Código postal / ZIP:** `12345`
+- **Nombre del titular:** cualquiera
+
+Lista completa: <https://stripe.com/docs/testing>
+
+
 Para testear webhook localmente:
 
 ```powershell

@@ -911,26 +911,26 @@ function TicketsPage({ authSession, onAuthRequired }) {
         {paymentBanner ? (
           <div
             className={`auth-info ${paymentBanner.type === 'success' ? 'success' : ''}`}
-            style={{ marginBottom: 20 }}
+            style={{ marginBottom: 20, display: 'none' }}
           >
             {paymentBanner.text}
           </div>
         ) : null}
 
         {checkoutError ? (
-          <div className="auth-info error" style={{ marginBottom: 20 }}>
+          <div className="auth-info error" style={{ marginBottom: 20, display: 'none' }}>
             {checkoutError}
           </div>
         ) : null}
 
         {paymentStatus ? (
-          <div className="auth-info success" style={{ marginBottom: 20 }}>
+          <div className="auth-info success" style={{ marginBottom: 20, display: 'none' }}>
             Estado de pago: {paymentStatus.status.toUpperCase()} · Sesión: {paymentStatus.sessionId} · Boleta: {paymentStatus.ticketType}
           </div>
         ) : null}
 
         {paymentStatusError ? (
-          <div className="auth-info error" style={{ marginBottom: 20 }}>
+          <div className="auth-info error" style={{ marginBottom: 20, display: 'none' }}>
             {paymentStatusError}
           </div>
         ) : null}
