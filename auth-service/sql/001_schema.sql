@@ -45,3 +45,25 @@ CREATE TABLE IF NOT EXISTS favorite_conferences (
   INDEX idx_favorite_conferences_user_id (user_id),
   INDEX idx_favorite_conferences_conference_id (conference_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS payments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  session_id VARCHAR(191) NOT NULL,
+  user_id INT NOT NULL,
+  user_email VARCHAR(160) NOT NULL,
+  ticket_type VARCHAR(60) NOT NULL,
+  amount_in_minor_unit BIGINT NOT NULL,
+  currency VARCHAR(10) NOT NULL DEFAULT 'cop',
+  checkout_url TEXT NULL,
+  provider_payment_id VARCHAR(191) NULL,
+  provider_event_id VARCHAR(191) NULL,
+  status VARCHAR(30) NOT NULL DEFAULT 'created',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT uq_payments_session_id UNIQUE (session_id),
+  CONSTRAINT fk_payments_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE,
+  INDEX idx_payments_user_id (user_id),
+  INDEX idx_payments_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

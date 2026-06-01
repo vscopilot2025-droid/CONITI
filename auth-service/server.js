@@ -4,6 +4,10 @@ const helmet = require('helmet')
 const { getAuthConfig } = require('./src/config/env')
 const { createAuthRepository } = require('./src/repositories')
 const { createAuthRouter } = require('./src/routes/auth.routes')
+const {
+  createPaymentsRouter,
+  createPaymentsWebhookHandler
+} = require('./src/routes/payments.routes')
 
 function createCorsOptions(corsOrigins) {
   return {
@@ -61,6 +65,7 @@ async function bootstrap() {
     crossOriginResourcePolicy: { policy: 'cross-origin' }
   }))
   app.use(cors(createCorsOptions(config.corsOrigins)))
+  app.post('/payments/webhook', express.raw({ type: 'application/json' }), createPaymentsWebhookHandler(repository, config))
   app.use(express.json({ limit: config.requestBodyLimit }))
   app.disable('x-powered-by')
   app.use(createAuditLogger('auth-service', [
@@ -80,6 +85,7 @@ async function bootstrap() {
   })
 
   app.use('/auth', authNoStore, createAuthRouter(repository, config))
+  app.use('/payments', createPaymentsRouter(repository, config))
 
   app.use((error, _req, res, _next) => {
     if (error?.type === 'entity.too.large') {

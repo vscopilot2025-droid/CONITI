@@ -1,4 +1,10 @@
 {
+    "files.associations": {
+        "*.sql": "sql"
+    },
+    "[sql]": {
+        "editor.defaultFormatter": null
+    },
     "sqltools.connections": [
         {
             "mysqlOptions": {
