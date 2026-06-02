@@ -28,6 +28,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    env_file:
+      - ./auth-service/.env
     environment:
       AUTH_SERVICE_PORT: 3003
       AUTH_SERVICE_STORAGE: mysql
@@ -38,7 +40,6 @@ services:
       AUTH_SERVICE_DB_NAME: CONIITI_AUTH
       AUTH_SERVICE_DB_USER: coniiti_app
       AUTH_SERVICE_DB_PASSWORD: ${CONIITI_APP_DB_PASSWORD:-coniiti_app_2026!}
-      AUTH_SERVICE_DB_BOOTSTRAP: "false"
       AUTH_SERVICE_DB_BOOTSTRAP: "false"
       EMAIL_HOST: smtp.gmail.com
       EMAIL_PORT: "465"
