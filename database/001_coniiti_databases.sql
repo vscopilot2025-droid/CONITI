@@ -62,6 +62,25 @@ CREATE TABLE IF NOT EXISTS favorite_conferences (
   INDEX idx_favorite_conferences_conference_id (conference_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS payments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  session_id VARCHAR(255) NOT NULL UNIQUE,
+  user_id INT NOT NULL,
+  user_email VARCHAR(160) NOT NULL,
+  ticket_type VARCHAR(120) NOT NULL,
+  amount_in_minor_unit INT NOT NULL,
+  currency VARCHAR(10) NOT NULL,
+  checkout_url TEXT NULL,
+  provider_payment_id VARCHAR(255) NULL,
+  provider_event_id VARCHAR(255) NULL,
+  status VARCHAR(40) NOT NULL DEFAULT 'created',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_payments_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 USE `CONIITI_CONFERENCIAS`;
 
 CREATE TABLE IF NOT EXISTS conferences (
