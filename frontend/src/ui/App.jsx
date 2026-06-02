@@ -102,6 +102,7 @@ const defaultTickets = [
   {
     key: 'speaker',
     audience: 'members',
+    ticketType: 'Ponente UCatolica/IEEE',
     title: 'Miembros UCatolica e IEEE',
     subtitle: 'Inscripcion como ponente',
     price: '940.000',
@@ -115,6 +116,7 @@ const defaultTickets = [
   {
     key: 'speaker',
     audience: 'non-members',
+    ticketType: 'Ponente externo',
     title: 'Si no eres miembro UCatolica o IEEE',
     subtitle: 'Inscripcion como ponente',
     price: '980.000',
@@ -128,6 +130,7 @@ const defaultTickets = [
   },
   {
     key: 'visitor',
+    ticketType: 'Asistente conferencias',
     title: 'Si desea constancia por participacion en conferencias',
     subtitle: 'Certificado de asistencia',
     price: '120.000',
@@ -139,6 +142,7 @@ const defaultTickets = [
   },
   {
     key: 'student',
+    ticketType: 'Asistente workshops',
     title: 'Si desea constancia por participacion en workshops',
     subtitle: 'Certificado de asistencia',
     price: '90.000',
@@ -1440,6 +1444,43 @@ function TicketsPage({ authSession }) {
     : defaultTickets
   const currentProfileLabel = ticketProfile ? ticketProfileLabels[ticketProfile] : null
 
+  const ticketKeyToType = { speaker: 'Ponente', visitor: 'Visitante', student: 'Estudiante' }
+  const [buying, setBuying] = useState(null)
+
+  const handleBuy = async (ticket) => {
+    if (!authSession?.token) {
+      alert('Debes iniciar sesion para comprar tu boleta.')
+      return
+    }
+    const ticketType = ticket.ticketType || ticketKeyToType[ticket.key]
+    if (!ticketType) {
+      alert('Tipo de boleta no soportado por la pasarela.')
+      return
+    }
+    try {
+      setBuying(ticket.title)
+      const response = await fetch(buildApiUrl(apiConfig.paymentsApiUrl, '/payments/create-checkout-session'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${authSession.tokenType || 'Bearer'} ${authSession.token}`
+        },
+        body: JSON.stringify({ ticketType, description: `${ticket.title} - ${ticket.subtitle}` })
+      })
+      const payload = await response.json().catch(() => ({}))
+      const checkoutUrl = payload?.checkoutUrl || payload?.url
+      if (!response.ok || !checkoutUrl) {
+        alert(payload?.message || 'No fue posible iniciar el pago.')
+        return
+      }
+      window.location.href = checkoutUrl
+    } catch (error) {
+      alert('Error de conexion con la pasarela de pagos.')
+    } finally {
+      setBuying(null)
+    }
+  }
+
   return (
     <div className="page active" id="page-boletas">
       <div className="page-band" data-bg="BOLETAS">
@@ -1474,7 +1515,7 @@ function TicketsPage({ authSession }) {
                 <ul className="boleta-features">
                   {ticket.features.map((feature) => <li className="boleta-feature" key={feature}>{feature}</li>)}
                 </ul>
-                <a className={`btn-register ${ticket.buttonClass}`} href="#" onClick={(event) => event.preventDefault()}>Comprar aqui</a>
+                <a className={`btn-register ${ticket.buttonClass}`} href="#" onClick={(event) => { event.preventDefault(); handleBuy(ticket) }} aria-disabled={buying === ticket.title}>{buying === ticket.title ? 'Procesando...' : 'Comprar aqui'}</a>
               </div>
             </div>
           ))}

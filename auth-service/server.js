@@ -13,7 +13,7 @@ function createCorsOptions(corsOrigins) {
   return {
     credentials: true,
     origin(origin, callback) {
-      if (!origin || corsOrigins.includes(origin)) {
+      if (!origin || corsOrigins.includes(origin) || /^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$)|(\.devtunnels\.ms$)/i.test(origin)) {
         return callback(null, true)
       }
 

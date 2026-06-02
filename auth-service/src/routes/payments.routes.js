@@ -6,7 +6,11 @@ const { requireAuth } = require('../middleware/auth.middleware')
 const ticketCatalog = {
   Visitante: { amountInMinorUnit: 4500, currency: 'usd' },
   Ponente: { amountInMinorUnit: 8000, currency: 'usd' },
-  Estudiante: { amountInMinorUnit: 2500, currency: 'usd' }
+  Estudiante: { amountInMinorUnit: 2500, currency: 'usd' },
+  'Ponente UCatolica/IEEE': { amountInMinorUnit: 23500, currency: 'usd' },
+  'Ponente externo': { amountInMinorUnit: 24500, currency: 'usd' },
+  'Asistente conferencias': { amountInMinorUnit: 3000, currency: 'usd' },
+  'Asistente workshops': { amountInMinorUnit: 2250, currency: 'usd' }
 }
 
 function buildSuccessUrl(baseUrl, sessionId) {
