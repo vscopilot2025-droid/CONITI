@@ -426,8 +426,7 @@ class AuthMySqlRepository {
     return this.findPaymentSessionById(sessionId)
   }
 
-  async findPaymentSessionById(sessionId) {
-    const [rows] = await this.pool.query(
+  async findPaymentSessionById(sessionId) {    const [rows] = await this.pool.query(
       `
       SELECT
         session_id AS sessionId,
@@ -450,6 +449,31 @@ class AuthMySqlRepository {
     )
 
     return rows[0] || null
+  }
+
+  async listUserPayments(userId) {
+    const [rows] = await this.pool.query(
+      `
+      SELECT
+        session_id AS sessionId,
+        user_id AS userId,
+        user_email AS userEmail,
+        ticket_type AS ticketType,
+        amount_in_minor_unit AS amountInMinorUnit,
+        currency,
+        checkout_url AS checkoutUrl,
+        provider_payment_id AS providerPaymentId,
+        provider_event_id AS providerEventId,
+        status,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+      FROM payments
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+      `,
+      [Number(userId)]
+    )
+    return rows
   }
 }
 

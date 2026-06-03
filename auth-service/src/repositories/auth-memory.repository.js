@@ -227,6 +227,13 @@ class AuthMemoryRepository {
     const payment = this.payments.find((item) => item.sessionId === sessionId)
     return payment ? { ...payment } : null
   }
+
+  async listUserPayments(userId) {
+    return this.payments
+      .filter((item) => Number(item.userId) === Number(userId))
+      .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
+      .map((item) => ({ ...item }))
+  }
 }
 
 module.exports = {

@@ -431,7 +431,7 @@ function SimpleFooter({ dark = false, full = false }) {
   )
 }
 
-function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, onOpenAuth, onNavigate }) {
+function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, onOpenAuth, onNavigate, isAuthenticated }) {
   const nextSlide = () => onHomeSlide((currentHomeSlide + 1) % 2)
   const prevSlide = () => onHomeSlide(currentHomeSlide === 0 ? 1 : currentHomeSlide - 1)
 
@@ -469,7 +469,7 @@ function HomePage({ featuredSpeakers, currentHomeSlide, onHomeSlide, countdown, 
 
                     <div className="hero-actions">
                       <span className="btn-primary" onClick={() => onOpenAuth()} style={{ cursor: 'pointer' }}>
-                        <i className="bi bi-ticket-perforated" /> Adquirir Boleta
+                        <i className="bi bi-ticket-perforated" /> {isAuthenticated ? 'Ver Boletería' : 'Adquirir Boleta'}
                       </span>
                       <span className="btn-secondary" onClick={() => onNavigate('cronograma')} style={{ cursor: 'pointer' }}>
                         <i className="bi bi-play-circle" /> Ver cronograma
@@ -1437,7 +1437,7 @@ function SchedulePage({
   )
 }
 
-function TicketsPage({ authSession }) {
+function TicketsPage({ authSession, onNavigate }) {
   const ticketProfile = authSession?.user?.ticketProfile || null
   const visibleTickets = ticketProfile
     ? defaultTickets.filter((ticket) => ticket.key === ticketProfile)
@@ -1484,9 +1484,32 @@ function TicketsPage({ authSession }) {
   return (
     <div className="page active" id="page-boletas">
       <div className="page-band" data-bg="BOLETAS">
-        <div className="container" style={{ maxWidth: 1200 }}>
-          <span className="section-eyebrow eyebrow-gold">Boletería abierta</span>
-          <h1>Boletería</h1>
+        <div className="container" style={{ maxWidth: 1200, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <span className="section-eyebrow eyebrow-gold">Boleteía abierta</span>
+            <h1>Boletería</h1>
+          </div>
+          {authSession?.user ? (
+            <button
+              type="button"
+              onClick={() => onNavigate?.('mis-boletos')}
+              style={{
+                background: 'var(--gold, #ffd54f)',
+                color: '#1a1a1a',
+                border: 'none',
+                padding: '12px 22px',
+                borderRadius: 8,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                boxShadow: '0 4px 14px rgba(0,0,0,0.25)'
+              }}
+            >
+              <i className="bi bi-ticket-perforated-fill" /> Ver mis boletos comprados
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -1520,6 +1543,168 @@ function TicketsPage({ authSession }) {
             </div>
           ))}
         </div>
+      </div>
+
+      <SimpleFooter />
+    </div>
+  )
+}
+
+function formatPaymentAmount(amountInMinorUnit) {
+  const value = Number(amountInMinorUnit) / 100
+  if (!Number.isFinite(value)) return `COP ${amountInMinorUnit}`
+  try {
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value)
+  } catch (_e) {
+    return `COP ${value.toLocaleString('es-CO')}`
+  }
+}
+
+function findTicketInfo(ticketType) {
+  return defaultTickets.find((t) => t.ticketType === ticketType) || null
+}
+
+function generateTicketCode(sessionId) {
+  if (!sessionId) return 'CONIITI-XXXX'
+  const tail = String(sessionId).replace(/[^a-zA-Z0-9]/g, '').slice(-6).toUpperCase()
+  return `CONIITI-${tail || 'XXXX'}`
+}
+
+function paymentStatusLabel(status) {
+  switch (status) {
+    case 'paid': return { label: 'Pagado', color: '#2e7d32', bg: '#e8f5e9' }
+    case 'failed': return { label: 'Fallido', color: '#c62828', bg: '#ffebee' }
+    case 'created': return { label: 'Confirmada', color: '#2e7d32', bg: '#e8f5e9' }
+    default: return { label: status || 'Confirmada', color: '#2e7d32', bg: '#e8f5e9' }
+  }
+}
+
+function MisBoletosPage({ authSession, refreshKey }) {
+  const [payments, setPayments] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!authSession?.token) {
+      setLoading(false)
+      setPayments([])
+      return undefined
+    }
+    const controller = new AbortController()
+    setLoading(true)
+    setError('')
+    fetch(buildApiUrl(apiConfig.paymentsApiUrl, '/payments/me'), {
+      headers: { Authorization: `${authSession.tokenType || 'Bearer'} ${authSession.token}` },
+      signal: controller.signal
+    })
+      .then(async (res) => {
+        const payload = await res.json().catch(() => ({}))
+        if (!res.ok || !payload?.ok) {
+          throw new Error(payload?.message || 'No fue posible cargar tus boletos.')
+        }
+        setPayments(payload.payments || [])
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') setError(err.message || 'Error de conexión.')
+      })
+      .finally(() => setLoading(false))
+    return () => controller.abort()
+  }, [authSession, refreshKey])
+
+  if (!authSession?.user) {
+    return (
+      <div className="page active" id="page-mis-boletos">
+        <div className="page-band" data-bg="MIS BOLETOS">
+          <div className="container" style={{ maxWidth: 1200 }}>
+            <span className="section-eyebrow eyebrow-gold">Mi cuenta</span>
+            <h1>Mis Boletos</h1>
+          </div>
+        </div>
+        <div className="container py-6" style={{ maxWidth: 900 }}>
+          <p>Inicia sesión para ver los boletos que has comprado.</p>
+        </div>
+        <SimpleFooter />
+      </div>
+    )
+  }
+
+  return (
+    <div className="page active" id="page-mis-boletos">
+      <div className="page-band" data-bg="MIS BOLETOS">
+        <div className="container" style={{ maxWidth: 1200 }}>
+          <span className="section-eyebrow eyebrow-gold">Mi cuenta</span>
+          <h1>Mis Boletos</h1>
+        </div>
+      </div>
+
+      <div className="container py-6" style={{ maxWidth: 1000 }}>
+        {loading ? (
+          <p>Cargando tus boletos...</p>
+        ) : error ? (
+          <p style={{ color: '#c62828' }}>{error}</p>
+        ) : payments.length === 0 ? (
+          <div style={{ background: '#f7f8fb', padding: 28, borderRadius: 12, textAlign: 'center' }}>
+            <h3 style={{ marginTop: 0 }}>Aún no tienes boletos</h3>
+            <p>Visita la sección de Boletería para adquirir tu inscripción al congreso.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gap: 16 }}>
+            {payments.map((p) => {
+              const badge = paymentStatusLabel(p.status)
+              const info = findTicketInfo(p.ticketType)
+              const code = generateTicketCode(p.sessionId)
+              return (
+                <div key={p.sessionId} style={{ background: '#fff', border: '1px solid #e3e6ef', borderRadius: 12, padding: 24, boxShadow: '0 4px 14px rgba(20,30,80,.06)', borderLeft: '6px solid var(--gold, #ffd54f)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+                    <div style={{ flex: '1 1 320px' }}>
+                      <div style={{ fontSize: 12, letterSpacing: 1.5, color: '#b26a00', textTransform: 'uppercase', fontWeight: 700 }}>★ Boleta CONIITI 2026</div>
+                      <div style={{ fontSize: 22, fontWeight: 800, color: '#0b1d51', marginTop: 6 }}>{p.ticketType}</div>
+                      {info?.subtitle ? (
+                        <div style={{ fontSize: 14, color: '#4b5563', marginTop: 4, fontStyle: 'italic' }}>{info.subtitle}</div>
+                      ) : null}
+                      <div style={{ fontSize: 13, color: '#6b7280', marginTop: 10 }}>
+                        <i className="bi bi-calendar-check" /> Comprado el {new Date(p.createdAt).toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' })}
+                      </div>
+                      <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
+                        <i className="bi bi-person-circle" /> {p.userEmail}
+                      </div>
+                      <div style={{ fontSize: 13, color: '#0b1d51', marginTop: 4, fontWeight: 600 }}>
+                        <i className="bi bi-qr-code" /> Código de boleta: <code style={{ background: '#f3f4f6', padding: '2px 8px', borderRadius: 4 }}>{code}</code>
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ display: 'inline-block', padding: '6px 14px', borderRadius: 999, fontSize: 12, fontWeight: 700, color: badge.color, background: badge.bg }}>✓ {badge.label}</span>
+                      <div style={{ fontSize: 28, fontWeight: 800, color: '#0b1d51', marginTop: 10 }}>{formatPaymentAmount(p.amountInMinorUnit)}</div>
+                      <div style={{ fontSize: 12, color: '#6b7280' }}>Pesos colombianos</div>
+                    </div>
+                  </div>
+                  {info?.features?.length ? (
+                    <>
+                      <hr style={{ border: 'none', borderTop: '1px dashed #d1d5db', margin: '18px 0' }} />
+                      <div style={{ fontSize: 13, color: '#374151', fontWeight: 700, marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>✨ Tu boleta incluye</div>
+                      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 8 }}>
+                        {info.features.map((feature) => (
+                          <li key={feature} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#1f2937' }}>
+                            <span style={{ color: '#2e7d32', fontWeight: 700, fontSize: 16, lineHeight: 1.2 }}>✓</span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                        <li style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#1f2937' }}>
+                          <span style={{ color: '#2e7d32', fontWeight: 700, fontSize: 16, lineHeight: 1.2 }}>✓</span>
+                          <span>Acceso a las tres jornadas del congreso (30 Sep – 02 Oct, 2026)</span>
+                        </li>
+                        <li style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, color: '#1f2937' }}>
+                          <span style={{ color: '#2e7d32', fontWeight: 700, fontSize: 16, lineHeight: 1.2 }}>✓</span>
+                          <span>Kit oficial CONIITI 2026 + acceso a sede en Bogotá D.C.</span>
+                        </li>
+                      </ul>
+                    </>
+                  ) : null}
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       <SimpleFooter />
@@ -1730,6 +1915,8 @@ export default function App() {
     type: '',
     message: ''
   })
+  const [paymentNotice, setPaymentNotice] = useState(null)
+  const [misBoletosRefresh, setMisBoletosRefresh] = useState(0)
 
   async function parseJsonResponse(response) {
     try {
@@ -1812,6 +1999,30 @@ export default function App() {
     }, 1000)
     return () => clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const paymentParam = params.get('payment')
+    if (!paymentParam) return
+    if (paymentParam === 'success') {
+      setPaymentNotice({ type: 'success', message: '¡Pago exitoso! Tu boleta fue registrada en Mis Boletos.' })
+      setMisBoletosRefresh((n) => n + 1)
+      setPage('mis-boletos')
+    } else if (paymentParam === 'cancelled') {
+      setPaymentNotice({ type: 'info', message: 'Pago cancelado. Puedes intentarlo de nuevo cuando quieras.' })
+    }
+    params.delete('payment')
+    params.delete('session_id')
+    const cleanQuery = params.toString()
+    const cleanUrl = window.location.pathname + (cleanQuery ? `?${cleanQuery}` : '')
+    window.history.replaceState({}, document.title, cleanUrl)
+  }, [])
+
+  useEffect(() => {
+    if (!paymentNotice) return undefined
+    const timer = setTimeout(() => setPaymentNotice(null), 6000)
+    return () => clearTimeout(timer)
+  }, [paymentNotice])
 
   useEffect(() => {
     const nextEmail = authSession?.user?.email || ''
@@ -2136,7 +2347,7 @@ export default function App() {
   const currentView = useMemo(() => {
     switch (page) {
       case 'inicio':
-        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={handleNavigate} />
+        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={handleNavigate} isAuthenticated={Boolean(authSession?.user)} />
       case 'conferencias':
         return (
           <ConferencesPage
@@ -2173,7 +2384,9 @@ export default function App() {
           />
         )
       case 'boleteria':
-        return <TicketsPage authSession={authSession} />
+        return <TicketsPage authSession={authSession} onNavigate={handleNavigate} />
+      case 'mis-boletos':
+        return <MisBoletosPage authSession={authSession} refreshKey={misBoletosRefresh} />
       case 'lineas':
         return <TopicsPage />
       case 'nosotros':
@@ -2181,9 +2394,9 @@ export default function App() {
       case 'contacto':
         return <ContactPage form={contactForm} submissionState={contactSubmissionState} onFieldChange={handleContactFieldChange} onSubmit={handleContactSubmit} />
       default:
-        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={handleNavigate} />
+        return <HomePage featuredSpeakers={featuredSpeakers} currentHomeSlide={currentHomeSlide} onHomeSlide={setCurrentHomeSlide} countdown={countdown} onOpenAuth={handleAuthEntry} onNavigate={handleNavigate} isAuthenticated={Boolean(authSession?.user)} />
     }
-  }, [authSession, conferenceCards, conferenceCardsLoading, conferenceCategories, contactForm, contactSubmissionState, countdown, currentHomeSlide, favoriteActionId, favoriteConferenceIds, featuredSpeakers, page, scheduleDayIndex, scheduleTabs, selectedConferenceCategory, selectedScheduleEntry, selectedSpeakerSlug, speakers])
+  }, [authSession, conferenceCards, conferenceCardsLoading, conferenceCategories, contactForm, contactSubmissionState, countdown, currentHomeSlide, favoriteActionId, favoriteConferenceIds, featuredSpeakers, page, scheduleDayIndex, scheduleTabs, selectedConferenceCategory, selectedScheduleEntry, selectedSpeakerSlug, speakers, misBoletosRefresh])
 
   function handleNavigate(nextPage) {
     setPage(nextPage)
@@ -2271,7 +2484,23 @@ export default function App() {
   }
 
   function handleAuthEntry() {
-    if (authSession?.user) {
+    let activeSession = authSession
+    if (!activeSession?.user) {
+      const storedValue = readStoredAuthSession()
+      if (storedValue) {
+        try {
+          const parsed = JSON.parse(storedValue)
+          if (parsed?.user) {
+            activeSession = parsed
+            setAuthSession(parsed)
+          }
+        } catch (_error) {
+          clearStoredAuthSession()
+        }
+      }
+    }
+
+    if (activeSession?.user) {
       setPage('boleteria')
       setMobileNavOpen(false)
       return
@@ -2337,7 +2566,7 @@ export default function App() {
             <li><a id="nav-conferencistas" className={page === 'conferencistas' ? 'active' : ''} onClick={(event) => { event.preventDefault(); handleNavigate('conferencistas') }} href="#">Conferencistas</a></li>
             <li><a id="nav-nosotros" className={page === 'nosotros' ? 'active' : ''} onClick={(event) => { event.preventDefault(); handleNavigate('nosotros') }} href="#">Nosotros</a></li>
             <li className={`has-dropdown${dropdownOpen ? ' open' : ''}`}>
-              <button id="nav-mas" type="button" className={['comite', 'participacion', 'lineas', 'boleteria', 'contacto'].includes(page) ? 'active' : ''} onClick={() => setDropdownOpen((current) => !current)} aria-expanded={dropdownOpen}>
+              <button id="nav-mas" type="button" className={['comite', 'participacion', 'lineas', 'boleteria', 'mis-boletos', 'contacto'].includes(page) ? 'active' : ''} onClick={() => setDropdownOpen((current) => !current)} aria-expanded={dropdownOpen}>
                 Más sobre nosotros <i className="bi bi-chevron-down ms-1" style={{ fontSize: '.5rem' }} />
               </button>
               <div className="nav-dropdown">
@@ -2345,6 +2574,9 @@ export default function App() {
                 <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('participacion') }}><span className="dot" /> Guía de participación</a>
                 <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('lineas') }}><span className="dot" /> Líneas temáticas</a>
                 <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('boleteria') }}><span className="dot" /> Boletería</a>
+                {authSession?.user ? (
+                  <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('mis-boletos') }}><span className="dot" /> Mis Boletos</a>
+                ) : null}
                 <a href="#" onClick={(event) => { event.preventDefault(); handleNavigate('contacto') }}><span className="dot" /> Contacto</a>
               </div>
             </li>
@@ -2384,6 +2616,9 @@ export default function App() {
             <button type="button" className={`mobile-nav-link${page === 'participacion' ? ' active' : ''}`} onClick={() => handleNavigate('participacion')}>Guia de participacion</button>
             <button type="button" className={`mobile-nav-link${page === 'lineas' ? ' active' : ''}`} onClick={() => handleNavigate('lineas')}>Lineas tematicas</button>
             <button type="button" className={`mobile-nav-link${page === 'boleteria' ? ' active' : ''}`} onClick={() => handleNavigate('boleteria')}>Boleteria</button>
+            {authSession?.user ? (
+              <button type="button" className={`mobile-nav-link${page === 'mis-boletos' ? ' active' : ''}`} onClick={() => handleNavigate('mis-boletos')}>Mis Boletos</button>
+            ) : null}
             <button type="button" className={`mobile-nav-link${page === 'contacto' ? ' active' : ''}`} onClick={() => handleNavigate('contacto')}>Contacto</button>
           </div>
 
@@ -2401,6 +2636,32 @@ export default function App() {
       </nav>
 
       {currentView}
+
+      {paymentNotice ? (
+        <div
+          role="status"
+          style={{
+            position: 'fixed',
+            top: 88,
+            right: 24,
+            zIndex: 9999,
+            maxWidth: 380,
+            padding: '14px 18px',
+            borderRadius: 10,
+            boxShadow: '0 8px 24px rgba(0,0,0,.18)',
+            background: paymentNotice.type === 'success' ? '#0e7c3a' : '#1f4f8b',
+            color: '#fff',
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 12
+          }}
+        >
+          <i className={`bi ${paymentNotice.type === 'success' ? 'bi-check-circle-fill' : 'bi-info-circle-fill'}`} style={{ fontSize: 20 }} />
+          <div style={{ flex: 1, lineHeight: 1.4 }}>{paymentNotice.message}</div>
+          <button type="button" onClick={() => setPaymentNotice(null)} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 18, lineHeight: 1 }} aria-label="Cerrar">×</button>
+        </div>
+      ) : null}
 
       <AuthModal
         initialMode={authMode}

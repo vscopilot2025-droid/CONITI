@@ -3,14 +3,15 @@ const Stripe = require('stripe')
 const crypto = require('crypto')
 const { requireAuth } = require('../middleware/auth.middleware')
 
+// Stripe trata COP como moneda de 2 decimales: amountInMinorUnit = pesos * 100.
 const ticketCatalog = {
-  Visitante: { amountInMinorUnit: 4500, currency: 'usd' },
-  Ponente: { amountInMinorUnit: 8000, currency: 'usd' },
-  Estudiante: { amountInMinorUnit: 2500, currency: 'usd' },
-  'Ponente UCatolica/IEEE': { amountInMinorUnit: 23500, currency: 'usd' },
-  'Ponente externo': { amountInMinorUnit: 24500, currency: 'usd' },
-  'Asistente conferencias': { amountInMinorUnit: 3000, currency: 'usd' },
-  'Asistente workshops': { amountInMinorUnit: 2250, currency: 'usd' }
+  Visitante: { amountInMinorUnit: 12000000, currency: 'cop' },
+  Ponente: { amountInMinorUnit: 94000000, currency: 'cop' },
+  Estudiante: { amountInMinorUnit: 9000000, currency: 'cop' },
+  'Ponente UCatolica/IEEE': { amountInMinorUnit: 94000000, currency: 'cop' },
+  'Ponente externo': { amountInMinorUnit: 98000000, currency: 'cop' },
+  'Asistente conferencias': { amountInMinorUnit: 12000000, currency: 'cop' },
+  'Asistente workshops': { amountInMinorUnit: 9000000, currency: 'cop' }
 }
 
 function buildSuccessUrl(baseUrl, sessionId) {
@@ -22,8 +23,15 @@ function createPaymentsRouter(repository, config) {
   const router = Router()
   const authGuard = requireAuth(repository)
 
-  router.get('/sessions/:sessionId', authGuard, async (req, res) => {
-    if (typeof repository.findPaymentSessionById !== 'function') {
+  router.get('/me', authGuard, async (req, res) => {
+    if (typeof repository.listUserPayments !== 'function') {
+      return res.status(200).json({ ok: true, payments: [] })
+    }
+    const payments = await repository.listUserPayments(req.auth.user.id)
+    return res.status(200).json({ ok: true, payments })
+  })
+
+  router.get('/sessions/:sessionId', authGuard, async (req, res) => {    if (typeof repository.findPaymentSessionById !== 'function') {
       return res.status(404).json({
         ok: false,
         message: 'Consulta de pagos no disponible en este almacenamiento.'
